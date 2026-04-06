@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 				description = "Ddasum backend API 문서"
 		)
 )
-q
+
 
 // @OpenAPIDefinition은 필수는 아닙니다.
 
