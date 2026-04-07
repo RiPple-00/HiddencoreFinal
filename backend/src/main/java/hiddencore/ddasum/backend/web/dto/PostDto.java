@@ -29,17 +29,16 @@ public class PostDto {
         private String content;
 
         @NotNull(message = "게시글 타입은 필수입니다")
-        private PostType type; // enum: param 값으로 받아옴
+        private PostType type; // NOTICE | BOARD | PROGRAM
 
-        @NotNull(message = "게시글 타입은 필수입니다")
+        @NotNull(message = "게시글 상태는 필수입니다")
         private PostStatus status; // ACTIVE | INACTIVE | RESERVE
 
-        private Integer capacity; // 정원
-        private Integer currentEnrolled; // 현재 신청자 수 -> Type = PROGRAM이면 0, 아니면 null
-        private LocalDateTime startAt;  // PROGRAM일 때 사용
-        private LocalDateTime endAt;    // PROGRAM일 때 사용
+        private Integer capacity;       // PROGRAM일 때만 사용
+        private LocalDateTime startAt;  // PROGRAM일 때만 사용
+        private LocalDateTime endAt;    // PROGRAM일 때만 사용
         private String attachmentUrls;
-        private LocalDateTime reservationAt; // 예약 일시, null이면 바로 게시
+        private LocalDateTime reservationAt; // 예약 시간. null이면 바로 게시
 
     } //
 
@@ -62,6 +61,7 @@ public class PostDto {
         private Integer capacity;
         private Integer currentEnrolled;
         private String attachmentUrls;
+        private LocalDateTime reservationAt;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -135,6 +135,15 @@ public class PostDto {
 
         @NotBlank(message = "내용은 필수입니다")
         private String content;
+
+        // CHECK!! 공지/일반 게시글은 아래 필드 null로 전달 ? 공지 게시글 필수 필드
+        // PROGRAM일 때만 사용
+        private PostStatus status;
+        private LocalDateTime startAt;
+        private LocalDateTime endAt;
+        private Integer capacity;
+        private String attachmentUrls;
+        private LocalDateTime reservationAt;
     }
     
 }

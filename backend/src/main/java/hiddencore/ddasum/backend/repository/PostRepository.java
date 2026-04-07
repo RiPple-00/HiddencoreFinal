@@ -31,7 +31,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("type") PostType type,
             Pageable pageable);
 
-    /* 유저별 개인 페이지에서 사용할 조회 */
+    // 시설 내 단건 조회 - Optional: 게시글이 없을 때 명시적으로 처리
+    // CHECK!! 필요한가
+    @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
+           "WHERE p.postId = :postId AND f.facilityId = :facilityId AND p.status = 'ACTIVE'")
+    Optional<Post> findByIdInFacility(@Param("postId") Long postId,
+                                      @Param("facilityId") Long facilityId);
+
+    /* 유저 마이 페이지 조회 */
 
     // 1. 작성 기록 페이지 (ACTIVE 글 전체)
     @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
