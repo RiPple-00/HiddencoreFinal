@@ -48,6 +48,7 @@ public class Patient {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false, length = 20)
     private String gender;
 
@@ -79,6 +80,10 @@ public class Patient {
     @Column(name = "memo", columnDefinition = "TEXT")
     private String memo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "patient_status", nullable = false, length = 30)
+    private PatientStatus patientStatus;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -106,5 +111,19 @@ public class Patient {
         AB_NEGATIVE, // AB-
         O_POSITIVE, // O+
         O_NEGATIVE // O-
+    }
+
+    public enum Gender { // 성별 ENUM 추가
+        MALE,
+        FEMALE,
+        OTHER
+    }
+
+    public enum PatientStatus {
+        STABLE, // 안정
+        DISCHARGE_SOON, // 퇴원예정
+        FOCUSED_CARE, // 집중관찰
+        DANGER, // 위험
+        DISCHARGED // 퇴원
     }
 }
