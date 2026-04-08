@@ -50,7 +50,7 @@ public class Patient {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false, length = 20)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;

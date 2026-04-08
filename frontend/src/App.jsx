@@ -3,6 +3,8 @@ import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import PatientListPage from "./pages/Patient/PatientListPage";
+import PatientDetailPage from './pages/patient/PatientDetailPage'
+
 
 function App() {
   return (

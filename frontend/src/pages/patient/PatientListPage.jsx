@@ -1,72 +1,44 @@
-import { useMemo, useState } from "react"; //useMemo: 계산결과 기억하기
+import { useEffect, useMemo, useState } from "react"; //useMemo: 계산결과 기억하기
 import PatientSearchBar from "../../components/patient/PatientSearchBar";
 import PatientTable from "../../components/patient/PatientTable";
-import PatientFormModal from "../../components/patient/PatientFormModal";
+// import PatientFormModal from "../../components/patient/PatientFormModal";
 import { useNavigate } from "react-router-dom";
+import patientApi from "../../api/patientApi";
 
-const initialPatients = [
-  //임시 테스트 나주엥 지움
-  {
-    patientId: "2024001",
-    name: "박서준",
-    gender: "남",
-    age: 45,
-    building: "A",
-    room: "301",
-    birthDate: "2026-01-01",
-    patientStatus: "STABLE",
-  },
-
-  {
-    patientId: "2024002",
-    name: "김미나",
-    gender: "여",
-    age: 32,
-     building: "B",
-    room: "301",
-    birthDate: "2026-01-03",
-    patientStatus: "DISCHARGE_SOON",
-  },
-
-  {
-    patientId: "2024002",
-    name: "홍길동",
-    gender: "여",
-    age: 55,
-     building: "",
-    room: "",
-    birthDate: "2026-01-03",
-    patientStatus: "DISCHARGE",
-  },
-];
 
 export default function PatientListPage() {
-  const [patients, setPatients] = useState(initialPatients);
+  const [patients, setPatients] = useState([]);
   // useState(initialPatients) -> useState([])
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
-  /*
-  useEffect(() => {
-  fetchPatients();
-}, []);
 
-const fetchPatients = async () => {
-  try {
-    const response = await patientApi.getPatients();
-    setPatients(response.data.content || response.data);
-  } catch (error) {
-    console.error("환자 목록 조회 실패", error);
-  }
-};
-*/
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      const response = await patientApi.getPatients();
+
+      console.log("status:", response.status);
+      console.log("data:", response.data);
+      console.log("isArray:", Array.isArray(response.data));
+
+      setPatients(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("환자 목록 조회 실패", error);
+      console.log("error response:", error.response);
+      setPatients([]);
+    }
+  };
+
 
   const filteredPatients = useMemo(() => {
-    //검색부분
-    const lowerKeyword = keyword.toLowerCase(); //영어일때 다 소문자로 변환
+    const lowerKeyword = keyword.toLowerCase();
 
-    return patients.filter((patient) => {
+    return (Array.isArray(patients) ? patients : []).filter((patient) => {
       return (
-        patient.name.toLowerCase().includes(lowerKeyword) ||
+        patient.name?.toLowerCase().includes(lowerKeyword) ||
         String(patient.patientId).includes(lowerKeyword)
       );
     });

@@ -1,18 +1,18 @@
 import axios from "axios";
 
-const API_BASE = "/api/patients";
+const API_BASE = "http://localhost:8080/api/patients";
 
 const patientApi = {
   getPatients: async (params) => {
-    return axios.get(API_BASE, { params }); //patient 목록 전체
+    return axios.get(API_BASE, { params });
   },
 
   getPatientById: async (patientId) => {
-    return axios.get(`${API_BASE}/${patientId}`);//patient 상세 조회
+    return axios.get(`${API_BASE}/${patientId}`);
   },
 
   createPatient: async (patientData) => {
-    return axios.post(API_BASE, patientData); 
+    return axios.post(API_BASE, patientData);
   },
 
   updatePatient: async (patientId, patientData) => {
