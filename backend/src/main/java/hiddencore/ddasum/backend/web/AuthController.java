@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
     
-    //DI 
+    //DI
     private final MemberService memberService;
 
     //회원가입
@@ -53,8 +53,8 @@ public class AuthController {
         boolean available = memberService.isUsernameAvailable(username);
         return ResponseEntity.ok(Map.of("available", available));
     
-        /* 
-        Map.of("available", ture) -> 사용가능
+        /*
+        Map.of("available", true) -> 사용가능
         Map.of("available", false) -> 이미있음
         */
     

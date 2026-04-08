@@ -7,10 +7,11 @@ import hiddencore.ddasum.backend.domain.Post.PostType;
 import hiddencore.ddasum.backend.domain.Users;
 import hiddencore.ddasum.backend.repository.FacilityRepository;
 import hiddencore.ddasum.backend.repository.PostRepository;
-import hiddencore.ddasum.backend.repository.UserRepository;
+import hiddencore.ddasum.backend.repository.MemberRepository;
 import hiddencore.ddasum.backend.web.dto.PostDto;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final FacilityRepository facilityRepository;
-    private final UserRepository userRepository;
-
+    private final MemberRepository memberRepository;
 
     /* 게시판 조회 */
 
@@ -53,8 +54,8 @@ public class PostService {
 
     // 검색: searchType = title | content | all
     public List<PostDto.PostListResponse> searchPost(Long facilityId, PostType type,
-                                                  String searchType, String keyword,
-                                                  Pageable pageable) {
+            String searchType, String keyword,
+            Pageable pageable) {
         if (!List.of("title", "content", "all").contains(searchType)) {
             throw new IllegalArgumentException("잘못된 검색 타입입니다. (title | content | all)");
         }
@@ -63,7 +64,8 @@ public class PostService {
         List<Post> posts;
         if (type == null) {
             posts = Stream.of(PostType.values())
-                    .flatMap(t -> postRepository.searchInFacility(facilityId, t, searchType, keyword, pageable).stream())
+                    .flatMap(
+                            t -> postRepository.searchInFacility(facilityId, t, searchType, keyword, pageable).stream())
                     .toList();
         } else {
             posts = postRepository.searchInFacility(facilityId, type, searchType, keyword, pageable);
@@ -83,7 +85,7 @@ public class PostService {
     public PostDto.PostResponse createPost(Long facilityId, Long userId, PostDto.CreateRequest request) {
         Facility facility = facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("시설을 찾을 수 없습니다."));
-        Users author = userRepository.findById(userId)
+        Users author = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // PROGRAM 타입일 때만 currentEnrolled를 0으로 초기화, 나머지는 null
@@ -110,7 +112,7 @@ public class PostService {
     // 게시글 수정: 작성자 본인만 가능
     @Transactional
     public PostDto.PostResponse updatePost(Long facilityId, Long postId, Long userId,
-                                           PostDto.UpdateRequest request) {
+            PostDto.UpdateRequest request) {
         Post post = postRepository.findByIdInFacility(postId, facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
@@ -123,12 +125,18 @@ public class PostService {
         post.setContent(request.getContent());
 
         // PROGRAM 전용 필드: null이면 기존 값 유지
-        if (request.getStatus() != null)        post.setStatus(request.getStatus());
-        if (request.getStartAt() != null)        post.setStartAt(request.getStartAt());
-        if (request.getEndAt() != null)          post.setEndAt(request.getEndAt());
-        if (request.getCapacity() != null)       post.setCapacity(request.getCapacity());
-        if (request.getAttachmentUrls() != null) post.setAttachmentUrls(request.getAttachmentUrls());
-        if (request.getReservationAt() != null)  post.setReservationAt(request.getReservationAt());
+        if (request.getStatus() != null)
+            post.setStatus(request.getStatus());
+        if (request.getStartAt() != null)
+            post.setStartAt(request.getStartAt());
+        if (request.getEndAt() != null)
+            post.setEndAt(request.getEndAt());
+        if (request.getCapacity() != null)
+            post.setCapacity(request.getCapacity());
+        if (request.getAttachmentUrls() != null)
+            post.setAttachmentUrls(request.getAttachmentUrls());
+        if (request.getReservationAt() != null)
+            post.setReservationAt(request.getReservationAt());
 
         // @Transactional 안에서 변경하면 save() 없이 dirty checking으로 자동 반영됨
         return PostDto.PostResponse.from(post);
@@ -137,23 +145,23 @@ public class PostService {
     // // 게시글 삭제: 소프트 삭제 (INACTIVE로 상태 변경)
     // @Transactional
     // public void deletePost(Long facilityId, Long postId, Long userId) {
-    //     Post post = postRepository.findByIdInFacility(postId, facilityId)
-    //             .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    // Post post = postRepository.findByIdInFacility(postId, facilityId)
+    // .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-    //     if (!post.getAuthorUserId().getUserId().equals(userId)) {
-    //         throw new IllegalArgumentException("삭제 권한이 없습니다.");
-    //     }
+    // if (!post.getAuthorUserId().getUserId().equals(userId)) {
+    // throw new IllegalArgumentException("삭제 권한이 없습니다.");
+    // }
 
-    //     // 물리적으로 삭제하지 않고 상태만 변경 (복구 가능성 유지)
-    //     post.setStatus(PostStatus.INACTIVE);
+    // // 물리적으로 삭제하지 않고 상태만 변경 (복구 가능성 유지)
+    // post.setStatus(PostStatus.INACTIVE);
     // }
 
     // 게시글 삭제: 강한 삭제 (DB에서 완전 제거)
-  
+
     @Transactional
     public void deletePost(Long facilityId, Long postId, Long userId) {
         Post post = postRepository.findByIdInFacility(postId, facilityId)
-            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         if (!post.getAuthorUserId().getUserId().equals(userId)) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
