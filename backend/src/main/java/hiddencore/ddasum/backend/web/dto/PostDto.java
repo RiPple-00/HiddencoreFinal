@@ -112,34 +112,33 @@ public class PostDto {
         private Integer capacity;
         private Integer currentEnrolled;
         private LocalDateTime updatedAt;
-        private LocalDateTime startAt, endAt;
+        private String recruitStatus;
 
         // 전체 게시글 조회
         public static PostListResponse from(Post post) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime start = post.getStartAt();
+            LocalDateTime end = post.getEndAt();
+
+            String recruitStatus = null;
+            if (start != null && end != null) {
+                if (now.isBefore(start)) recruitStatus = "모집 예정";
+                else if (now.isAfter(end)) recruitStatus = "마감";
+                else recruitStatus = "모집 중";
+            }
+
             return PostListResponse.builder()
                     .id(post.getPostId())
                     .facilityId(post.getFacilityId().getFacilityId())
                     .authorName(post.getAuthorUserId().getName())
-                    .type(post.getType()) // 타입으로 필터링
+                    .type(post.getType()) // 타입으로 필터링 -> 필터링에 따른 게시판 분류는 프론트에서
                     .title(post.getTitle())
                     .status(post.getStatus())
                     .capacity(post.getCapacity())
                     .currentEnrolled(post.getCurrentEnrolled())
                     .updatedAt(post.getUpdatedAt())
-                    .startAt(post.getStartAt())
-                    .endAt(post.getEndAt())
+                    .recruitStatus(recruitStatus)
                     .build();
-        }
-
-        public String getRecruitStatus() {
-            if (startAt == null || endAt == null)
-                return null;
-            LocalDateTime now = LocalDateTime.now();
-            if (now.isBefore(startAt))
-                return "모집 예정";
-            if (now.isAfter(endAt))
-                return "마감";
-            return "모집 중";
         }
 
     }
