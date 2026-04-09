@@ -82,9 +82,10 @@ public class Schedule {
     }
 
     public enum ScheduleType {
-    FACILITY,      // 병원 전체 일정
-    PERSONAL,      // 개인 일정
-    PATIENT,       // 환자 관련 일정
-    WORK_SHIFT     // 근무 일정
+        FACILITY, // 병원 전체 일정
+        PERSONAL, // 개인 일정
+        PATIENT, // 환자 관련 일정
+        WORK_SHIFT, // 근무 일정
+        PROGRAM, // 프로그램 일정
     }
 }

@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'; // 알림 메세지
 
 // axios 인스턴스 생성
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'http://localhost:8081/api',
     timeout: 10000, // 10초안에 응답 없으면 자동으로 요청 취소
     headers : {
         'Content-Type' : 'application/json',
