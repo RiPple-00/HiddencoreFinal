@@ -34,14 +34,13 @@ public class PostDto {
         @NotNull(message = "게시글 상태는 필수입니다")
         private PostStatus status; // ACTIVE | INACTIVE | RESERVE
 
-        private Integer capacity;       // PROGRAM일 때만 사용
-        private LocalDateTime startAt;  // PROGRAM일 때만 사용
-        private LocalDateTime endAt;    // PROGRAM일 때만 사용
+        private Integer capacity; // PROGRAM일 때만 사용
+        private LocalDateTime startAt; // PROGRAM일 때만 사용
+        private LocalDateTime endAt; // PROGRAM일 때만 사용
         private String attachmentUrls;
         private LocalDateTime reservationAt; // 예약 시간. null이면 바로 게시
 
     } //
-
 
     @Data
     @Builder
@@ -80,10 +79,22 @@ public class PostDto {
                     .capacity(post.getCapacity())
                     .currentEnrolled(post.getCurrentEnrolled())
                     .attachmentUrls(post.getAttachmentUrls())
+                    .reservationAt(post.getReservationAt())
                     .createdAt(post.getCreatedAt())
                     .updatedAt(post.getUpdatedAt())
                     .build();
         }//
+
+        public String getRecruitStatus() {
+            if (startAt == null || endAt == null)
+                return null;
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(startAt))
+                return "모집 예정";
+            if (now.isAfter(endAt))
+                return "마감";
+            return "모집 중";
+        }
     }
 
     @Data
@@ -101,7 +112,7 @@ public class PostDto {
         private Integer capacity;
         private Integer currentEnrolled;
         private LocalDateTime updatedAt;
-
+        private LocalDateTime startAt, endAt;
 
         // 전체 게시글 조회
         public static PostListResponse from(Post post) {
@@ -115,7 +126,20 @@ public class PostDto {
                     .capacity(post.getCapacity())
                     .currentEnrolled(post.getCurrentEnrolled())
                     .updatedAt(post.getUpdatedAt())
+                    .startAt(post.getStartAt())
+                    .endAt(post.getEndAt())
                     .build();
+        }
+
+        public String getRecruitStatus() {
+            if (startAt == null || endAt == null)
+                return null;
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(startAt))
+                return "모집 예정";
+            if (now.isAfter(endAt))
+                return "마감";
+            return "모집 중";
         }
 
     }
@@ -128,7 +152,7 @@ public class PostDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateRequest {
-        
+
         @NotBlank(message = "제목은 필수입니다")
         @Size(max = 200, message = "제목은 200자 이하여야 합니다")
         private String title;
@@ -145,5 +169,5 @@ public class PostDto {
         private String attachmentUrls;
         private LocalDateTime reservationAt;
     }
-    
+
 }

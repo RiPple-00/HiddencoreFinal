@@ -105,5 +105,3 @@ public class Post {
         RESERVE
     }
 }
-
-
