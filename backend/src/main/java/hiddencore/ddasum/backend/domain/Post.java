@@ -47,11 +47,18 @@ public class Post {
     @Column(name = "post_type", nullable = false, length = 30)
     private PostType type; // NOTICE | PROGRAM | BOARD
 
+    @Column(name = "is_pinned", nullable = false)
+    @Builder.Default
+    private Boolean isPinned = false; // 상단 고정 = TRUE / 일반 = FALSE
+
     @Column(name = "title", nullable = false, length = 200)
     private String title; // 제목
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content; // 본문
+
+    @Column(name = "views")
+    private Integer views; // 조회수
 
     @Enumerated(EnumType.STRING)
     @Column(name = "post_status", nullable = false, length = 50)
@@ -64,7 +71,7 @@ public class Post {
     private LocalDateTime endAt; // 종료 일시
 
     @Column(name = "reservation_at")
-    private LocalDateTime reservationAt; // 예약 일시
+    private LocalDateTime reservationAt; // 예약 일시 | 예약X = 게시 일시
 
     @Column(name = "capacity")
     private Integer capacity; // 정원
