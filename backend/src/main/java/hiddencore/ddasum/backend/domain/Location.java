@@ -2,6 +2,8 @@ package hiddencore.ddasum.backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -53,8 +55,12 @@ public class Location {
     @Column(name = "bed", length = 50)
     private String bed;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "room_type", nullable = false, length = 50)
-    private String roomType;
+    private RoomType roomType;
+
+    @Column(name = "room_capacity", nullable = false)
+    private Integer roomCapacity;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -62,15 +68,39 @@ public class Location {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_occupied", nullable = false)
+    private Boolean isOccupied;
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+
+        if (isOccupied == null) {
+            isOccupied = false;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public enum RoomType {
+
+        GENERAL("일반실"),
+        ICU("중환자실"),
+        ISOLATION("격리실");
+
+        private final String description;
+
+        RoomType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 }
