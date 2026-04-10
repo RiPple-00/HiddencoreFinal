@@ -2,8 +2,9 @@ import { Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
-import PatientListPage from "./pages/Patient/PatientListPage";
+import PatientListPage from "./pages/patient/PatientListPage"
 import PatientDetailPage from './pages/patient/PatientDetailPage'
+// import PatientCreatePage from './pages/patient/PatientCreatePage'
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
               >
                 환자 조회
               </Link>
+          
             </div>
           </nav>
         </div>
@@ -50,7 +52,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/patients" element={<PatientListPage />}/>
           <Route path="/patients/:patientId" element={<PatientDetailPage />} />
+          {/* <Route path="/patients/new" element={<PatientCreatePage/>}/> */}
         </Routes>
+
+        
       </main>
     </div>
   );

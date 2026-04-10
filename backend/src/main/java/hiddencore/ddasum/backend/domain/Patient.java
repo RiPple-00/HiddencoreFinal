@@ -55,6 +55,9 @@ public class Patient {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    @Column(name = "address", length = 255) // 주소 칼럼 추가
+    private String address;
+
     @Column(name = "admission_date", nullable = false) // 입원 날짜
     private LocalDate admissionDate;
 

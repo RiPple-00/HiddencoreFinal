@@ -23,6 +23,8 @@ public class PatientDto {
         private Integer age;
         private String building;
         private String room;
+        private LocalDate birthDate;
+        private Long locationId;
         private Patient.PatientStatus patientStatus;
 
         public static ListResponse from(Patient patient) {
@@ -31,6 +33,7 @@ public class PatientDto {
                     .name(patient.getName())
                     .gender(patient.getGender())
                     .age(calculateAge(patient.getBirthDate()))
+                    .birthDate(patient.getBirthDate())
                     .building(
                             patient.getLocationId() != null
                                     ? patient.getLocationId().getBuilding()
@@ -40,6 +43,7 @@ public class PatientDto {
                                     ? patient.getLocationId().getRoom()
                                     : null)
                     .patientStatus(patient.getPatientStatus())
+                    .locationId(patient.getLocationId() != null ? patient.getLocationId().getLocationId() : null)
                     .build();
         }
 
@@ -61,6 +65,7 @@ public class PatientDto {
         private Patient.Gender gender;
         private Integer age;
         private LocalDate birthDate;
+        private String address;
         private LocalDate admissionDate;
         private LocalDate dischargeDate;
         private Patient.BloodType bloodType;
@@ -77,6 +82,7 @@ public class PatientDto {
                     .gender(patient.getGender())
                     .age(calculateAge(patient.getBirthDate()))
                     .birthDate(patient.getBirthDate())
+                    .address(patient.getAddress())
                     .admissionDate(patient.getAdmissionDate())
                     .dischargeDate(patient.getDischargeDate())
                     .bloodType(patient.getType())
@@ -103,8 +109,8 @@ public class PatientDto {
     public static class CreateRequest {
         private String name;
         private Patient.Gender gender;
-        private Integer age;
         private LocalDate birthDate;
+        private String address;
         private LocalDate admissionDate;
         private LocalDate dischargeDate;
         private Patient.BloodType bloodType;
@@ -115,6 +121,7 @@ public class PatientDto {
         private String memo;
         private Patient.PatientStatus patientStatus;
         private Long facilityId;
+        private Long locationId;
     }
 
     @Data
