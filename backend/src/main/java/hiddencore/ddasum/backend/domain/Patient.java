@@ -48,8 +48,9 @@ public class Patient {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false, length = 20)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
@@ -79,6 +80,10 @@ public class Patient {
     @Column(name = "memo", columnDefinition = "TEXT")
     private String memo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 50)
+    private PatientStatus status;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -98,13 +103,48 @@ public class Patient {
     }
 
     public enum BloodType {
-        A_POSITIVE, // A+
-        A_NEGATIVE, // A-
-        B_POSITIVE, // B+
-        B_NEGATIVE, // B-
-        AB_POSITIVE, // AB+
-        AB_NEGATIVE, // AB-
-        O_POSITIVE, // O+
-        O_NEGATIVE // O-
+        A_POSITIVE("A형+"),
+        A_NEGATIVE("A형-"),
+        B_POSITIVE("B형+"),
+        B_NEGATIVE("B형-"),
+        O_POSITIVE("O형+"),
+        O_NEGATIVE("O형-"),
+        AB_POSITIVE("AB형+"),
+        AB_NEGATIVE("AB형-");
+
+        private final String description;
+
+        BloodType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
+
+    public enum PatientStatus {
+        STABLE("안정"),
+        MONITORING("집중관찰"),
+        DISCHARGE("퇴원예정"),
+        POSTOPERATIVE("수술후"),
+        CRITICAL("위험");
+
+        private final String description;
+
+        PatientStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public enum Gender { // 성별 ENUM 추가
+        MALE,
+        FEMALE,
+        OTHER
+    }
+
 }
