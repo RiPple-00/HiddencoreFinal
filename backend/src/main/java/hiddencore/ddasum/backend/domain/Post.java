@@ -57,6 +57,9 @@ public class Post {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content; // 본문
 
+    @Column(name = "target_roles", length = 200)
+    private String targetRoles; // "DOCTOR,CAREGIVER" 형태로 저장. PARSING: split(",")
+
     @Column(name = "views")
     private Integer views; // 조회수
 
