@@ -1,5 +1,7 @@
 package hiddencore.ddasum.backend.web.dto;
 
+import java.time.LocalDateTime;
+
 import hiddencore.ddasum.backend.domain.Users.UsersRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 public class MemberDto {
 
