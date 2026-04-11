@@ -6,6 +6,7 @@ import FilterTab from '../../components/common/FilterTab';
 import SearchBar from '../../components/common/SearchBar';
 import Pagination from '../../components/common/Pagination';
 import PostList from '../../components/board/PostList';
+import Button from '../../components/Button';
 
 /**
  * 게시판 내부 콘텐츠
@@ -16,6 +17,7 @@ const BoardListContent = () => {
   const { facilityId } = useParams();
 
   const {
+    selectedBoard,
     currentTab,
     currentPage,
     searchKeyword,
@@ -25,19 +27,15 @@ const BoardListContent = () => {
     totalPages,
     paginatedPosts,
     fetchAllPosts,
+    changeBoard,
     changeTab,
     changePage,
     search,
     resetSearch,
   } = useBoardContext();
 
-  // 현재 선택된 게시판 (드롭다운)
-  const [selectedBoard, setSelectedBoard] = useState(BOARD_OPTIONS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  // 현재 선택된 게시판에 해당하는 탭 목록
-  const currentTabs = BOARD_TABS_MAP[selectedBoard.value];
 
   // 마운트 시 전체 데이터 1회 로드
   useEffect(() => {
@@ -55,12 +53,14 @@ const BoardListContent = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 현재 선택된 게시판의 탭 목록
+  // null이면 탭 없음 (전체 게시판, 자유 게시판)
+  const currentTabs = BOARD_TABS_MAP[selectedBoard.value] ?? null;
+
   // 게시판 변경 시 탭 및 검색 초기화
   const handleBoardSelect = (option) => {
-    setSelectedBoard(option);
+    changeBoard(option);
     setIsDropdownOpen(false);
-    changeTab(null);  // 탭 전체로 초기화
-    resetSearch();
   };
 
   return (
@@ -101,21 +101,25 @@ const BoardListContent = () => {
           )}
         </div>
 
-        {/* CHECK!!! 작성 권한 조건 확인 필요 - 모든 사용자 가능한지 */}
-        <button
+        {/* CHECK!!! 작성 권한 조건 확인 필요 - 역할별 제한 추가 예정 */}
+        <Button
+          type="button"
+          variant="primary"
+          size="md"
           onClick={() => navigate(`/facilities/${facilityId}/board/create`)}
-          className="flex items-center gap-1 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded hover:bg-teal-700 transition-colors"
         >
           + 새 게시물 작성
-        </button>
+        </Button>
       </div>
 
-      {/* 선택된 게시판에 해당하는 탭 (PostType enum 기반) */}
-      <FilterTab
-        tabs={currentTabs}
-        currentTab={currentTab}
-        onChange={changeTab}
-      />
+      {/* 탭: 전체 게시판(ALL)과 자유 게시판(GENERAL)은 탭 없음 */}
+      {currentTabs && (
+        <FilterTab
+          tabs={currentTabs}
+          currentTab={currentTab}
+          onChange={changeTab}
+        />
+      )}
 
       {/* 게시글 목록 카드 */}
       <div className="bg-white border border-gray-200 rounded-lg mt-4">

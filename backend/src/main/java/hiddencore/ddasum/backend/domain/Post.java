@@ -102,16 +102,29 @@ public class Post {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
+    
     public enum PostType {
-        NOTICE,
-        BOARD,
-        PROGRAM
+        // 공지 게시판
+        URGENT, // 긴급
+        CLINICAL, // 임상
+        ADMIN, // 행정
+        FACILITY, // 시설
+        
+        // 프로그램 게시판
+        APPLY, // 참여 신청
+        REVIEW, // 활동 후기
+        
+        // 자유 게시판
+        GENERAL,
     }
-
+    
     public enum PostStatus {
         ACTIVE,
         INACTIVE,
         RESERVE
+    }
+    
+    public void incrementViews() {
+        this.views = (this.views == null ? 0 : this.views) + 1;
     }
 }

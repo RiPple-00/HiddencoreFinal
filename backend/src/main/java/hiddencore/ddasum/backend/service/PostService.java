@@ -46,16 +46,19 @@ public class PostService {
     }
 
     // 단건 상세 조회
+    // CHECK!!! 추후 중복 조회수 방지 로직 추가 필요 (userId 기반 또는 세션 기반)
+    @Transactional
     public PostDto.PostResponse getPost(Long facilityId, Long postId) {
         Post post = postRepository.findByIdInFacility(postId, facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        post.incrementViews(); // 조회수 증가 ※상세 페이지 로딩 완료 시점
         return PostDto.PostResponse.from(post);
     }
 
     // 검색: searchType = title | content | all
+    // CHECK!!! 프론트 필터링으로 대체 예정 - 현재는 미사용이나 엔드포인트 유지
     public List<PostDto.PostListResponse> searchPost(Long facilityId, PostType type,
-            String searchType, String keyword,
-            Pageable pageable) {
+            String searchType, String keyword, Pageable pageable) {
         if (!List.of("title", "content", "all").contains(searchType)) {
             throw new IllegalArgumentException("잘못된 검색 타입입니다. (title | content | all)");
         }
@@ -64,8 +67,7 @@ public class PostService {
         List<Post> posts;
         if (type == null) {
             posts = Stream.of(PostType.values())
-                    .flatMap(
-                            t -> postRepository.searchInFacility(facilityId, t, searchType, keyword, pageable).stream())
+                    .flatMap(t -> postRepository.searchInFacility(facilityId, t, searchType, keyword, pageable).stream())
                     .toList();
         } else {
             posts = postRepository.searchInFacility(facilityId, type, searchType, keyword, pageable);
@@ -88,13 +90,16 @@ public class PostService {
         Users author = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // PROGRAM 타입일 때만 currentEnrolled를 0으로 초기화, 나머지는 null
-        Integer currentEnrolled = (request.getType() == PostType.PROGRAM) ? 0 : null;
+        // 프로그램 게시판 타입(APPLY, REVIEW)일 때만 currentEnrolled 0으로 초기화, 나머지는 null
+        Integer currentEnrolled = (request.getType() == PostType.APPLY
+                                || request.getType() == PostType.REVIEW) ? 0 : null;
 
         Post post = Post.builder()
                 .facilityId(facility)
                 .authorUserId(author)
                 .type(request.getType())
+                .isPinned(request.getIsPinned() != null ? request.getIsPinned() : false)
+                .targetRoles(request.getTargetRoles())
                 .title(request.getTitle())
                 .content(request.getContent())
                 .status(request.getStatus())
@@ -125,19 +130,15 @@ public class PostService {
         post.setContent(request.getContent());
 
         // PROGRAM 전용 필드: null이면 기존 값 유지
-        if (request.getStatus() != null)
-            post.setStatus(request.getStatus());
-        if (request.getStartAt() != null)
-            post.setStartAt(request.getStartAt());
-        if (request.getEndAt() != null)
-            post.setEndAt(request.getEndAt());
-        if (request.getCapacity() != null)
-            post.setCapacity(request.getCapacity());
-        if (request.getAttachmentUrls() != null)
-            post.setAttachmentUrls(request.getAttachmentUrls());
-        if (request.getReservationAt() != null)
-            post.setReservationAt(request.getReservationAt());
-
+        if (request.getIsPinned() != null)       post.setIsPinned(request.getIsPinned());
+        if (request.getTargetRoles() != null)    post.setTargetRoles(request.getTargetRoles());
+        if (request.getStatus() != null)         post.setStatus(request.getStatus());
+        if (request.getStartAt() != null)        post.setStartAt(request.getStartAt());
+        if (request.getEndAt() != null)          post.setEndAt(request.getEndAt());
+        if (request.getCapacity() != null)       post.setCapacity(request.getCapacity());
+        if (request.getAttachmentUrls() != null) post.setAttachmentUrls(request.getAttachmentUrls());
+        if (request.getReservationAt() != null)  post.setReservationAt(request.getReservationAt());
+ 
         // @Transactional 안에서 변경하면 save() 없이 dirty checking으로 자동 반영됨
         return PostDto.PostResponse.from(post);
     }
@@ -156,8 +157,7 @@ public class PostService {
     // post.setStatus(PostStatus.INACTIVE);
     // }
 
-    // 게시글 삭제: 강한 삭제 (DB에서 완전 제거)
-
+    // 게시글 삭제: 하드 삭제 (DB에서 완전 제거)
     @Transactional
     public void deletePost(Long facilityId, Long postId, Long userId) {
         Post post = postRepository.findByIdInFacility(postId, facilityId)

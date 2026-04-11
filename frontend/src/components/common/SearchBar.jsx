@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { SEARCH_TYPES } from '../../utils/boardUtils';
+import Input from '../Input';
+import Button from '../Button';
 
 /**
  * 공통 검색바 컴포넌트
@@ -27,8 +29,9 @@ const SearchBar = ({ searchType, searchKeyword, onSearch, onReset }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 mt-4">
-      {/* 검색 타입 셀렉트 */}
+   <div className="flex items-center gap-2 mt-4">
+
+      {/* 검색 타입 셀렉트 - Input 미지원으로 직접 사용 */}
       <select
         value={localType}
         onChange={(e) => setLocalType(e.target.value)}
@@ -41,25 +44,28 @@ const SearchBar = ({ searchType, searchKeyword, onSearch, onReset }) => {
         ))}
       </select>
 
-      {/* 키워드 입력 */}
-      <input
-        type="text"
-        value={localKeyword}
-        onChange={(e) => setLocalKeyword(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="검색어를 입력하세요"
-        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-      />
+      {/* 키워드 입력 - Input 컴포넌트 사용 */}
+      <div className="flex-1">
+        <Input
+          type="text"
+          value={localKeyword}
+          onChange={(e) => setLocalKeyword(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="검색어를 입력하세요"
+        />
+      </div>
 
-      {/* 검색 버튼 */}
-      <button
+      {/* 검색 버튼 - Button 컴포넌트 사용 */}
+      <Button
+        type="button"
+        variant="primary"
+        size="md"
         onClick={handleSearch}
-        className="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded hover:bg-teal-700 transition-colors"
       >
         검색
-      </button>
-    </div>
-  );
+      </Button>
+
+    </div>  );
 };
 
 export default SearchBar;

@@ -15,11 +15,17 @@ export const WIDGET_SIZE = 2;
 // value: BOARD_TABS_MAP의 키와 반드시 일치해야 함
 // CHECK!!! 게시판 종류 세분화 시 항목 및 BOARD_TABS_MAP 동시 추가
 export const BOARD_OPTIONS = [
-  { label: '전체 게시판', value: 'BOARD' },
+  { label: '전체 게시판', value: 'ALL' },
   { label: '공지사항', value: 'NOTICE' },
   { label: '프로그램', value: 'PROGRAM' },
   { label: '자유 게시판', value: 'GENERAL' }
 ];
+
+export const BOARD_TYPE_MAP = {
+  NOTICE: ['URGENT', 'CLINICAL', 'ADMIN', 'FACILITY'],
+  PROGRAM: ['APPLY', 'REVIEW'],
+  GENERAL: ['GENERAL'],
+};
 
 /* 게시판별 탭 목록 */
 // key: BOARD_OPTIONS의 value와 일치
@@ -31,13 +37,14 @@ export const BOARD_TABS_MAP = {
     { label: '긴급 공지', type: 'URGENT' },
     { label: '임상 가이드라인', type: 'CLINICAL' },
     { label: '행정 소식', type: 'ADMIN' },
+    { label: '시설 공지', type: 'FACILITY' },
   ],
   PROGRAM: [
     { label: '전체', type: null },
     { label: '참여 신청', type: 'APPLY' },
     { label: '활동 후기', type: 'REVIEW' },
-    { label: '월간 일정', type: 'SCHEDULE' },
   ],
+  GENERAL: null,
 };
 
 // 검색 타입 목록
@@ -52,12 +59,12 @@ export const SEARCH_TYPES = [
 // className: Tailwind 클래스 (배경색 + 글자색)
 export const BADGE_STYLES = {
   URGENT: { label: '긴급', className: 'bg-red-100 text-red-700' },
-  NOTICE: { label: '공지', className: 'bg-blue-100 text-blue-700' },
   CLINICAL: { label: '임상', className: 'bg-green-100 text-green-700' },
   ADMIN: { label: '행정', className: 'bg-gray-100 text-gray-600' },
+  FACILITY: { label: '시설', className: 'bg-orange-100 text-orange-700' },
+  APPLY: { label: '참여신청', className: 'bg-blue-100 text-blue-700' },
+  REVIEW: { label: '활동후기', className: 'bg-yellow-100 text-yellow-700' },
   GENERAL: { label: '일반', className: 'bg-gray-100 text-gray-500' },
-  PROGRAM: { label: '프로그램', className: 'bg-purple-100 text-purple-700' },
-  FREE: { label: '자유', className: 'bg-yellow-100 text-yellow-700' },
   // CHECK!!! HOT 배지 - 추후 조회수 기준 확정 후 주석 해제
   // HOT: { label: 'HOT', className: 'bg-red-500 text-white' },
 };
