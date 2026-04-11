@@ -3,6 +3,8 @@ import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import BoardListPage from './pages/board/BoardListPage';
+import BoardDetailPage from './pages/board/BoardDetailPage';
+import BoardCreatePage from './pages/board/BoardCreatePage';
 
 function App() {
     return (
@@ -39,7 +41,17 @@ function App() {
                     <Route path="/" element={<HomePage />} /> {/*<Routes> -> 페이지 이동 경로 </Routes>*/}
                     <Route path="/signup" element={<SignUpPage />} />
                     <Route path="/login" element={<LoginPage />} />
+
+                    
+                    {/* 게시판 */}
                     <Route path="/facilities/:facilityId/board" element={<BoardListPage />} />
+                    <Route path="/facilities/:facilityId/board/create" element={<BoardCreatePage />} />
+                    <Route path="/facilities/:facilityId/board/:postId" element={<BoardDetailPage />} />
+
+                    {/* 미작성 페이지 - 완성 후 주석 해제 */}
+                    {/* <Route path="/facilities/:facilityId/board/:postId/edit" element={<BoardEditPage />} /> */}
+                    {/* <Route path="/facilities/:facilityId/board/history" element={<BoardHistoryPage />} /> */}
+                    {/* <Route path="/facilities/:facilityId/board/draft" element={<BoardDraftPage />} /> */}
                 </Routes>
             </main>
         </div>
