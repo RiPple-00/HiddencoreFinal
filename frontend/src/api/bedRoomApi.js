@@ -17,9 +17,9 @@ const bedRoomApi = {
         return api.get(`/patients/${patientId}`);
     },
 
-    // 병상 배정을 위한 환자 검색
+    // 병상 배정을 위한 환자 검색 (/api/rooms/... 와 경로 충돌 방지)
     getSearchPatientsForAssign: (keyword) => {
-        return api.get(`/rooms/patients/search`, {
+        return api.get(`/patients/search`, {
             params: { keyword },
         });
     },

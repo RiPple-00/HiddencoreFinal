@@ -9,10 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 import hiddencore.ddasum.backend.domain.Patient;
 
-
-//Jpa는 _ 를 기준으로 객체 내부 필드 탐색을
 public interface PatientRepository extends JpaRepository<Patient, Long> {
-    
+
     Optional<Patient> findByLocationId_LocationId(Long locationId);
 
     List<Patient> findByNameContainingIgnoreCase(String name);

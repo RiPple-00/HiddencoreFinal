@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const defaultNavItems = [
   { key: "rooms", label: "병실 조회", to: "/" },
-  { key: "patients", label: "환자 조회", to: null },
+  { key: "patients", label: "환자 조회", to: "/patients" },
   { key: "calendar", label: "캘린더", to: null },
   { key: "notice", label: "공지사항", to: null },
 ];

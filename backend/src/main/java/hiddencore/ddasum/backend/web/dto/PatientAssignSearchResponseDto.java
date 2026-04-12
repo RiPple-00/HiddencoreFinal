@@ -32,7 +32,7 @@ public class PatientAssignSearchResponseDto {
         return PatientAssignSearchResponseDto.builder()
                 .patientId(patient.getPatientId())
                 .name(patient.getName())
-                .gender(patient.getGender())
+                .gender(patient.getGender() != null ? patient.getGender().name() : null)
                 .age(getAge(patient.getBirthDate()))
                 .assignedBedLabel(assignedBedLabel)
                 .condition(patient.getStatus() != null ? patient.getStatus().getDescription() : "-")

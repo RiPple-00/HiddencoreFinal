@@ -48,24 +48,29 @@ public class Patient {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "gender", nullable = false, length = 20)
-    private String gender;
+    /** 선택 입력. DB에는 MALE / FEMALE / OTHER 만 저장 (EnumType.STRING). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", length = 20)
+    private Gender gender;
 
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    @Column(name = "address", length = 255) // 주소 칼럼 추가
+    private String address;
+
     @Column(name = "admission_date", nullable = false) // 입원 날짜
     private LocalDate admissionDate;
 
-    @Column(name = "discharge_date") // 퇴원날짜
+    @Column(name = "discharge_date")
     private LocalDate dischargeDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "blood_type", nullable = false)
     private BloodType type;
 
-    @Column(name = "height", precision = 5, scale = 2) // precision 총 자리수, scale = 소수점 표현 자리수
-    private BigDecimal height; // BigDecimal 더 정확한 소수점
+    @Column(name = "height", precision = 5, scale = 2)
+    private BigDecimal height;
 
     @Column(name = "weight", precision = 5, scale = 2)
     private BigDecimal weight;
@@ -103,6 +108,8 @@ public class Patient {
 
    
 
+   
+
     public enum BloodType {
         A_POSITIVE("A형+"),
         A_NEGATIVE("A형-"),
@@ -125,21 +132,28 @@ public class Patient {
     }
 
     public enum PatientStatus {
-    STABLE("안정"),
-    MONITORING("집중관찰"),
-    DISCHARGE("퇴원예정"),
-    POSTOPERATIVE("수술후"),
-    CRITICAL("위험");
+        STABLE("안정"),
+        MONITORING("집중관찰"),
+        DISCHARGE("퇴원예정"),
+        POSTOPERATIVE("수술후"),
+        CRITICAL("위험"),
+        /** 더미/시드 데이터 호환: 퇴원 완료 */
+        DISCHARGED("퇴원완료");
 
-    private final String description;
+        private final String description;
 
-    PatientStatus(String description) {
-        this.description = description;
+        PatientStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
-    public String getDescription() {
-        return description;
+    public enum Gender {
+        MALE,
+        FEMALE,
+        OTHER
     }
-}
-
 }

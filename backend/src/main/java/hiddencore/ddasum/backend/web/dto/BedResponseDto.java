@@ -36,14 +36,16 @@ public class BedResponseDto {
                 .patientId(patient != null ? patient.getPatientId() : null)
                 .bedId(location.getRoom() + "-" + location.getBed())
                 .occupied(patient != null)
-                .status(patient != null ? patient.getStatus().getDescription() : "비어있음")
+                .status(patient != null
+                        ? (patient.getStatus() != null ? patient.getStatus().getDescription() : "-")
+                        : "비어있음")
                 .name(patient != null ? patient.getName() : null)
-                .gender(patient != null ? patient.getGender() : null)
+                .gender(patient != null && patient.getGender() != null ? patient.getGender().name() : null)
                 .age(patient != null
                         ? Period.between(patient.getBirthDate(), LocalDate.now()).getYears()
                         : null)
                 .birthDate(patient != null ? patient.getBirthDate() : null)
-                .type(patient != null ? patient.getType().getDescription() : null)
+                .type(patient != null && patient.getType() != null ? patient.getType().getDescription() : null)
                 .admissionDate(patient != null ? patient.getAdmissionDate() : null)
                 .roomCapacity(location.getRoomCapacity())
                 .build();

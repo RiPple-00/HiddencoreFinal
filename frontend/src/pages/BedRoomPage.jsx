@@ -9,7 +9,32 @@ import VisitorsPanel from "../components/bedroom/VisitorsPanel";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import bedRoomApi from "../api/bedRoomApi";
-import { useParams } from "react-router-dom"
+import patientApi from "../api/patientApi";
+import { useParams } from "react-router-dom";
+
+const mapDetailToSummaryPatient = (d) => {
+  if (!d) return null;
+  const g = d.gender;
+  let genderLabel = "-";
+  if (g === "MALE") genderLabel = "남";
+  else if (g === "FEMALE") genderLabel = "여";
+  else if (g === "OTHER") genderLabel = "기타";
+  else if (g != null) genderLabel = String(g);
+
+  return {
+    patientId: d.patientId,
+    id: String(d.patientId),
+    name: d.name ?? "-",
+    gender: genderLabel,
+    age: d.age ?? "-",
+    doctor: "-",
+    checkup: "-",
+    admissionDate: d.admissionDate ?? "-",
+    height: "-",
+    weight: "-",
+    description: d.memo ?? "-",
+  };
+};
 
 function BedRoomPage() {
   const { room } = useParams();
@@ -148,48 +173,20 @@ function BedRoomPage() {
 
   //-------------------------------------------------------------------------
 
-  const selectedPatientModel = (data) => ({
-    id: data?.patientId ? String(data.patientId) : "-",
-    name: data?.name || "-",
-    gender: data?.gender || "-",
-    age: data?.age ?? "-",
-    status: data?.status || "-",
-    caution: data?.caution || "-",
-    doctor: data?.doctor || "-",
-    description: data?.description || "-",
-    admissionDate: data?.admissionDate || "-",
-  });
-
   const handleBedClick = async (bed) => {
     setSelectedBed(bed);
     setSelectedPatient(null);
     setPatientDetailError("");
 
     if (!bed?.patientId) {
-      setPatientDetailError("선택한 환자에 대한 상세 정보가 없습니다.");
+      setPatientDetailError("선택한 침상에 배정된 환자가 없습니다.");
       return;
     }
 
     try {
       setPatientDetailLoading(true);
-      //const res = await bedRoomApi.getPatientDetail(bed.patientId);
-      //const mapped = selectedPatientModel(res?.data ?? {});
-      //setSelectedPatient(mapped);
-
-      setSelectedPatient({
-        id: "440392-B",
-        name: "이영희",
-        gender: "남자",
-        age: 72,
-        doctor: "최원빈 과장",
-        checkup: "완료 (08:30)",
-        admissionDate: "2023.10.12",
-        height: "170",
-        weight: "50",
-        description: "의사가 남긴 코멘트",
-      });
-
-
+      const res = await patientApi.getPatientById(bed.patientId);
+      setSelectedPatient(mapDetailToSummaryPatient(res?.data));
     } catch (e) {
       console.error("환자 상세 조회", e);
       setPatientDetailError("환자 상세 정보를 불러오지 못했습니다.");
@@ -244,7 +241,7 @@ function BedRoomPage() {
             </div>
 
             {loading ? (
-              <div className="rounded-2 xl bg-white p-6 shadow-sm">로딩 중...</div>
+              <div className="rounded-2xl bg-white p-6 shadow-sm">로딩 중...</div>
             ) : error ? (
               <div className="rounded-2xl bg-white p-6 shadow-sm text-red-600">{error}</div>
             ) : (
