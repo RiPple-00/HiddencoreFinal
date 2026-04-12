@@ -43,13 +43,13 @@ const postApi = {
   // 작성 기록 (type 없으면 전체)
   getMyPosts: (facilityId, userId, type = null, page = 0, size = 20) =>
     api.get(`/facilities/${facilityId}/posts/my`, {
-      params: { userId, type, page, size },
+      params: { userId, page, size, ...(type != null ? { type } : {}) },
     }),
 
   // 임시저장 (type 없으면 전체)
   getMyDrafts: (facilityId, userId, type = null, page = 0, size = 20) =>
     api.get(`/facilities/${facilityId}/posts/draft`, {
-      params: { userId, type, page, size },
+      params: { userId, page, size, ...(type != null ? { type } : {}) },
     }),
 
   // 백엔드 업로드

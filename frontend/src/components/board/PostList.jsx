@@ -11,12 +11,16 @@ import { formatDate, formatRelativeTime } from '../../utils/dateUtils';
  * @param {'table'|'widget'} mode - 렌더링 모드
  * @param {number} [facilityId] - 상세 페이지 이동 시 필요
  */
+/** 목록 API(PostListResponse)는 `id`, 구버전 호환으로 `postId` */
+const rowId = (post) => post?.id ?? post?.postId;
+
 const PostList = ({ posts = [], mode = 'table', facilityId }) => {
   const navigate = useNavigate();
 
-  const handleRowClick = (postId) => {
-    // CHECK!!! 상세 페이지 라우팅 경로 확인 필요
-    navigate(`/facilities/${facilityId}/board/${postId}`);
+  const handleRowClick = (post) => {
+    const id = rowId(post);
+    if (id == null) return;
+    navigate(`/facilities/${facilityId}/board/${id}`);
   };
 
   // 게시글이 없을 때 Empty State
@@ -44,12 +48,12 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
         <tbody>
           {posts.map((post) => (
             <tr
-              key={post.postId}
-              onClick={() => handleRowClick(post.postId)}
+              key={rowId(post) ?? post.title}
+              onClick={() => handleRowClick(post)}
               className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
             >
               {/* NO */}
-              <td className="py-3 text-center text-gray-400">{post.postId}</td>
+              <td className="py-3 text-center text-gray-400">{rowId(post)}</td>
 
               {/* TITLE: 배지 + 제목 + 첨부파일 아이콘 + 댓글 수 */}
               <td className="py-3">
@@ -77,13 +81,12 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
 
               {/* DATE */}
               <td className="py-3 text-center text-gray-400">
-                {formatDate(post.createdAt)}
+                {formatDate(post.updatedAt ?? post.createdAt)}
               </td>
 
               {/* VIEWS */}
               <td className="py-3 text-center text-gray-400">
-                {/* CHECK!!! 조회수 필드명 확인 필요 - post.viewCount 또는 post.views */}
-                {post.viewCount ?? 0}
+                {post.views ?? post.viewCount ?? 0}
               </td>
             </tr>
           ))}
@@ -98,8 +101,8 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
       <ul className="flex flex-col gap-3">
         {posts.map((post) => (
           <li
-            key={post.postId}
-            onClick={() => handleRowClick(post.postId)}
+            key={rowId(post) ?? post.title}
+            onClick={() => handleRowClick(post)}
             className="flex flex-col gap-0.5 cursor-pointer hover:bg-gray-50 rounded px-2 py-1 transition-colors"
           >
             {/* 배지 + 제목 */}
@@ -111,7 +114,7 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
             <div className="flex justify-between text-xs text-gray-400">
               {/* CHECK!!! 작성자 필드명 확인 필요 */}
               <span>{post.authorName ?? '-'}</span>
-              <span>{formatRelativeTime(post.createdAt)}</span>
+              <span>{formatRelativeTime(post.updatedAt ?? post.createdAt)}</span>
             </div>
           </li>
         ))}

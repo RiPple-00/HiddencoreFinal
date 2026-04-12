@@ -146,3 +146,25 @@ export const parseAttachmentUrls = (attachmentUrls) => {
     return [];
   }
 };
+
+/**
+ * 작성 UI(공지/프로그램) → 백엔드 Post.PostType enum 값
+ * (NOTICE/PROGRAM 문자열은 DB enum에 없음)
+ */
+export const BOARD_UI_TO_POST_TYPE = {
+  NOTICE: 'FACILITY',
+  PROGRAM: 'APPLY',
+};
+
+/**
+ * HTML `type="date"` 값(YYYY-MM-DD)을 백엔드 `LocalDateTime` JSON 역직렬화용 ISO 문자열로 변환
+ * @param {string|null|undefined} value
+ * @param {boolean} endOfDay - 종료일이면 해당 일 23:59:59
+ * @returns {string|null}
+ */
+export const dateOnlyToLocalDateTimeString = (value, endOfDay = false) => {
+  if (value == null || String(value).trim() === '') return null;
+  const s = String(value).trim();
+  if (s.includes('T')) return s;
+  return endOfDay ? `${s}T23:59:59` : `${s}T00:00:00`;
+};

@@ -7,6 +7,7 @@ import SchedulePage from './pages/SchedulePage';
 import BoardListPage from './pages/board/BoardListPage';
 import BoardDetailPage from './pages/board/BoardDetailPage';
 import BoardCreatePage from './pages/board/BoardCreatePage';
+import BoardUserPostsPage from './pages/board/BoardUserPostsPage';
 import { useAuth } from './contexts/AutoContext.jsx';
 
 function App() {
@@ -108,6 +109,14 @@ function App() {
           <Route
             path="/facilities/:facilityId/board/create"
             element={<BoardCreatePage />}
+          />
+          <Route
+            path="/facilities/:facilityId/board/history"
+            element={<BoardUserPostsPage variant="history" />}
+          />
+          <Route
+            path="/facilities/:facilityId/board/draft"
+            element={<BoardUserPostsPage variant="draft" />}
           />
           <Route
             path="/facilities/:facilityId/board/:postId"

@@ -124,7 +124,7 @@ export const BoardProvider = ({ facilityId, children }) => {
     }
 
     return result;
-  }, [allPosts, currentTab, searchKeyword, searchType]);
+  }, [allPosts, selectedBoard, currentTab, searchKeyword, searchType]);
 
   /** 전체 페이지 수 */
   const totalPages = useMemo(
