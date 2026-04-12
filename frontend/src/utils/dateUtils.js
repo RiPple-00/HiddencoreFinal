@@ -18,18 +18,21 @@ export const formatDate = (dateOrStr) => {
   return `${year}.${month}.${day}`;
 };
 
+// 캘린더 등 — 시간 표시 (HH:mm)
 export const formatTime = (date) => {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 };
 
+// 캘린더 등 — 월 표시 (YYYY년 MM월)
 export const formatMonthTitle = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${year}년 ${month}월`;
 };
 
+// 캘린더 등 — 날짜 입력값을 `Date` 객체로 변환
 export const toDate = (value) => {
   if (!value) return null;
 
@@ -38,12 +41,14 @@ export const toDate = (value) => {
     return Number.isNaN(d.getTime()) ? null : d;
   }
 
+  // 배열 형태: [year, month, day, hour?, minute?, second?]
   if (Array.isArray(value)) {
     const [y, m, d, hh = 0, mm = 0, ss = 0] = value;
     const dt = new Date(y, (m ?? 1) - 1, d ?? 1, hh, mm, ss);
     return Number.isNaN(dt.getTime()) ? null : dt;
   }
 
+  // 객체 형태: { year, month, day, hour?, minute?, second? } 또는 { y, m, d, hh?, mm?, ss? }
   if (typeof value === 'object') {
     const y = value.year ?? value.y;
     const m = value.monthValue ?? value.month ?? value.m;
@@ -59,6 +64,7 @@ export const toDate = (value) => {
   return null;
 };
 
+// 캘린더 등 — 날짜 입력값을 `YYYY-MM-DD` 문자열로 변환
 export const toDateString = (value) => {
   const d = toDate(value);
   return d ? formatDate(d) : null;

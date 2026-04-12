@@ -93,3 +93,56 @@ export const getSearchTypeLabel = (value) => {
 
 // CHECK!!! HOT 배지 - 추후 조회수 기준 확정 후 주석 해제
 // export const isHotPost = (views) => views >= HOT_THRESHOLD;
+
+/** PostStatus (백엔드 `Post.PostStatus`와 동일) */
+export const POST_STATUS = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  RESERVE: 'RESERVE',
+};
+
+/** 공지 작성 시 공개 대상 체크박스 */
+export const TARGET_ROLES = [
+  { value: 'DOCTOR', label: '의사' },
+  { value: 'CAREGIVER', label: '간병인' },
+  { value: 'STAFF', label: '시설 직원' },
+];
+
+/**
+ * 공개 대상 배열 → DB 저장 문자열 ("DOCTOR,CAREGIVER")
+ * @param {string[]} roles
+ */
+export const stringifyTargetRoles = (roles) => {
+  if (!roles || !Array.isArray(roles)) return '';
+  return roles.filter(Boolean).join(',');
+};
+
+/**
+ * 첨부 URL 배열 → DB JSON 문자열
+ * @param {string[]} urls
+ */
+export const stringifyAttachmentUrls = (urls) => {
+  if (!urls || !Array.isArray(urls)) return '[]';
+  try {
+    return JSON.stringify(urls);
+  } catch {
+    return '[]';
+  }
+};
+
+/**
+ * DB의 attachment_urls(JSON 문자열) → URL 배열
+ * @param {string|null|undefined} attachmentUrls
+ * @returns {string[]}
+ */
+export const parseAttachmentUrls = (attachmentUrls) => {
+  if (!attachmentUrls) return [];
+  if (Array.isArray(attachmentUrls)) return attachmentUrls;
+  if (typeof attachmentUrls !== 'string') return [];
+  try {
+    const parsed = JSON.parse(attachmentUrls);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};

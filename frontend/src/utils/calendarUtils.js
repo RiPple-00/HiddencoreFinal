@@ -1,7 +1,6 @@
 import { toDate } from "./dateUtils";
 
 
-
 // 월 시작일 계산
 export const getStartOfMonth = (date) => {
   const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -27,8 +26,9 @@ export const generateCalendar = (date) => {
         [null, null, null, null, null, null, null]
     ];
     
+    // 달력 시작일을 일요일로 맞춤
     let currentDate = new Date(startOfMonth);
-    currentDate.setDate(currentDate.getDate() - currentDate.getDay()); // 달력 시작일을 일요일로 맞춤
+    currentDate.setDate(currentDate.getDate() - currentDate.getDay()); 
     
     for (let week = 0; week < 6; week++) {
         for (let day = 0; day < 7; day++) {
