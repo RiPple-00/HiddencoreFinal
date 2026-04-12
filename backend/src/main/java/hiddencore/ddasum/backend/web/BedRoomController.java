@@ -51,11 +51,11 @@ public class BedRoomController {
         return ResponseEntity.noContent().build();
     }
 
-    /*환자 상세 정보 불러오기*/
-    @GetMapping("/patients/${patientId}")
-    public ResponseEntity<>{
+    // /*환자 상세 정보 불러오기*/
+    // @GetMapping("/patients/${patientId}")
+    // public ResponseEntity<>{
         
-    }
+    // }
     
 
     /*배정 환자 해제*/

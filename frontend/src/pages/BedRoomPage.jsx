@@ -146,7 +146,7 @@ function BedRoomPage() {
     }
   };
 
-
+  //-------------------------------------------------------------------------
 
   const selectedPatientModel = (data) => ({
     id: data?.patientId ? String(data.patientId) : "-",
@@ -154,12 +154,10 @@ function BedRoomPage() {
     gender: data?.gender || "-",
     age: data?.age ?? "-",
     status: data?.status || "-",
-    ward: data?.ward || "-",
     caution: data?.caution || "-",
     doctor: data?.doctor || "-",
-    checkup: data?.checkup || "-",
+    description: data?.description || "-",
     admissionDate: data?.admissionDate || "-",
-    roomType: data?.roomType || "-",
   });
 
   const handleBedClick = async (bed) => {
@@ -183,16 +181,15 @@ function BedRoomPage() {
         name: "이영희",
         gender: "남자",
         age: 72,
-        status: "정상",
-        ward: "A 병동",
-        caution: "고혈압",
         doctor: "최원빈 과장",
         checkup: "완료 (08:30)",
         admissionDate: "2023.10.12",
-        roomType: "치매병군",
+        height: "170",
+        weight: "50",
+        description: "의사가 남긴 코멘트",
       });
 
-      
+
     } catch (e) {
       console.error("환자 상세 조회", e);
       setPatientDetailError("환자 상세 정보를 불러오지 못했습니다.");
@@ -457,6 +454,14 @@ function BedRoomPage() {
             ) : (
               <PatientSummaryCard patient={selectedPatient} />
             )}
+            <br/>
+            <button className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600 ">
+              병상 배치 취소하기
+            </button>
+            
+            <button className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
+              환자 병실 이동(전실) 관리
+            </button>
           </div>
         </div>
       )}

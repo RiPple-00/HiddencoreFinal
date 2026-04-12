@@ -35,9 +35,14 @@ function PatientSummaryCard({ patient }) {
         </div>
 
         <div className="space-y-3 text-base">
+         
           <div>
             <p className="text-slate-400">주치의</p>
             <p className="font-bold text-slate-900">{patient.doctor}</p>
+          </div>
+          <div>
+            <p className="text-slate-400">키</p>
+            <p className="font-bold text-slate-900">{patient.height}</p>
           </div>
           <div>
             <p className="text-slate-400">정기 체크</p>
@@ -51,8 +56,12 @@ function PatientSummaryCard({ patient }) {
             <p className="font-bold text-slate-900">{patient.admissionDate}</p>
           </div>
           <div>
-            <p className="text-slate-400">위험도</p>
-            <p className="font-bold text-emerald-700">{patient.status}</p>
+            <p className="text-slate-400">몸무게</p>
+            <p className="font-bold text-slate-900">{patient.weight}</p>
+          </div>
+          <div>
+            <p className="text-slate-400">코멘트</p>
+            <p className="font-bold text-emerald-700">{patient.description}</p>
           </div>
         </div>
       </div>
