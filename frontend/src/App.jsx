@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import SchedulePage from './pages/SchedulePage';
+import BoardListPage from './pages/board/BoardListPage';
+import BoardDetailPage from './pages/board/BoardDetailPage';
+import BoardCreatePage from './pages/board/BoardCreatePage';
 import { useAuth } from './contexts/AutoContext.jsx';
 
 function App() {
@@ -11,6 +14,8 @@ function App() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const facilityId = user?.facilityId ?? 1;
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -29,22 +34,25 @@ function App() {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      {/* 헤더 */}
       <header className="bg-gradient-to-r from-orange-100 to-amber-100 border-b-2 border-orange-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
-            {/* 로고 */}
             <Link to="/" className="text-2xl font-bold text-orange-700">
               따숨🏥
             </Link>
 
-            {/* 메뉴 */}
             <div className="flex items-center gap-6">
               <Link
                 to="/schedule"
                 className="text-gray-600 hover:text-blue-600 transition"
               >
                 캘린더
+              </Link>
+              <Link
+                to={`/facilities/${facilityId}/board`}
+                className="text-gray-600 hover:text-blue-600 transition"
+              >
+                게시판
               </Link>
 
               {isAuthenticated ? (
@@ -90,13 +98,21 @@ function App() {
         </div>
       </header>
 
-      {/* 메인 콘텐츠 */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/facilities/:facilityId/board" element={<BoardListPage />} />
+          <Route
+            path="/facilities/:facilityId/board/create"
+            element={<BoardCreatePage />}
+          />
+          <Route
+            path="/facilities/:facilityId/board/:postId"
+            element={<BoardDetailPage />}
+          />
         </Routes>
       </main>
     </div>

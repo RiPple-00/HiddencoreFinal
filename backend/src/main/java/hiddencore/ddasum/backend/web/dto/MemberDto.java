@@ -16,11 +16,11 @@ public class MemberDto {
     // ═══════════════════════════════════════════════════════════
     // 회원가입 요청 DTO
     // ═══════════════════════════════════════════════════════════
-    @Data  //getter, setter, toString, equals, hashCode 자동 생성
-    //@Data는 lombok에서 제공하는 어노테이션
-    @Builder //빌더 패턴이란? 객체 생성 시 가독성을 높이고, 선택적 매개변수를 지원하는 디자인 패턴
+    @Data // getter, setter, toString, equals, hashCode 자동 생성
+    // @Data는 lombok에서 제공하는 어노테이션
+    @Builder // 빌더 패턴이란? 객체 생성 시 가독성을 높이고, 선택적 매개변수를 지원하는 디자인 패턴
     @NoArgsConstructor
-    @AllArgsConstructor   //DI 필드 자동주입
+    @AllArgsConstructor // DI 필드 자동주입
     public static class SignUpRequest {
 
         @NotBlank(message = "아이디는 필수입니다")
@@ -70,7 +70,7 @@ public class MemberDto {
     @AllArgsConstructor
     public static class LoginResponse {
 
-        private String token;      // JWT 토큰
+        private String token; // JWT 토큰
         private Long id;
         private String userId;
         private String username;
