@@ -1,9 +1,24 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import MealEditPage from './pages/MealEditPage';
+import MealCarePage from './pages/MealCarePage';
+import CalendarPage from './pages/CalendarPage';
+import MealType from './pages/MealTypePage';
+import MealUploadPage from './pages/MealUploadPage';
 
 function App(){
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/');
+  };
+
   return(
   <div className='min-h-screen bg-orange-50'>
     {/* 헤더 */}
@@ -28,12 +43,34 @@ function App(){
         </nav>
         </div>
       </header>
+
   {/* 메인 콘텐츠 - 라우팅 <Routes> -> 메인 */}
             <main className="max-w-7xl mx-auto px-4 py-8">
+                {location.pathname !== '/' && (
+                    <div className="mb-4">
+                        <button
+                            type="button"
+                            onClick={handleGoBack}
+                            className="rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-50"
+                        >
+                            ← 뒤로가기
+                        </button>
+                    </div>
+                )}
                 <Routes>
-                    <Route path="/" element={<HomePage />} /> {/*<Routes> -> 페이지 이동 경로 </Routes>*/}
+                    <Route path="/" element={<MealCarePage />} />
                     <Route path="/signup" element={<SignUpPage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/meal-care" element={<MealCarePage />} />
+                    <Route path="/calendar" element={<CalendarPage />} />
+                    <Route path="/meal-edit" element={<MealEditPage />} />
+                    <Route path="/meal-edit/:date" element={<MealEditPage />} />
+                    <Route path="/admin/menu/edit/:id" element={<MealEditPage />} />
+                    <Route path="/meal-type" element={<MealType />} />
+                    <Route path="/meal-type/:date" element={<MealType />} />
+                    <Route path="/meal-upload" element={<MealUploadPage />} />
+                 
+
                 </Routes>
             </main>
         </div>
