@@ -41,7 +41,7 @@ public class BedResponseDto {
                         : "비어있음")
                 .name(patient != null ? patient.getName() : null)
                 .gender(patient != null && patient.getGender() != null ? patient.getGender().name() : null)
-                .age(patient != null
+                .age(patient != null && patient.getBirthDate() != null
                         ? Period.between(patient.getBirthDate(), LocalDate.now()).getYears()
                         : null)
                 .birthDate(patient != null ? patient.getBirthDate() : null)

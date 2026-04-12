@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import hiddencore.ddasum.backend.domain.Patient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -108,6 +109,7 @@ public class PatientDto {
     @AllArgsConstructor
     public static class CreateRequest {
         private String name;
+        @JsonDeserialize(using = GenderJsonDeserializer.class)
         private Patient.Gender gender;
         private LocalDate birthDate;
         private String address;
@@ -125,6 +127,7 @@ public class PatientDto {
     @AllArgsConstructor
     public static class UpdateRequest {
         private String name;
+        @JsonDeserialize(using = GenderJsonDeserializer.class)
         private Patient.Gender gender;
         private LocalDate birthDate;
         private LocalDate admissionDate;

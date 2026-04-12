@@ -1,3 +1,5 @@
+import { genderCodeToLabel } from "../../utils/genderDisplay";
+
 function BedCard({ bed, onAssignClick, onBedClick }) {
   if (!bed.occupied) {
     return (
@@ -34,7 +36,7 @@ function BedCard({ bed, onAssignClick, onBedClick }) {
       <div className="mb-5">
         <h3 className="text-3xl font-bold text-slate-900">{bed.patientName}</h3>
         <p className="mt-1 text-base text-slate-500">
-          {bed.gender} / {bed.age}세
+          {genderCodeToLabel(bed.gender)} / {bed.age ?? "-"}세
         </p>
       </div>
 

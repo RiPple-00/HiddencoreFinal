@@ -10,11 +10,19 @@ const patientApi = {
   },
 
   createPatient: (patientData) => {
-    return api.post(`/patients`, patientData);
+    const body = { ...patientData };
+    if (body.gender === "" || body.gender == null) {
+      delete body.gender;
+    }
+    return api.post(`/patients`, body);
   },
 
   updatePatient: (patientId, patientData) => {
-    return api.put(`/patients/${patientId}`, patientData);
+    const body = { ...patientData };
+    if (body.gender === "") {
+      body.gender = null;
+    }
+    return api.put(`/patients/${patientId}`, body);
   },
 
   deletePatient: (patientId) => {

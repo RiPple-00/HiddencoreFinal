@@ -1,6 +1,9 @@
 package hiddencore.ddasum.backend.domain;
 
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -48,8 +51,11 @@ public class Patient {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    /** 선택 입력. DB에는 MALE / FEMALE / OTHER 만 저장 (EnumType.STRING). */
-    @Enumerated(EnumType.STRING)
+    /**
+     * 선택 입력(null 가능). 저장 시에는 {@link Gender#name()} 만 DB에 기록.
+     * 읽기 시 레거시·한글·깨진 문자열이 있어도 매핑 실패로 전체 조회가 죽지 않도록 컨버터 사용.
+     */
+    @Convert(converter = PatientGenderConverter.class)
     @Column(name = "gender", length = 20)
     private Gender gender;
 
@@ -155,5 +161,33 @@ public class Patient {
         MALE,
         FEMALE,
         OTHER
+    }
+
+    @Converter(autoApply = false)
+    public static class PatientGenderConverter implements AttributeConverter<Gender, String> {
+
+        @Override
+        public String convertToDatabaseColumn(Gender attribute) {
+            return attribute == null ? null : attribute.name();
+        }
+
+        @Override
+        public Gender convertToEntityAttribute(String dbData) {
+            if (dbData == null || dbData.isBlank()) {
+                return null;
+            }
+            String s = dbData.trim();
+            try {
+                return Gender.valueOf(s.toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                // fall through: 레거시 한글·인코딩 깨짐 등
+            }
+            return switch (s) {
+                case "남", "남성", "M", "m", "Male", "MALE" -> Gender.MALE;
+                case "여", "여성", "F", "f", "Female", "FEMALE" -> Gender.FEMALE;
+                case "기타", "Other", "OTHER" -> Gender.OTHER;
+                default -> Gender.OTHER;
+            };
+        }
     }
 }

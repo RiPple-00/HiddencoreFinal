@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { genderCodeToLabel } from "../../utils/genderDisplay";
 
 function PatientSummaryCard({ patient }) {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ function PatientSummaryCard({ patient }) {
 
             <div className="mt-3 flex gap-2">
               <span className="rounded-lg bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700">
-                {patient.gender}
+                {genderCodeToLabel(patient.gender)}
               </span>
               <span className="rounded-lg bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
                 {patient.age}세
