@@ -12,23 +12,24 @@ import java.util.List;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    @Query("""
-    SELECT new hiddencore.ddasum.backend.web.dto.LocationDto$RoomPatientCountDto(
-        l.building,
-        l.floor,
-        l.room,
-        l.roomType,
-        l.roomGenderType,
-        COUNT(l),
-        SUM(CASE WHEN p.patientId IS NOT NULL THEN 1 ELSE 0 END)
-    )
-    FROM Location l
-    LEFT JOIN Patient p ON p.locationId = l AND p.dischargeDate IS NULL
-    WHERE l.building = :building
-      AND l.floor = :floor
-    GROUP BY l.building, l.floor, l.room, l.roomType, l.roomGenderType
-    ORDER BY l.room
-    """)
+@Query("""
+SELECT new hiddencore.ddasum.backend.web.dto.LocationDto$RoomPatientCountDto(
+    l.building,
+    l.floor,
+    l.room,
+    l.roomType,
+    l.roomGenderType,
+    COUNT(l),
+    SUM(CASE WHEN p.patientId IS NOT NULL THEN 1 ELSE 0 END),
+    MAX(l.roomCapacity)
+)
+FROM Location l
+LEFT JOIN Patient p ON p.locationId = l AND p.dischargeDate IS NULL
+WHERE l.building = :building
+  AND l.floor = :floor
+GROUP BY l.building, l.floor, l.room, l.roomType, l.roomGenderType
+ORDER BY l.room
+""")
     List<LocationDto.RoomPatientCountDto> findRoomSummaryByBuildingAndFloor(
         @Param("building") String building,
         @Param("floor") Integer floor
@@ -48,5 +49,3 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
         @Param("room") String room
     );
 }
-
-// countByLocation_Facility_FacilityId

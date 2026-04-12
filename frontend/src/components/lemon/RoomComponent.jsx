@@ -20,15 +20,15 @@ const STATUS_STYLE = {
 
 function RoomComponent({ room, isDimmed = false }) {
   const statusStyle = STATUS_STYLE[room.status] || STATUS_STYLE.AVAILABLE;
-  const occupiedRatio = Math.min(100, (room.occupiedBeds / room.totalBeds) * 100);
-  const availableBeds = Math.max(0, room.totalBeds - room.occupiedBeds);
+  const occupiedRatio = Math.min(100, (room.patientCount / room.roomCapacity) * 100);
+  const availableBeds = Math.max(0, room.roomCapacity - room.patientCount);
 
   return (
     <article
       className={`w-full rounded-xl border border-gray-200 border-l-4 bg-white p-4 shadow-sm transition ${isDimmed ? 'grayscale opacity-45' : ''} ${statusStyle.line}`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-3xl font-extrabold leading-none text-gray-800">{room.roomNumber}호</p>
+        <p className="text-3xl font-extrabold leading-none text-gray-800 whitespace-nowrap">{room.roomNumber}호</p>
         <div className="flex items-center gap-2">
           <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-600">
             {room.roomType}
@@ -42,9 +42,8 @@ function RoomComponent({ room, isDimmed = false }) {
       <p className="mb-2 text-sm text-gray-600">
         성별: {room.gender}{' '}
         <span className="ml-2 font-semibold text-emerald-700">
-          {room.occupiedBeds}/{room.totalBeds} Beds
+          {room.patientCount}/{room.roomCapacity} Beds
         </span>
-        <span className="ml-2 text-gray-500">환자 {room.occupiedBeds}명</span>
       </p>
 
       <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-gray-200">

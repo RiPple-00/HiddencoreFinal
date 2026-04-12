@@ -55,19 +55,7 @@ public class LocationDto {
         private RoomGenderType roomGenderType;
         private Long locationCount;
         private Long patientCount;
+        private Integer roomCapacity;
     }
 
-    // @Getter
-    // @NoArgsConstructor
-    // @AllArgsConstructor
-    // @Builder
-    // public static class RoomSummaryDto {
-    //     private String building;
-    //     private Integer floor;
-    //     private String room;
-    //     private RoomType roomType;
-    //     private RoomGenderType roomGenderType;
-    //     private Long locationCount;
-    //     private Long patientCount;
-    // }
 }

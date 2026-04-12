@@ -1,40 +1,49 @@
+// // import { useState, useEffect } from "react";
+
+
+// function HomePage(){
+
+//     return(
+//           <div>
+//           </div>
+//         )
+// }
+
+// export default HomePage;
+
+
 import { useEffect, useMemo, useState } from 'react';
 import { getRoomSummary } from '../api/LocationApi';
 import RoomComponent from '../components/lemon/RoomComponent';
 
-const WARDS = ['A동', 'B동', 'C동'];
+const WARDS = [
+  { value: 'A', label: 'A동' },
+  { value: 'B', label: 'B동' },
+  { value: 'C', label: 'C동' },
+];
 const FLOORS = [1, 2, 3, 4, 5];
 const SPECIALS = ['중환자실', '격리실'];
+
+const ROOM_TYPE_MAP = {
+  GENERAL: '일반실',
+  ICU: '중환자실',
+  ISOLATION: '격리실',
+};
+
+const GENDER_MAP = {
+  MALE: '남성',
+  FEMALE: '여성',
+  CONCOCTION: '혼합',
+};
 
 const btnBaseClass = 'rounded-lg px-4 py-2 text-sm font-medium transition';
 const btnActiveClass = 'bg-blue-600 text-white';
 const btnInactiveClass = 'bg-white text-gray-800 hover:bg-blue-50';
 
-const getStatus = (occupiedBeds) => {
-  if (occupiedBeds === 4) return 'FULL';
-  if (occupiedBeds <= 1) return 'AVAILABLE';
+const getStatus = (patientCount, roomCapacity) => {
+  if (patientCount >= roomCapacity) return 'FULL';
+  if (patientCount <= 1) return 'AVAILABLE';
   return 'WARNING';
-};
-
-const buildRoomData = (ward, floor) => {
-  const wardSeed = ward.charCodeAt(0) - 65;
-  return Array.from({ length: 10 }, (_, idx) => {
-    const roomNo = idx + 1;
-    const occupiedBeds = (roomNo + floor + wardSeed) % 5;
-    let roomType = '일반실';
-    if (roomNo === 3) roomType = '중환자실';
-    if (roomNo === 9) roomType = '격리실';
-    return {
-      id: `${ward}-${floor}-${roomNo}`,
-      roomNumber: `${ward}${floor}${String(roomNo).padStart(2, '0')}`,
-      gender: (roomNo + wardSeed) % 2 === 0 ? '남성' : '여성',
-      occupiedBeds,
-      totalBeds: 4,
-      status: getStatus(occupiedBeds),
-      roomType,
-      nurses: occupiedBeds === 0 ? ['S'] : ['K', 'L', 'M', 'S'].slice(0, Math.max(1, occupiedBeds)),
-    };
-  });
 };
 
 const isRoomHighlighted = (roomType, selectedSpecial) => {
@@ -48,28 +57,6 @@ function HomePage() {
   const [selectedSpecial, setSelectedSpecial] = useState(null);
   const [roomCounts, setRoomCounts] = useState({});
 
-  const roomData = useMemo(
-    () => {
-      const baseRooms = buildRoomData(selectedWard, selectedFloor);
-
-      return baseRooms.map((room) => {
-        const key = room.roomNumber;
-        const patientCount = roomCounts[key];
-        const occupiedBeds = typeof patientCount === 'number' ? patientCount : room.occupiedBeds;
-
-        return {
-          ...room,
-          occupiedBeds,
-          status: getStatus(occupiedBeds),
-        };
-      });
-    },
-    [selectedWard, selectedFloor, roomCounts]
-  );
-
-  const topRooms = roomData.slice(0, 5);
-  const bottomRooms = roomData.slice(5, 10);
-
   useEffect(() => {
     const fetchRoomSummary = async () => {
       try {
@@ -80,11 +67,13 @@ function HomePage() {
 
         const counts = {};
         summary.forEach((item) => {
-          const rawRoom = String(item.room ?? '');
-          const roomDigits = rawRoom.replace(/\D/g, '');
-          const roomSuffix = roomDigits.length >= 2 ? roomDigits.slice(-2) : rawRoom.padStart(2, '0');
-          const roomKey = `${item.building}${item.floor}${roomSuffix}`;
-          counts[roomKey] = item.patientCount ?? 0;
+          const roomKey = `${String(item.room).padStart(2, '0')}`;
+          counts[roomKey] = {
+            patientCount: item.patientCount ?? 0,
+            roomCapacity: item.roomCapacity ?? 4,
+            roomType: item.roomType,
+            roomGenderType: item.roomGenderType,
+          };
         });
 
         setRoomCounts(counts);
@@ -97,6 +86,29 @@ function HomePage() {
     fetchRoomSummary();
   }, [selectedWard, selectedFloor]);
 
+  const roomData = useMemo(() => {
+    return Object.entries(roomCounts).map(([roomKey, data]) => {
+      const patientCount = data.patientCount ?? 0;
+      const roomCapacity = data.roomCapacity ?? 4;
+      const roomType = ROOM_TYPE_MAP[data.roomType] ?? '일반실';
+      const gender = GENDER_MAP[data.roomGenderType] ?? '혼합';
+
+      return {
+        id: roomKey,
+        roomNumber: roomKey,
+        gender,
+        patientCount,
+        roomCapacity,
+        status: getStatus(patientCount, roomCapacity),
+        roomType,
+        nurses: [],
+      };
+    });
+  }, [roomCounts]);
+
+  const topRooms = roomData.slice(0, 5);
+  const bottomRooms = roomData.slice(5, 10);
+
   return (
     <section className="space-y-5">
       <div className="rounded-2xl bg-gray-300 p-6">
@@ -104,14 +116,14 @@ function HomePage() {
           <div>
             <p className="mb-4 text-lg text-blue-600">WARD SELECTION</p>
             <div className="flex gap-3">
-              {WARDS.map((ward) => (
+              {WARDS.map(({ value, label }) => (
                 <button
-                  key={ward}
+                  key={value}
                   type="button"
-                  onClick={() => setSelectedWard(ward)}
-                  className={`${btnBaseClass} ${selectedWard === ward ? btnActiveClass : btnInactiveClass}`}
+                  onClick={() => setSelectedWard(value)}
+                  className={`${btnBaseClass} ${selectedWard === value ? btnActiveClass : btnInactiveClass}`}
                 >
-                  병동{ward}
+                  {label}
                 </button>
               ))}
             </div>

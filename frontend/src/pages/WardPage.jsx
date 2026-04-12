@@ -1,102 +1,191 @@
-// import { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom'; // Link 페이지 이동 <a href>와 유사하다
-// //import productApi from '../api/productApi'; // Axios기반 API호출
+import { useEffect, useMemo, useState } from 'react';
+import { getRoomSummary } from '../api/LocationApi';
+import RoomComponent from '../components/lemon/RoomComponent';
 
-// function HomePage() {
-//     // 상품 목록 데이터(배열) 초기값은 빈배열
-//     const [latestProducts, setLatestProducts] = useState([]);
-//     // 로딩 여부 초기값은 true
-//     const [loading, setLoading] = useState(true);
+const WARDS = [
+  { value: 'A', label: 'A동' },
+  { value: 'B', label: 'B동' },
+  { value: 'C', label: 'C동' },
+];
+const FLOORS = [1, 2, 3, 4, 5];
+const SPECIALS = ['중환자실', '격리실'];
 
-//     useEffect(() => {
-//         fetchLatestProducts();
-//     }, []); // 의존성 배열 (빈배열 = 최초 1회만 실행)
+const ROOM_TYPE_MAP = {
+  GENERAL: '일반실',
+  ICU: '중환자실',
+  ISOLATION: '격리실',
+};
 
-//     const fetchLatestProducts = async () => {
-//         try {
-//             setLoading(true); // 로딩 시작
-//             const response = await productApi.getLatestProducts(); // API 호출
-//             setLatestProducts(response.data); // 데이터 저장
-//         } catch (error) {
-//             console.error('상품 조회 실패:', error);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
+const GENDER_MAP = {
+  MALE: '남성',
+  FEMALE: '여성',
+  CONCOCTION: '혼합',
+};
 
-//     if (loading) {
-//         return (
-//             <div className="flex justify-center items-center h-64">
-//                 <div className="text-gray-500">로딩중...</div>
-//             </div>
-//         );
-//     }
+const btnBaseClass = 'rounded-lg px-4 py-2 text-sm font-medium transition';
+const btnActiveClass = 'bg-blue-600 text-white';
+const btnInactiveClass = 'bg-white text-gray-800 hover:bg-blue-50';
 
-//     return (
-//         <div>
-//             {/* 히어로 섹션 */}
-//             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-12 mb-8">
-//                 <h1 className="text-4xl font-bold mb-4">
-//                     Spring Boot + React 쇼핑몰
-//                 </h1>
-//                 <p className="text-xl mb-6 opacity-90">
-//                     최신 상품을 만나보세요!
-//                 </p>
-//                 <Link
-//                     to="/products"
-//                     className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
-//                 >
-//                     상품 둘러보기 →
-//                 </Link>
-//             </div>
+const getStatus = (patientCount, roomCapacity) => {
+  if (patientCount >= roomCapacity) return 'FULL';
+  if (patientCount <= 1) return 'AVAILABLE';
+  return 'WARNING';
+};
 
-//             {/* 최신 상품 섹션 */}
-//             <h2 className="text-2xl font-bold mb-6">🆕 최신 상품</h2>
+const isRoomHighlighted = (roomType, selectedSpecial) => {
+  if (!selectedSpecial) return roomType === '일반실';
+  return roomType === selectedSpecial;
+};
 
-//             {latestProducts.length === 0 ? (
-//                 <div className="text-center py-12 text-gray-500">
-//                     등록된 상품이 없습니다.
-//                 </div>
-//             ) : (
-//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//                     {latestProducts.map((product) => (
-//                         <div
-//                             key={product.id}
-//                             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
-//                         >
-//                             {/* 상품 이미지 */}
-//                             <div className="h-48 bg-gray-200 flex items-center justify-center">
-//                                 {product.imageUrl ? (
-//                                     <img
-//                                         src={product.imageUrl}
-//                                         alt={product.name}
-//                                         className="w-full h-full object-cover"
-//                                     />
-//                                 ) : (
-//                                     <span className="text-4xl">📦</span>
-//                                 )}
-//                             </div>
+function HomePage() {
+  const [selectedWard, setSelectedWard] = useState('A');
+  const [selectedFloor, setSelectedFloor] = useState(1);
+  const [selectedSpecial, setSelectedSpecial] = useState(null);
+  const [roomCounts, setRoomCounts] = useState({});
 
-//                             {/* 상품 정보 */}
-//                             <div className="p-4">
-//                                 <h3 className="font-semibold text-lg mb-2 truncate">
-//                                     {product.name}
-//                                 </h3>
-//                                 <p className="text-blue-600 font-bold text-xl">
-//                                     {product.price?.toLocaleString()}원
-//                                     {/* toLocaleString()} -> 10000 => 10,000
-//                                         roduct.price? => null일때 undefinded */}
-//                                 </p>
-//                                 <p className="text-sm text-gray-500 mt-2">
-//                                     재고: {product.stockQuantity}개
-//                                 </p>
-//                             </div>
-//                         </div>
-//                     ))}
-//                 </div>
-//             )}
-//         </div>
-//     );
-// }
+  useEffect(() => {
+    const fetchRoomSummary = async () => {
+      try {
+        const summary = await getRoomSummary({
+          building: selectedWard,
+          floor: selectedFloor,
+        });
 
-// export default HomePage;
+        const counts = {};
+        summary.forEach((item) => {
+          const roomKey = `${String(item.room).padStart(2, '0')}`;
+          counts[roomKey] = {
+            patientCount: item.patientCount ?? 0,
+            roomCapacity: item.roomCapacity ?? 4,
+            roomType: item.roomType,
+            roomGenderType: item.roomGenderType,
+          };
+        });
+
+        setRoomCounts(counts);
+      } catch (error) {
+        console.error('병실 환자 수 조회 실패:', error);
+        setRoomCounts({});
+      }
+    };
+
+    fetchRoomSummary();
+  }, [selectedWard, selectedFloor]);
+
+  const roomData = useMemo(() => {
+    return Object.entries(roomCounts).map(([roomKey, data]) => {
+      const patientCount = data.patientCount ?? 0;
+      const roomCapacity = data.roomCapacity ?? 4;
+      const roomType = ROOM_TYPE_MAP[data.roomType] ?? '일반실';
+      const gender = GENDER_MAP[data.roomGenderType] ?? '혼합';
+
+      return {
+        id: roomKey,
+        roomNumber: roomKey,
+        gender,
+        patientCount,
+        roomCapacity,
+        status: getStatus(patientCount, roomCapacity),
+        roomType,
+        nurses: [],
+      };
+    });
+  }, [roomCounts]);
+
+  const topRooms = roomData.slice(0, 5);
+  const bottomRooms = roomData.slice(5, 10);
+
+  return (
+    <section className="space-y-5">
+      <div className="rounded-2xl bg-gray-300 p-6">
+        <div className="flex flex-wrap gap-10">
+          <div>
+            <p className="mb-4 text-lg text-blue-600">WARD SELECTION</p>
+            <div className="flex gap-3">
+              {WARDS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSelectedWard(value)}
+                  className={`${btnBaseClass} ${selectedWard === value ? btnActiveClass : btnInactiveClass}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-4 text-lg text-blue-600">FLOOR SELECTION</p>
+            <div className="flex gap-2">
+              {FLOORS.map((floor) => (
+                <button
+                  key={floor}
+                  type="button"
+                  onClick={() => setSelectedFloor(floor)}
+                  className={`${btnBaseClass} rounded ${selectedFloor === floor ? btnActiveClass : btnInactiveClass}`}
+                >
+                  {floor}F
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-4 text-lg text-blue-600">SPECIAL SELECTION</p>
+            <div className="flex gap-2">
+              {SPECIALS.map((special) => (
+                <button
+                  key={special}
+                  type="button"
+                  onClick={() =>
+                    setSelectedSpecial((prev) => (prev === special ? null : special))
+                  }
+                  className={`${btnBaseClass} ${selectedSpecial === special ? btnActiveClass : btnInactiveClass}`}
+                >
+                  {special}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 md:p-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {topRooms.map((room) => (
+            <RoomComponent
+              key={room.id}
+              room={room}
+              isDimmed={!isRoomHighlighted(room.roomType, selectedSpecial)}
+            />
+          ))}
+        </div>
+
+        <div className="my-5 flex h-28 items-center justify-center rounded-xl border border-blue-200 bg-gray-200 text-2xl font-bold tracking-widest text-slate-500">
+          복도(HALL)
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {bottomRooms.map((room) => (
+            <RoomComponent
+              key={room.id}
+              room={room}
+              isDimmed={!isRoomHighlighted(room.roomType, selectedSpecial)}
+            />
+          ))}
+        </div>
+
+        <div className="mt-5 flex items-center justify-center gap-3 text-xl font-semibold text-gray-500">
+          <button type="button" className="text-blue-600">1</button>
+          <button type="button" className="hover:text-gray-800">2</button>
+          <button type="button" className="hover:text-gray-800">3</button>
+          <button type="button" className="hover:text-gray-800">4</button>
+          <button type="button" className="hover:text-gray-800">5</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default HomePage;
