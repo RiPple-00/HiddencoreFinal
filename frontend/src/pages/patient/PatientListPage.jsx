@@ -138,9 +138,9 @@ export default function PatientListPage() {
           >
             <option value="">전체 상태</option>
             <option value="STABLE">안정</option>
-            <option value="DISCHARGE_SOON">퇴원예정</option>
             <option value="FOCUSED_CARE">집중관찰</option>
             <option value="DANGER">주의</option>
+            <option value="DISCHARGE_SOON">퇴원예정</option>
             <option value="DISCHARGED">퇴원</option>
           </select>
         </div>

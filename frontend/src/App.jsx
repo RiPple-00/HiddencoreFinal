@@ -4,7 +4,7 @@ import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import PatientListPage from "./pages/patient/PatientListPage"
 import PatientDetailPage from './pages/patient/PatientDetailPage'
-// import PatientCreatePage from './pages/patient/PatientCreatePage'
+import PatientCreatePage from './pages/patient/PatientCreatePage'
 
 
 function App() {
@@ -52,7 +52,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/patients" element={<PatientListPage />}/>
           <Route path="/patients/:patientId" element={<PatientDetailPage />} />
-          {/* <Route path="/patients/new" element={<PatientCreatePage/>}/> */}
+          <Route path="/patients/new" element={<PatientCreatePage/>}/>
         </Routes>
 
         

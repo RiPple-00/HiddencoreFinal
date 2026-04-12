@@ -112,16 +112,11 @@ public class PatientDto {
         private LocalDate birthDate;
         private String address;
         private LocalDate admissionDate;
-        private LocalDate dischargeDate;
         private Patient.BloodType bloodType;
-        private BigDecimal height;
-        private BigDecimal weight;
-        private String admissionStatus;
-        private String dietType;
+        private String building;
+        private String room;
+        private String bed;
         private String memo;
-        private Patient.PatientStatus patientStatus;
-        private Long facilityId;
-        private Long locationId;
     }
 
     @Data

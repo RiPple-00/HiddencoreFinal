@@ -84,7 +84,7 @@ public class Patient {
     private String memo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "patient_status", nullable = false, length = 30)
+    @Column(name = "patient_status", length = 30)// 널 허용
     private PatientStatus patientStatus;
 
     @Column(name = "created_at", nullable = false)
