@@ -1,7 +1,10 @@
 package hiddencore.ddasum.backend.domain;
 
+<<<<<<< HEAD
 import java.time.LocalDateTime;
 
+=======
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +24,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+<<<<<<< HEAD
+=======
+import java.time.LocalDateTime;
+
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 @Entity
 @Table(name = "POST")
 @Getter
@@ -104,6 +112,7 @@ public class Post {
     }
     
     public enum PostType {
+<<<<<<< HEAD
         URGENT,
         CLINICAL,
         ADMIN,
@@ -111,6 +120,20 @@ public class Post {
         REVIEW,
         SCHEDULE,
         GENERAL
+=======
+        // 공지 게시판
+        URGENT, // 긴급
+        CLINICAL, // 임상
+        ADMIN, // 행정
+        FACILITY, // 시설
+        
+        // 프로그램 게시판
+        APPLY, // 참여 신청
+        REVIEW, // 활동 후기
+        
+        // 자유 게시판
+        GENERAL,
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
     }
     
     public enum PostStatus {

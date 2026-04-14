@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
  * 날짜 문자열을 "YYYY.MM.DD" 형식으로 변환
  * table 모드 날짜 표시에 사용
  * @param {string} dateStr - ISO 날짜 문자열
@@ -19,6 +20,75 @@ export const formatDate = (dateStr) => {
  * @param {string} dateStr - ISO 날짜 문자열
  * @returns {string} "방금 전" | "N분 전" | "N시간 전" | "어제" | "YYYY.MM.DD"
  */
+=======
+ * 날짜 표시: `Date` 인스턴스는 캘린더용 `YYYY-MM-DD`, 그 외(ISO 문자열 등)는 게시판 표시용 `YYYY.MM.DD`.
+ */
+export const formatDate = (dateOrStr) => {
+  if (dateOrStr === undefined || dateOrStr === null || dateOrStr === '') {
+    return '-';
+  }
+  const date =
+    dateOrStr instanceof Date ? dateOrStr : new Date(dateOrStr);
+  if (Number.isNaN(date.getTime())) return '-';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  if (dateOrStr instanceof Date) {
+    return `${year}-${month}-${day}`;
+  }
+  return `${year}.${month}.${day}`;
+};
+
+export const formatTime = (date) => {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+export const formatMonthTitle = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}년 ${month}월`;
+};
+
+export const toDate = (value) => {
+  if (!value && value !== 0) return null;
+  if (value instanceof Date) return value;
+  if (typeof value === 'number') return new Date(value);
+
+  if (typeof value === 'string') {
+    const d = new Date(value.trim());
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  if (Array.isArray(value)) {
+    const [y, m, d, hh = 0, mm = 0, ss = 0] = value;
+    const dt = new Date(y, (m ?? 1) - 1, d ?? 1, hh, mm, ss);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+  }
+
+  if (typeof value === 'object') {
+    const y = value.year ?? value.y;
+    const m = value.monthValue ?? value.month ?? value.m;
+    const d = value.dayOfMonth ?? value.day ?? value.d;
+    const hh = value.hour ?? 0;
+    const mm = value.minute ?? 0;
+    const ss = value.second ?? 0;
+    if (!y || !m || !d) return null;
+    const dt = new Date(y, m - 1, d, hh, mm, ss);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+  }
+
+  return null;
+};
+
+export const toDateString = (value) => {
+  const d = toDate(value);
+  return d ? formatDate(d) : null;
+};
+
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 export const formatRelativeTime = (dateStr) => {
   if (!dateStr) return '-';
 
@@ -34,6 +104,9 @@ export const formatRelativeTime = (dateStr) => {
   if (diffHour < 24) return `${diffHour}시간 전`;
   if (diffDay === 1) return '어제';
 
+<<<<<<< HEAD
   // 이틀 이상이면 날짜로 표시
+=======
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
   return formatDate(dateStr);
 };

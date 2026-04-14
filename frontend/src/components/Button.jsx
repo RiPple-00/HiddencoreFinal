@@ -14,7 +14,11 @@ const Button = ( {
     size = 'md', // 중간 크기
     children, // 버튼안에 들어갈 내용
     onClick, // 클릭시 실행할 함수
+<<<<<<< HEAD
     className = '', // css
+=======
+    className = '', // css 
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
     disabled = false, // 비활성화
     type ='button', 
     ...props // 나머지 props들 관리

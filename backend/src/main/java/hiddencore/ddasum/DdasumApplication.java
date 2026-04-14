@@ -1,9 +1,17 @@
 package hiddencore.ddasum;
 
+<<<<<<< HEAD
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+=======
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 
 @SpringBootApplication
 @OpenAPIDefinition(
@@ -14,6 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		)
 )
 
+<<<<<<< HEAD
 
 // @OpenAPIDefinition은 필수는 아닙니다.
 
@@ -23,6 +32,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // 단, API 문서에 원하는 제목/버전/설명을 넣고 싶으면 그대로 두어야 합니다.
 // 즉, 없어도 동작은 하지만, 문서 헤더 정보를 직접 지정하려면 필요합니다.
 
+=======
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 public class DdasumApplication {
 
 	public static void main(String[] args) {

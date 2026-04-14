@@ -8,7 +8,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
+<<<<<<< HEAD
       ddl-auto: update
+=======
+      ddl-auto: none
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
     show-sql: true
     properties:
       hibernate:
@@ -18,3 +22,9 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+<<<<<<< HEAD
+=======
+
+server:
+  port: 8081
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf

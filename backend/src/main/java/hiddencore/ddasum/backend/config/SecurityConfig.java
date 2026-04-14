@@ -1,5 +1,10 @@
 package hiddencore.ddasum.backend.config;
 
+<<<<<<< HEAD
+=======
+import java.util.List;
+
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,8 +19,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+<<<<<<< HEAD
 import java.util.List;
 
+=======
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,14 +31,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+<<<<<<< HEAD
                 .csrf(AbstractHttpConfigurer::disable)
+=======
+                .csrf(csrf -> csrf.disable())
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/members/**").permitAll()
+<<<<<<< HEAD
                         .anyRequest().authenticated()
+=======
+                        .requestMatchers("/api/schedules/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/meals/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/meals/**").permitAll()
+                        .anyRequest().permitAll()
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);

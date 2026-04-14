@@ -4,9 +4,17 @@ import toast from 'react-hot-toast'; // 토스트 알림
 import authApi from '../api/authApi'; // 회원가입 API
 import Input from '../components/Input'; 
 import Button from '../components/Button'; 
+<<<<<<< HEAD
 
 function LoginPage(){
     const navigate = useNavigate();
+=======
+import { useAuth } from '../contexts/AutoContext.jsx';
+
+function LoginPage(){
+    const navigate = useNavigate();
+    const { login } = useAuth();
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         userId: '',
@@ -55,6 +63,10 @@ function LoginPage(){
             // 토큰 저장 JWT 토큰 발급 
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data));
+<<<<<<< HEAD
+=======
+            login(response.data);
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
             
             toast.success(`${response.data.nickname || response.data.username}님, 환영합니다!`);
             navigate('/');

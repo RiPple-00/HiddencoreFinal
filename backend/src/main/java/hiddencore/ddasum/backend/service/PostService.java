@@ -49,9 +49,18 @@ public class PostService {
     // CHECK!!! 추후 중복 조회수 방지 로직 추가 필요 (userId 기반 또는 세션 기반)
     @Transactional
     public PostDto.PostResponse getPost(Long facilityId, Long postId) {
+<<<<<<< HEAD
         Post post = postRepository.findByIdInFacility(postId, facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
         post.incrementViews(); // 조회수 증가 ※상세 페이지 로딩 완료 시점
+=======
+        Post post = postRepository.findByPostIdAndFacilityId(postId, facilityId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        // 공개 게시글만 조회수 증가 (임시저장·비공개 조회는 제외)
+        if (post.getStatus() == PostStatus.ACTIVE || post.getStatus() == PostStatus.RESERVE) {
+            post.incrementViews();
+        }
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
         return PostDto.PostResponse.from(post);
     }
 
@@ -118,7 +127,11 @@ public class PostService {
     @Transactional
     public PostDto.PostResponse updatePost(Long facilityId, Long postId, Long userId,
             PostDto.UpdateRequest request) {
+<<<<<<< HEAD
         Post post = postRepository.findByIdInFacility(postId, facilityId)
+=======
+        Post post = postRepository.findByPostIdAndFacilityId(postId, facilityId)
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         if (!post.getAuthorUserId().getUserId().equals(userId)) {
@@ -160,7 +173,11 @@ public class PostService {
     // 게시글 삭제: 하드 삭제 (DB에서 완전 제거)
     @Transactional
     public void deletePost(Long facilityId, Long postId, Long userId) {
+<<<<<<< HEAD
         Post post = postRepository.findByIdInFacility(postId, facilityId)
+=======
+        Post post = postRepository.findByPostIdAndFacilityId(postId, facilityId)
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         if (!post.getAuthorUserId().getUserId().equals(userId)) {

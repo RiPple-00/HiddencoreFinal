@@ -1,6 +1,10 @@
 import { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import postApi from '../api/postApi';
+<<<<<<< HEAD
 import { PAGE_SIZE } from '../utils/boardUtils';
+=======
+import { PAGE_SIZE, BOARD_OPTIONS } from '../utils/boardUtils';
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 
 const BoardContext = createContext(null);
 
@@ -124,7 +128,11 @@ export const BoardProvider = ({ facilityId, children }) => {
     }
 
     return result;
+<<<<<<< HEAD
   }, [allPosts, currentTab, searchKeyword, searchType]);
+=======
+  }, [allPosts, selectedBoard, currentTab, searchKeyword, searchType]);
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 
   /** 전체 페이지 수 */
   const totalPages = useMemo(

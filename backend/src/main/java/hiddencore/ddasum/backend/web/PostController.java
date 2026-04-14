@@ -25,6 +25,7 @@ import java.util.List;
 
 /* SWAGGER
  * 전체 페이지
+<<<<<<< HEAD
 GET/facilities/{facilityId}/posts             전체 목록 (type 필터 가능)
 GET/facilities/{facilityId}/posts/{postId}    단건 상세 (게시글 보기)
 GET/facilities/{facilityId}/posts/search      검색
@@ -34,11 +35,26 @@ DELETE/facilities/{facilityId}/posts/{postId} 게시글 삭제
  * 마이 페이지
 GET/facilities/{facilityId}/posts/my          내 작성 기록
 GET/facilities/{facilityId}/posts/draft       내 임시 저장
+=======
+GET /api/facilities/{facilityId}/posts             전체 목록 (type 필터 가능)
+GET /api/facilities/{facilityId}/posts/{postId}    단건 상세 (게시글 보기)
+GET /api/facilities/{facilityId}/posts/search      검색
+POST /api/facilities/{facilityId}/posts            게시글 생성
+PUT /api/facilities/{facilityId}/posts/{postId}    게시글 수정
+DELETE /api/facilities/{facilityId}/posts/{postId} 게시글 삭제
+ * 마이 페이지
+GET /api/facilities/{facilityId}/posts/my          내 작성 기록
+GET /api/facilities/{facilityId}/posts/draft       내 임시 저장
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 */
 
 @RestController
 @RequiredArgsConstructor
+<<<<<<< HEAD
 @RequestMapping("/facilities/{facilityId}/posts")
+=======
+@RequestMapping("/api/facilities/{facilityId}/posts")
+>>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 public class PostController {
 
     private final PostService postService;
