@@ -18,6 +18,10 @@ export const BoardProvider = ({ facilityId, children }) => {
 
   // 원본 전체 데이터 - 마운트 시 1회 로드 후 변경 안 함
   const [allPosts, setAllPosts] = useState([]);
+  
+  // 드롭다운 선택 상태 (게시판 종류)
+  // BOARD_OPTIONS[0] = { label: '전체 게시판', value: 'ALL' }
+  const [selectedBoard, setSelectedBoard] = useState(BOARD_OPTIONS[0]);
 
   // 필터/검색 상태
   const [currentTab, setCurrentTab] = useState(null);   // null = 전체
@@ -49,6 +53,18 @@ export const BoardProvider = ({ facilityId, children }) => {
       setIsLoading(false);
     }
   }, [facilityId]);
+
+  /**
+   * 게시판(드롭다운) 변경
+   * 탭/검색/페이지 모두 초기화
+   */
+  const changeBoard = useCallback((option) => {
+    setSelectedBoard(option);
+    setCurrentTab(null);
+    setCurrentPage(0);
+    setSearchKeyword('');
+    setSearchType('all');
+  }, []);
 
   /**
    * 탭 변경
@@ -84,12 +100,18 @@ export const BoardProvider = ({ facilityId, children }) => {
   const filteredPosts = useMemo(() => {
     let result = allPosts;
 
-    // 1단계: 탭 필터 (type이 null이면 전체)
+    // 1단계: 게시판 필터 (ALL이면 전체, 아니면 해당 게시판 PostType 묶음으로 필터링)
+    if (selectedBoard.value !== 'ALL') {
+      const types = BOARD_TYPE_MAP[selectedBoard.value] ?? [];
+      result = result.filter((post) => types.includes(post.type));
+    }
+
+    // 2단계: 탭 필터 (null이면 전체)
     if (currentTab) {
       result = result.filter((post) => post.type === currentTab);
     }
 
-    // 2단계: 검색 필터
+    // 3단계: 검색 필터
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.trim().toLowerCase();
       result = result.filter((post) => {
@@ -119,6 +141,7 @@ export const BoardProvider = ({ facilityId, children }) => {
   const value = {
     // 상태
     allPosts,
+    selectedBoard,
     currentTab,
     currentPage,
     searchKeyword,
@@ -131,6 +154,7 @@ export const BoardProvider = ({ facilityId, children }) => {
     paginatedPosts,
     // 액션
     fetchAllPosts,
+    changeBoard,
     changeTab,
     changePage: setCurrentPage,
     search,
