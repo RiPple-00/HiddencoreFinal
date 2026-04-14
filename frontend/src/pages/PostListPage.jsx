@@ -1,40 +1,13 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import postApi from "../api/postApi";
+import { Navigate, useParams } from 'react-router-dom';
 
+/**
+ * 예전 단순 목록 페이지는 시설 게시판(BoardListPage)으로 통합됨.
+ * 혹시 남은 링크는 시설 게시판으로 보냄.
+ */
 function PostListPage() {
-  const { boardId } = useParams();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await postApi.getPostsByBoard(boardId, page, 10);
-        setPosts(res.data.content);
-        setTotalPages(res.data.totalPages);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [boardId, page]);
-
-  return (
-    <div>
-      <h1>Post List</h1>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <Link to={`/posts/${post.id}`}>{post.title}</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  const { facilityId, boardId } = useParams();
+  const id = facilityId ?? boardId ?? '1';
+  return <Navigate to={`/facilities/${id}/board`} replace />;
 }
 
 export default PostListPage;

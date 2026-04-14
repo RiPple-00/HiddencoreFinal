@@ -1,29 +1,50 @@
-import api from "./index";
+import api from './index';
 
-const boardApi = {
-  // 프로그램 리스트 불러오기
-  getPostsByBoard: (boardId, page = 0, size = 10) => {
-    return api.get(`/posts/board/${boardId}`, { params: { page, size } });
-  },
+const postApi = {
+  getPostList: (facilityId, type = null, page = 0, size = 20) =>
+    api.get(`/facilities/${facilityId}/posts`, {
+      params: { type, page, size },
+    }),
 
-  // 프로그램 게시글 등록하기
-  getPost: (id) => {
-    return api.get(`/posts/${id}`);
-  },
+  getPost: (facilityId, postId) =>
+    api.get(`/facilities/${facilityId}/posts/${postId}`),
 
-  // 프로그램 게시글 등록하기
-  createPost: (postData) => {
-    return api.post("/posts", postData);
-  },
+  searchPosts: (facilityId, type, searchType, keyword, page = 0, size = 20) =>
+    api.get(`/facilities/${facilityId}/posts/search`, {
+      params: { type, searchType, keyword, page, size },
+    }),
 
-  // 프로그램 게시글 수정하기
-  updatePost: (id, postData) => {
-    return api.put(`/posts/${id}`, postData);
-  },
+  createPost: (facilityId, userId, data) =>
+    api.post(`/facilities/${facilityId}/posts`, data, {
+      params: { userId },
+    }),
 
-  // 프로그램 게시글 삭제하기
-  deletePost: (id) => {
-    return api.delete(`/posts/${id}`);
+  updatePost: (facilityId, postId, userId, data) =>
+    api.put(`/facilities/${facilityId}/posts/${postId}`, data, {
+      params: { userId },
+    }),
+
+  deletePost: (facilityId, postId, userId) =>
+    api.delete(`/facilities/${facilityId}/posts/${postId}`, {
+      params: { userId },
+    }),
+
+  getMyPosts: (facilityId, userId, type = null, page = 0, size = 20) =>
+    api.get(`/facilities/${facilityId}/posts/my`, {
+      params: { userId, page, size, ...(type != null ? { type } : {}) },
+    }),
+
+  getMyDrafts: (facilityId, userId, type = null, page = 0, size = 20) =>
+    api.get(`/facilities/${facilityId}/posts/draft`, {
+      params: { userId, page, size, ...(type != null ? { type } : {}) },
+    }),
+
+  uploadFile: (facilityId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/facilities/${facilityId}/posts/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 };
 

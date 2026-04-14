@@ -1,5 +1,7 @@
 package hiddencore.ddasum.backend.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,8 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +31,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/members/**").permitAll()
                         .requestMatchers("/api/schedules/**").permitAll()
-                        // 개발 단계에서는 전체 허용 (로그인/일정 기능 unblock)
+                        .requestMatchers(HttpMethod.GET, "/api/meals/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/meals/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
