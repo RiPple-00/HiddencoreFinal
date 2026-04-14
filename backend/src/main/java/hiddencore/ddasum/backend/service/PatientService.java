@@ -41,22 +41,24 @@ public class PatientService {
                 Facility facility = facilityRepository.findById(1L)
                                 .orElseThrow(() -> new IllegalArgumentException("시설이 없습니다. id=1"));
 
-                Location location = null; // 일단 널이라고 가정 -> 병실,병상을 일단 배정안했다는 가정
-        
-                // 병실 정보가 모두 들어왔는지 확인
-                boolean hasLocation = request.getBuilding() != null && !request.getBuilding().isBlank() &&
-                                request.getRoom() != null && !request.getRoom().isBlank() &&
-                                request.getBed() != null && !request.getBed().isBlank();
+                Location location = null;
 
-                if (hasLocation) { //병실 정보가 다 들어왔을 때만 Location 테이블 조회함 
-                        location = locationRepository
-                                        .findByBuildingAndRoomAndBed(
-                                                        request.getBuilding(),
-                                                        request.getRoom(),
-                                                        request.getBed())
-                                        .orElseThrow(() -> new IllegalArgumentException("해당 병실/병상이 없습니다.")); 
-                                        //지금은 입력값으로 받기 때문에 데이터 더미랑 데이터 다르면 예외처리 하는데 나중에 원준오빠꺼랑 합치고
-                                        //다른 방식으로 입력하도록 수정할거임
+                if (request.getLocationId() != null) {
+                        location = locationRepository.findById(request.getLocationId())
+                                        .orElseThrow(() -> new IllegalArgumentException("해당 병상이 없습니다."));
+                } else {
+                        boolean hasLocation = request.getBuilding() != null && !request.getBuilding().isBlank() &&
+                                        request.getRoom() != null && !request.getRoom().isBlank() &&
+                                        request.getBed() != null && !request.getBed().isBlank();
+
+                        if (hasLocation) {
+                                location = locationRepository
+                                                .findByBuildingAndRoomAndBed(
+                                                                request.getBuilding(),
+                                                                request.getRoom(),
+                                                                request.getBed())
+                                                .orElseThrow(() -> new IllegalArgumentException("해당 병실/병상이 없습니다."));
+                        }
                 }
 
                 Patient patient = Patient.builder()
@@ -73,6 +75,12 @@ public class PatientService {
                                 .build();
 
                 Patient savedPatient = patientRepository.save(patient);
+
+                if (location != null) {
+                        location.setPatientId(savedPatient);
+                        location.setIsOccupied(true);
+                }
+
                 return PatientDto.DetailResponse.from(savedPatient);
         }
 
