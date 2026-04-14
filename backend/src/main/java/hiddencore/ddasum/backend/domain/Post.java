@@ -104,9 +104,13 @@ public class Post {
     }
 
     public enum PostType {
-        NOTICE,
-        BOARD,
-        PROGRAM
+        URGENT,
+        CLINICAL,
+        ADMIN,
+        APPLY,
+        REVIEW,
+        SCHEDULE,
+        GENERAL
     }
 
     public enum PostStatus {
