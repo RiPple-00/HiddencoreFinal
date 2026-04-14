@@ -1,10 +1,5 @@
 package hiddencore.ddasum.backend.web.dto;
 
-<<<<<<< HEAD
-=======
-import java.time.LocalDateTime;
-
->>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
 import hiddencore.ddasum.backend.domain.Users.UsersRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,15 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-<<<<<<< HEAD
 import java.time.LocalDateTime;
 
-=======
->>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
-public class MemberDto {
 
-    // ═══════════════════════════════════════════════════════════
-    // 회원가입 요청 DTO
     // ═══════════════════════════════════════════════════════════
     @Data // getter, setter, toString, equals, hashCode 자동 생성
     // @Data는 lombok에서 제공하는 어노테이션

@@ -32,26 +32,20 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         @Param("type") PostType type,
                         Pageable pageable);
 
-<<<<<<< HEAD
         // 시설 내 단건 조회 - Optional: 게시글이 없을 때 명시적으로 처리
         // CHECK!! 필요한가
-=======
         // 시설 내 단건 조회 (목록·상세 공개용: ACTIVE만)
->>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
         @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
                         "WHERE p.postId = :postId AND f.facilityId = :facilityId AND p.status = 'ACTIVE'")
         Optional<Post> findByIdInFacility(@Param("postId") Long postId,
                         @Param("facilityId") Long facilityId);
 
-<<<<<<< HEAD
-=======
         /** 시설 + 글 ID (상세 조회: 임시저장 INACTIVE·예약 RESERVE 포함) */
         @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
                         "WHERE p.postId = :postId AND f.facilityId = :facilityId")
         Optional<Post> findByPostIdAndFacilityId(@Param("postId") Long postId,
                         @Param("facilityId") Long facilityId);
 
->>>>>>> 1039d55f3b99df2abaf1450d9e2f351e3b91d9bf
         /* 유저 마이 페이지 조회 */
 
         // 1. 작성 기록 페이지 (ACTIVE 글 전체)
