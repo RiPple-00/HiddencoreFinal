@@ -60,8 +60,6 @@ function BedRoomPage() {
   const [searchAttempted, setSearchAttempted] = useState(false);
   const [assigningPatientId, setAssigningPatientId] = useState(null);
 
-
-
   const loadBeds = useCallback(async () => {
     if (!room) return;
     try {
@@ -71,7 +69,6 @@ function BedRoomPage() {
       const res = await bedRoomApi.getBedsByRoom(room);
 
       const data = res?.data ?? [];
-
       const mappedBeds = data.map((bed) => ({
         locationId: bed.locationId,
         patientId: bed.patientId,
@@ -98,7 +95,9 @@ function BedRoomPage() {
       console.error("병상 조회 실패", e);
 
       if (e.code === "ERR_NETWORK") {
-        setError("백엔드 서버에 연결할 수 없습니다. 서버 실행 상태와 포트를 확인해주세요.");
+        setError(
+          "백엔드 서버에 연결할 수 없습니다. 서버 실행 상태와 포트를 확인해주세요.",
+        );
       } else {
         setError("병상 조회 중 오류가 발생했습니다.");
       }
@@ -134,7 +133,6 @@ function BedRoomPage() {
     }
   };
 
-
   // 환자 배정 모달 열기
   const openAssignModal = (bed) => {
     setSelectedBed(bed);
@@ -160,7 +158,10 @@ function BedRoomPage() {
     if (!selectedBed?.locationId || !patient?.assignable) return;
     try {
       setAssigningPatientId(patient.patientId);
-      await bedRoomApi.assignPatientToBed(selectedBed.locationId, patient.patientId);
+      await bedRoomApi.assignPatientToBed(
+        selectedBed.locationId,
+        patient.patientId,
+      );
       toast.success("환자를 침상에 배정했습니다.");
       closeAssignModal();
       await loadBeds();
@@ -221,10 +222,6 @@ function BedRoomPage() {
   };
 
 
-
-
-
-
   /*const transfers = [
     {
       id: 1,
@@ -259,18 +256,20 @@ function BedRoomPage() {
             </div>
 
             {loading ? (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">로딩 중...</div>
+              <div className="rounded-2xl bg-white p-6 shadow-sm">
+                로딩 중...
+              </div>
             ) : error ? (
-              <div className="rounded-2xl bg-white p-6 shadow-sm text-red-600">{error}</div>
+              <div className="rounded-2xl bg-white p-6 shadow-sm text-red-600">
+                {error}
+              </div>
             ) : (
-              <RoomLayoutCard beds={beds}
+              <RoomLayoutCard
+                beds={beds}
                 onAssignClick={openAssignModal}
-                onBedClick={handleBedClick} />
-
+                onBedClick={handleBedClick}
+              />
             )}
-
-
-
 
             {/* <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
@@ -296,15 +295,17 @@ function BedRoomPage() {
         </div>
       </div>
 
-
-
       {isAssignModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 px-4">
           <div className="w-full max-w-[760px] rounded-3xl bg-white p-8 shadow-2xl">
             <div className="mb-4 flex items-start justify-between">
               <div>
-                <h2 className="text-3xl font-bold text-slate-900">환자 검색 및 배정</h2>
-                <p className="mt-1 text-sm text-slate-500">병동 관리 및 환자 담당의 배정 시스템</p>
+                <h2 className="text-3xl font-bold text-slate-900">
+                  환자 검색 및 배정
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  병동 관리 및 환자 담당의 배정 시스템
+                </p>
               </div>
               <button
                 type="button"
@@ -339,13 +340,18 @@ function BedRoomPage() {
               </button>
             </div>
 
-            <p className="mb-3 text-sm text-slate-500">검색 결과 ({searchedPatients.length})</p>
-            {searchError && <p className="mb-3 text-sm text-red-500">{searchError}</p>}
+            <p className="mb-3 text-sm text-slate-500">
+              검색 결과 ({searchedPatients.length})
+            </p>
+            {searchError && (
+              <p className="mb-3 text-sm text-red-500">{searchError}</p>
+            )}
 
             <div className="max-h-[320px] space-y-3 overflow-y-auto rounded-2xl border border-slate-100 bg-white p-1">
               {searchedPatients.map((patient) => {
                 const isFemale =
-                  typeof patient.gender === "string" && patient.gender.includes("여");
+                  typeof patient.gender === "string" &&
+                  patient.gender.includes("여");
                 const iconClass = patient.assignable
                   ? isFemale
                     ? "bg-pink-100 text-pink-600"
@@ -355,10 +361,11 @@ function BedRoomPage() {
                 return (
                   <div
                     key={patient.patientId}
-                    className={`flex items-center justify-between rounded-2xl border px-4 py-4 ${patient.assignable
-                      ? "border-slate-200 bg-white"
-                      : "border-dashed border-slate-200 bg-slate-50 opacity-80"
-                      }`}
+                    className={`flex items-center justify-between rounded-2xl border px-4 py-4 ${
+                      patient.assignable
+                        ? "border-slate-200 bg-white"
+                        : "border-dashed border-slate-200 bg-slate-50 opacity-80"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
@@ -368,14 +375,19 @@ function BedRoomPage() {
                       </div>
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-2xl font-bold text-slate-900">{patient.name}</p>
+                          <p className="text-2xl font-bold text-slate-900">
+                            {patient.name}
+                          </p>
                           <span
-                            className={`rounded-full px-2 py-1 text-xs font-semibold ${patient.assignmentStatus === "미배정"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-slate-200 text-slate-700"
-                              }`}
+                            className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                              patient.assignmentStatus === "미배정"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
                           >
-                            {patient.assignmentStatus === "미배정" ? "미배정" : "배정됨"}
+                            {patient.assignmentStatus === "미배정"
+                              ? "미배정"
+                              : "배정됨"}
                           </span>
                           {patient.assignedBedLabel && (
                             <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
@@ -395,12 +407,16 @@ function BedRoomPage() {
 
                     <button
                       type="button"
-                      disabled={!patient.assignable || assigningPatientId === patient.patientId}
+                      disabled={
+                        !patient.assignable ||
+                        assigningPatientId === patient.patientId
+                      }
                       onClick={() => handleAssignPatientToSelectedBed(patient)}
-                      className={`rounded-xl px-5 py-2 text-base font-semibold ${patient.assignable
-                        ? "bg-blue-500 text-white transition hover:bg-blue-600 disabled:opacity-60"
-                        : "cursor-not-allowed bg-slate-200 text-slate-400"
-                        }`}
+                      className={`rounded-xl px-5 py-2 text-base font-semibold ${
+                        patient.assignable
+                          ? "bg-blue-500 text-white transition hover:bg-blue-600 disabled:opacity-60"
+                          : "cursor-not-allowed bg-slate-200 text-slate-400"
+                      }`}
                     >
                       {patient.assignable
                         ? assigningPatientId === patient.patientId
@@ -411,11 +427,13 @@ function BedRoomPage() {
                   </div>
                 );
               })}
-              {!searchLoading && searchAttempted && searchedPatients.length === 0 && (
-                <div className="rounded-2xl border border-dashed border-slate-200 py-10 text-center text-slate-400">
-                  검색된 환자가 없습니다.
-                </div>
-              )}
+              {!searchLoading &&
+                searchAttempted &&
+                searchedPatients.length === 0 && (
+                  <div className="rounded-2xl border border-dashed border-slate-200 py-10 text-center text-slate-400">
+                    검색된 환자가 없습니다.
+                  </div>
+                )}
               {!searchLoading && !searchAttempted && (
                 <div className="rounded-2xl border border-dashed border-slate-200 py-10 text-center text-slate-400">
                   환자 이름을 입력한 뒤 검색을 눌러주세요.
@@ -441,12 +459,13 @@ function BedRoomPage() {
             </div>
 
             {selectedBed && (
-              <p className="mt-3 text-sm text-slate-400">현재 선택 침상: {selectedBed.id}</p>
+              <p className="mt-3 text-sm text-slate-400">
+                현재 선택 침상: {selectedBed.id}
+              </p>
             )}
           </div>
         </div>
       )}
-
 
       {/* PatientSummaryCard 컴포넌트 관련 */}
       {selectedBed?.occupied && (
@@ -463,9 +482,13 @@ function BedRoomPage() {
             </div>
 
             {patientDetailLoading ? (
-              <div className="rounded-2xl border border-slate-200 p-6 text-slate-500">로딩 중...</div>
+              <div className="rounded-2xl border border-slate-200 p-6 text-slate-500">
+                로딩 중...
+              </div>
             ) : patientDetailError ? (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">{patientDetailError}</div>
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
+                {patientDetailError}
+              </div>
             ) : (
               <PatientSummaryCard patient={selectedPatient} />
             )}
@@ -488,11 +511,6 @@ function BedRoomPage() {
           </div>
         </div>
       )}
-
-
-
-
-
     </>
   );
 }

@@ -38,6 +38,7 @@ function RoomLayoutCard({ beds, onAssignClick, onBedClick}) {
         출입문 (DOOR)
       </div>
     </section>
+    
   );
 }
 
