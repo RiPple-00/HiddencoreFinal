@@ -204,6 +204,24 @@ function BedRoomPage() {
 
 
 
+  const [unassigning, setUnassigning] = useState(false);
+  const handleUnassignSelectedBed = async () => {
+    if (!selectedBed?.locationId) return;
+    try {
+      setUnassigning(true);
+      await bedRoomApi.deletePatientFromBed(selectedBed.locationId);
+      toast.success("병상 배치를 취소했습니다.");
+      closeBedModal();
+      await loadBeds();
+    } catch (e) {
+      console.error("병상 배치 취소 실패", e);
+    } finally {
+      setUnassigning(false);
+    }
+  };
+
+
+
 
 
 
@@ -451,14 +469,22 @@ function BedRoomPage() {
             ) : (
               <PatientSummaryCard patient={selectedPatient} />
             )}
-            <br/>
-            <button className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600 ">
-              병상 배치 취소하기
+            <br />
+            <button
+              type="button"
+              disabled={unassigning}
+              onClick={handleUnassignSelectedBed}
+              className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600"
+            >
+              {unassigning ? "처리 중..." : "병상 배치 취소하기"}
             </button>
-            
+
+
             <button className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
               환자 병실 이동(전실) 관리
             </button>
+
+
           </div>
         </div>
       )}

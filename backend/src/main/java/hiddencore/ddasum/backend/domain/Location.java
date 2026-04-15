@@ -69,7 +69,7 @@ public class Location {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_occupied", nullable = false)
-    private Boolean isOccupied;
+    private Boolean isOccupied; // 
 
     @PrePersist
     protected void onCreate() {

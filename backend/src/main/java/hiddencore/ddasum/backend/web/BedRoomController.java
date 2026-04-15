@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,9 +27,7 @@ public class BedRoomController {
 
     private final BedRoomService bedRoomService;
 
-    @Operation(
-            summary = "병실별 병상 목록",
-            description = "path의 room은 DB LOCATION.room 컬럼과 동일한 문자열입니다. (예: 303, 301호)")
+    @Operation(summary = "병실별 병상 목록", description = "path의 room은 DB LOCATION.room 컬럼과 동일한 문자열입니다. (예: 303, 301호)")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/{room}/beds")
     public ResponseEntity<List<BedResponseDto>> getBedsByRoom(
@@ -50,4 +49,14 @@ public class BedRoomController {
         bedRoomService.assignPatientToBed(locationId, body.getPatientId());
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "침상 환자 배정 해제", description = "해당 침상에서 환자 연결을 끊어 빈 병상으로 만듭니다.")
+    @ApiResponse(responseCode = "204", description = "해제 완료")
+    @DeleteMapping("/beds/{locationId}/assign")
+    public ResponseEntity<Void> unassignPatientFromBed(
+            @Parameter(description = "침상(LOCATION) ID") @PathVariable Long locationId) {
+        bedRoomService.deletePatientFromBed(locationId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

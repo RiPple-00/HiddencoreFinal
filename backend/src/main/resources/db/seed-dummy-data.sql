@@ -1,122 +1,147 @@
--- 통합 시드: (1) 본관 303호 A~D 침상  (2) 기존 다인실/타 병동 더미
--- MySQL 직접 실행용. JPA 스키마: FACILITY / PATIENT / LOCATION
---
--- 환자 ID 규칙 (9자리 BIGINT): YYMMDD + 당일 순번 001~999
---   예: 260410001 = 2026-04-10 입원 등록 첫 번째
--- 같은 입원일(admission_date)이 여러 명이면 001, 002, 003 … 부여
---
--- gender: MALE / FEMALE / OTHER (선택, NULL 가능 — 한글 저장 불가)
--- 병실 조회 API: GET /api/rooms/{room}/beds  → room 컬럼과 동일해야 함
---   · 303호 병실: room = '303'  → 프론트 /bedroompage/303
---   · 타 병동: room = '301호' 등 기존 유지
---
--- 실행 전 주의: 기존 데이터 삭제(TRUNCATE). 운영 DB에서는 백업 후 사용.
-
+-- 통합 시드 (모든 엔티티 초기화 + 더미 재생성)
 SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE NOTIFICATION;
+TRUNCATE TABLE EMERGENCY_CALL;
+TRUNCATE TABLE DOCUMENT;
+TRUNCATE TABLE POST_APPLICATION;
+TRUNCATE TABLE POST;
+TRUNCATE TABLE SCHEDULE;
+TRUNCATE TABLE MEDICATION;
+TRUNCATE TABLE MEAL_PLAN;
+TRUNCATE TABLE PATIENT_NOTE;
+TRUNCATE TABLE PATIENT_ASSIGNMENT;
+TRUNCATE TABLE GUARDIAN_PATIENT;
 TRUNCATE TABLE LOCATION;
 TRUNCATE TABLE PATIENT;
+TRUNCATE TABLE USERS;
 TRUNCATE TABLE FACILITY;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- ---------------------------------------------------------------------------
--- FACILITY
--- ---------------------------------------------------------------------------
-INSERT INTO FACILITY
-(facility_id, name, address, phone, created_at, updated_at)
-VALUES
+INSERT INTO FACILITY (facility_id, name, address, phone, created_at, updated_at) VALUES
 (1, '따숨요양병원', '서울특별시 강남구 테헤란로 123', '02-1234-5678', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- ---------------------------------------------------------------------------
--- PATIENT (먼저 삽입 — location_id 는 아래 UPDATE 로 연결)
--- ID | 이름     | 입원일     | 부여 ID
--- 303 본관
---    김영희     2026-04-01   260401001
---    박순자     2026-04-03   260403001, 260403002(이철수) … 아래 표 참고
--- ---------------------------------------------------------------------------
--- 입원일별 일련번호는 아래 순서(같은 날짜: 이름 가나다 순)로 부여했습니다.
+-- login_id(직원): 2자리 사번코드 + YYMMDD + 2자리 순번 (총 10자리)
+INSERT INTO USERS (user_id, facility_id, login_id, password, name, phone, email, users_role, users_status, created_at, updated_at) VALUES
+(1, 1, '1126030401', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '김원무', '010-5000-0001', 'admin@ddasum.com', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 1, '2126031501', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '박의사', '010-5000-0002', 'doctor1@ddasum.com', 'DOCTOR', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 1, '2126031502', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '최의사', '010-5000-0003', 'doctor2@ddasum.com', 'DOCTOR', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 1, '3126031501', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '이요양', '010-5000-0004', 'caregiver1@ddasum.com', 'CAREGIVER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(5, 1, '3126031502', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '정요양', '010-5000-0005', 'caregiver2@ddasum.com', 'CAREGIVER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(6, 1, '9026030101', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '한보호', '010-5000-0006', 'guardian1@ddasum.com', 'GUARDIAN', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(7, 1, '9026030102', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5bQFQfQfQfQfQfQfQfQfQfQfQfQfQf', '조보호', '010-5000-0007', 'guardian2@ddasum.com', 'GUARDIAN', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO PATIENT
 (patient_id, facility_id, location_id, name, gender, birth_date, address, admission_date, discharge_date, blood_type, height, weight, admission_status, diet_type, memo, status, created_at, updated_at)
 VALUES
--- === 본관 303호 (기존 DB 형식 유지: 성별 한글 가능) ===
-(260401001, 1, NULL, '김영희', '여성', DATE '1952-03-14', NULL, DATE '2026-04-01', NULL, 'A_POSITIVE', 158.20, 52.30, '입원중', '일반식', '고혈압 약 복용 중', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260403001, 1, NULL, '박순자', '여성', DATE '1948-11-22', NULL, DATE '2026-04-03', NULL, 'O_POSITIVE', 154.50, 48.10, '입원중', '당뇨식', '혈당 모니터링 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260404001, 1, NULL, '장원준', '남성', DATE '2001-08-16', NULL, DATE '2026-04-04', NULL, 'A_POSITIVE', 190.50, 60.50, '입원중', '당뇨식', '혈당 모니터링 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260401001, 1, NULL, '김영희', 'FEMALE', '1952-03-14', '서울특별시 강남구 역삼동 101-11', '2026-04-01', '2099-12-31', 'A_POSITIVE', 158.20, 52.30, '입원중', '일반식', '고혈압 약 복용 중', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260403001, 1, NULL, '박순자', 'FEMALE', '1948-11-22', '서울특별시 송파구 문정동 22-8', '2026-04-03', '2099-12-31', 'O_POSITIVE', 154.50, 48.10, '입원중', '당뇨식', '혈당 모니터링 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260404001, 1, NULL, '장원준', 'MALE', '1951-08-16', '경기도 성남시 분당구 정자동 55-2', '2026-04-04', '2099-12-31', 'B_POSITIVE', 170.30, 66.40, '입원중', '일반식', '재활치료 병행', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260405001, 1, NULL, '정민호', 'MALE', '1945-09-10', '인천광역시 부평구 부평동 13-4', '2026-04-05', '2099-12-31', 'O_NEGATIVE', 173.80, 68.90, '입원중', '저염식', '최근 낙상 이력으로 관찰 강화', 'CRITICAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260406001, 1, NULL, '강순자', 'FEMALE', '1937-10-05', '서울특별시 강서구 화곡동 91-14', '2026-04-06', '2099-12-31', 'O_POSITIVE', 152.70, 47.10, '입원중', '연식', '보행 보조 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260407001, 1, NULL, '조현식', 'MALE', '1940-09-19', '경기도 부천시 상동 101-9', '2026-04-07', '2099-12-31', 'A_NEGATIVE', 167.20, 60.80, '입원중', '일반식', '신규 입원 교육 완료', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260408001, 1, NULL, '문경자', 'FEMALE', '1935-01-09', '서울특별시 중랑구 면목동 18-5', '2026-04-08', '2026-04-13', 'AB_POSITIVE', 148.60, 42.90, '퇴원완료', '연하식', '보호자 동행 퇴원', 'DISCHARGED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(260409001, 1, NULL, '차성훈', 'MALE', '1949-03-27', '인천광역시 연수구 동춘동 88-4', '2026-04-09', '2099-12-31', 'B_NEGATIVE', 174.00, 69.70, '입원중', '당뇨식', '아침 어지럼증 호소', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- === 기존 대량 더미 (입원일 기준 ID 재부여) ===
-(260328001, 1, NULL, '김영수', 'MALE', DATE '1942-03-15', '서울특별시 강남구 역삼동 101-11', DATE '2026-03-28', NULL, 'A_POSITIVE', 168.50, 63.20, '입원중', '당뇨식', '보행 보조 필요', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260401002, 1, NULL, '박정희', 'FEMALE', DATE '1939-07-22', '서울특별시 송파구 문정동 22-8', DATE '2026-04-01', NULL, 'O_POSITIVE', 154.20, 49.80, '입원중', '저염식', '야간 화장실 이동 도움 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260403002, 1, NULL, '이철수', 'MALE', DATE '1947-11-03', '경기도 성남시 분당구 정자동 55-2', DATE '2026-04-03', NULL, 'B_POSITIVE', 171.00, 70.40, '입원중', '일반식', '혈압 변동 관찰', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260320001, 1, NULL, '최은숙', 'FEMALE', DATE '1936-12-29', '서울특별시 노원구 상계동 88-19', DATE '2026-03-20', NULL, 'AB_POSITIVE', 150.30, 45.70, '입원중', '연하식', '삼킴 주의', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260405001, 1, NULL, '정민호', 'MALE', DATE '1945-09-10', '인천광역시 부평구 부평동 13-4', DATE '2026-04-05', NULL, 'O_NEGATIVE', 173.80, 68.90, '입원중', '일반식', '최근 낙상 이력 있음', 'CRITICAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260330001, 1, NULL, '한수진', 'FEMALE', DATE '1949-01-17', '서울특별시 은평구 불광동 7-31', DATE '2026-03-30', NULL, 'A_NEGATIVE', 158.00, 52.30, '입원중', '죽식', '식사량 적음', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260318001, 1, NULL, '오상훈', 'MALE', DATE '1941-06-08', '경기도 고양시 일산동구 마두동 31-9', DATE '2026-03-18', NULL, 'B_NEGATIVE', 166.40, 59.20, '입원중', '저염식', '혈당 체크 필요', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260312001, 1, NULL, '윤미자', 'FEMALE', DATE '1938-04-14', '서울특별시 도봉구 창동 44-1', DATE '2026-03-12', DATE '2026-04-10', 'AB_NEGATIVE', 149.90, 43.60, '퇴원완료', '일반식', '가정 복귀', 'DISCHARGED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260402001, 1, NULL, '서동혁', 'MALE', DATE '1950-08-26', '경기도 수원시 영통구 망포동 20-6', DATE '2026-04-02', NULL, 'A_POSITIVE', 175.10, 72.50, '입원중', '당뇨식', '인슐린 투약 중', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260406001, 1, NULL, '강순자', 'FEMALE', DATE '1937-10-05', '서울특별시 강서구 화곡동 91-14', DATE '2026-04-06', NULL, 'O_POSITIVE', 152.70, 47.10, '접수완료', '죽식', '병실 배정 대기', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260327001, 1, NULL, '배재호', 'MALE', DATE '1943-02-11', '인천광역시 남동구 구월동 61-7', DATE '2026-03-27', NULL, 'B_POSITIVE', 169.30, 64.00, '입원중', '일반식', '재활치료 병행', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260322001, 1, NULL, '신명숙', 'FEMALE', DATE '1946-05-30', '서울특별시 마포구 성산동 12-3', DATE '2026-03-22', NULL, 'A_POSITIVE', 156.40, 50.20, '퇴원예정', '저염식', '4월 중 보호자 동행 퇴원 예정', 'DISCHARGE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260407001, 1, NULL, '조현식', 'MALE', DATE '1940-09-19', '경기도 부천시 상동 101-9', DATE '2026-04-07', NULL, 'O_POSITIVE', 167.20, 60.80, '접수완료', '일반식', '신규 입원, 병실 미배정', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260325001, 1, NULL, '문경자', 'FEMALE', DATE '1935-01-09', '서울특별시 중랑구 면목동 18-5', DATE '2026-03-25', NULL, 'AB_POSITIVE', 148.60, 42.90, '입원중', '연하식', '욕창 예방 체위변경 필요', 'CRITICAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260329001, 1, NULL, '임도윤', 'MALE', DATE '1948-12-01', '서울특별시 동작구 상도동 27-2', DATE '2026-03-29', NULL, 'A_NEGATIVE', 172.40, 67.30, '입원중', '일반식', '기력 저하 관찰', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260404002, 1, NULL, '백현주', 'FEMALE', DATE '1944-06-16', '경기도 안양시 동안구 평촌동 39-12', DATE '2026-04-04', NULL, 'B_NEGATIVE', 157.80, 53.60, '입원중', '당뇨식', '아침 어지럼증 호소', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260310001, 1, NULL, '유태식', 'MALE', DATE '1934-11-21', '서울특별시 서대문구 홍제동 77-1', DATE '2026-03-10', DATE '2026-04-08', 'O_NEGATIVE', 165.00, 58.00, '퇴원완료', '일반식', '요양 종료 후 전원', 'DISCHARGED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260401003, 1, NULL, '노미영', 'FEMALE', DATE '1941-08-02', '경기도 의정부시 금오동 11-15', DATE '2026-04-01', NULL, 'AB_NEGATIVE', 153.20, 46.80, '입원중', '죽식', '저체중으로 영양관리 필요', 'MONITORING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260409001, 1, NULL, '차성훈', 'MALE', DATE '1949-03-27', '인천광역시 연수구 동춘동 88-4', DATE '2026-04-09', NULL, 'B_POSITIVE', 174.00, 69.70, '접수완료', '일반식', '검사 후 병실 배정 예정', 'STABLE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(260315001, 1, NULL, '송혜자', 'FEMALE', DATE '1933-07-13', '서울특별시 종로구 창신동 14-8', DATE '2026-03-15', NULL, 'O_POSITIVE', 151.00, 44.50, '입원중', '연하식', '낙상 고위험군', 'CRITICAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
--- ---------------------------------------------------------------------------
--- LOCATION (patient_id FK — 위 PATIENT id 와 일치)
--- location_id: 101~104 = 본관 303호 A~D, 1~15 = 타 병동 침상
--- ---------------------------------------------------------------------------
 INSERT INTO LOCATION
 (location_id, facility_id, patient_id, building, floor, room, bed, room_type, room_capacity, created_at, updated_at, is_occupied)
 VALUES
--- 본관 303 (room 컬럼 '303' — API·프론트에서 동일 문자열 사용)
 (101, 1, 260401001, '본관', 3, '303', 'A', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
 (102, 1, 260403001, '본관', 3, '303', 'B', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
 (103, 1, 260404001, '본관', 3, '303', 'C', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(104, 1, NULL,      '본관', 3, '303', 'D', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE),
+(104, 1, 260405001, '본관', 3, '303', 'D', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
+(201, 1, 260406001, 'A동', 4, '402호', '1번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
+(202, 1, 260407001, 'A동', 4, '402호', '2번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
+(301, 1, 260409001, 'B동', 2, '201호', '1번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
+(302, 1, 260408001, 'B동', 2, '201호', '2번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE);
 
--- A동·B동·C동 더미 병상 (기존 seed 와 동일 연결)
-(1, 1, 260328001, 'A동', 3, '301호', '1번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(2, 1, 260401002, 'A동', 3, '301호', '2번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(3, 1, 260403002, 'A동', 3, '302호', '1번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(4, 1, 260320001, 'A동', 3, '302호', '2번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(5, 1, 260405001, 'A동', 4, '401호', '1번 침상', 'GENERAL', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(6, 1, 260330001, 'A동', 4, '402호', '1번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(7, 1, 260318001, 'A동', 4, '402호', '2번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(8, 1, 260402001, 'B동', 2, '201호', '1번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(9, 1, 260327001, 'B동', 2, '201호', '2번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(10, 1, 260322001, 'B동', 2, '202호', '1번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(11, 1, 260325001, 'B동', 2, '202호', '2번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(12, 1, 260329001, 'B동', 3, '301호', '1번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(13, 1, 260404002, 'B동', 3, '301호', '2번 침상', 'GENERAL', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(14, 1, 260310001, 'C동', 1, '101호', '1번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE),
-(15, 1, 260315001, 'C동', 1, '101호', '2번 침상', 'GENERAL', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE);
-
--- ---------------------------------------------------------------------------
--- PATIENT.location_id 양방향 맞춤
--- ---------------------------------------------------------------------------
 UPDATE PATIENT SET location_id = 101 WHERE patient_id = 260401001;
 UPDATE PATIENT SET location_id = 102 WHERE patient_id = 260403001;
 UPDATE PATIENT SET location_id = 103 WHERE patient_id = 260404001;
+UPDATE PATIENT SET location_id = 104 WHERE patient_id = 260405001;
+UPDATE PATIENT SET location_id = 201 WHERE patient_id = 260406001;
+UPDATE PATIENT SET location_id = 202 WHERE patient_id = 260407001;
+UPDATE PATIENT SET location_id = 301 WHERE patient_id = 260409001;
+UPDATE PATIENT SET location_id = 302 WHERE patient_id = 260408001;
 
-UPDATE PATIENT SET location_id = 1  WHERE patient_id = 260328001;
-UPDATE PATIENT SET location_id = 2  WHERE patient_id = 260401002;
-UPDATE PATIENT SET location_id = 3  WHERE patient_id = 260403002;
-UPDATE PATIENT SET location_id = 4  WHERE patient_id = 260320001;
-UPDATE PATIENT SET location_id = 5  WHERE patient_id = 260405001;
-UPDATE PATIENT SET location_id = 6  WHERE patient_id = 260330001;
-UPDATE PATIENT SET location_id = 7  WHERE patient_id = 260318001;
-UPDATE PATIENT SET location_id = 8  WHERE patient_id = 260402001;
-UPDATE PATIENT SET location_id = 9  WHERE patient_id = 260327001;
-UPDATE PATIENT SET location_id = 10 WHERE patient_id = 260322001;
-UPDATE PATIENT SET location_id = 11 WHERE patient_id = 260325001;
-UPDATE PATIENT SET location_id = 12 WHERE patient_id = 260329001;
-UPDATE PATIENT SET location_id = 13 WHERE patient_id = 260404002;
-UPDATE PATIENT SET location_id = 14 WHERE patient_id = 260310001;
-UPDATE PATIENT SET location_id = 15 WHERE patient_id = 260315001;
+INSERT INTO GUARDIAN_PATIENT (guardian_patient_id, guardian_user_id, patient_id, relationship, is_primary, created_at) VALUES
+(1, 6, 260401001, '딸', TRUE, CURRENT_TIMESTAMP),
+(2, 6, 260403001, '조카', FALSE, CURRENT_TIMESTAMP),
+(3, 7, 260404001, '아들', TRUE, CURRENT_TIMESTAMP),
+(4, 7, 260405001, '배우자', FALSE, CURRENT_TIMESTAMP);
 
--- 병실 미배정: 윤미자, 강순자, 조현식, 노미영, 차성훈 (location_id 유지 NULL)
--- 260312001 윤미자, 260406001 강순자, 260407001 조현식, 260401003 노미영, 260409001 차성훈
+INSERT INTO PATIENT_ASSIGNMENT (assignment_id, patient_id, employee_user_id, start_date, end_date, created_at) VALUES
+(1, 260401001, 4, '2026-04-01', '2099-12-31', CURRENT_TIMESTAMP),
+(2, 260403001, 4, '2026-04-03', '2099-12-31', CURRENT_TIMESTAMP),
+(3, 260404001, 5, '2026-04-04', '2099-12-31', CURRENT_TIMESTAMP),
+(4, 260405001, 5, '2026-04-05', '2099-12-31', CURRENT_TIMESTAMP),
+(5, 260406001, 4, '2026-04-06', '2099-12-31', CURRENT_TIMESTAMP),
+(6, 260407001, 5, '2026-04-07', '2099-12-31', CURRENT_TIMESTAMP),
+(7, 260408001, 4, '2026-04-08', '2026-04-13', CURRENT_TIMESTAMP),
+(8, 260409001, 5, '2026-04-09', '2099-12-31', CURRENT_TIMESTAMP);
+
+INSERT INTO PATIENT_NOTE
+(note_id, patient_id, employee_user_id, note_type, title, content, period_start, period_end, created_at, updated_at)
+VALUES
+(1, 260401001, 4, 'CARE', '오전 활력징후', '혈압 130/80, 체온 정상, 식사량 양호', '2026-04-14 09:00:00', '2026-04-14 09:30:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 260403001, 2, 'DOCTOR', '혈당 관리 지시', '식전 혈당 측정 유지, 당뇨식 지속', '2026-04-14 10:00:00', '2026-04-14 10:20:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 260405001, 5, 'HANDOVER', '야간 인계', '낙상 위험으로 야간 순회 간격 단축', '2026-04-14 22:00:00', '2026-04-14 22:15:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 260409001, 4, 'INCIDENT', '어지럼증 보고', '기립 시 어지럼증 호소, 침상 안정 권고', '2026-04-14 08:40:00', '2026-04-14 09:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO MEDICATION
+(medication_id, patient_id, docter_user_id, medication_name, dosage, frequency, route, start_date, end_date, note, created_at, updated_at)
+VALUES
+(1, 260401001, 2, '암로디핀정', '5mg', '1일 1회', 'PO', '2026-04-01', '2026-05-01', '아침 식후 복용', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 260403001, 2, '메트포르민', '500mg', '1일 2회', 'PO', '2026-04-03', '2026-05-03', '식후 복용', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 260405001, 3, '아스피린', '100mg', '1일 1회', 'PO', '2026-04-05', '2026-05-05', '출혈 징후 관찰', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 260409001, 3, '베타히스틴', '8mg', '1일 2회', 'PO', '2026-04-09', '2026-04-30', '어지럼증 완화 목적', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO MEAL_PLAN
+(meal_plan_id, facility_id, admin_id, meal_date, meal_type, diet_type, menu, created_at)
+VALUES
+(1, 1, 1, '2026-04-14', 'BREAKFAST', 'GENERAL', '잡곡밥, 북어국, 계란찜, 배추김치', CURRENT_TIMESTAMP),
+(2, 1, 1, '2026-04-14', 'LUNCH', 'DIABETIC', '현미밥, 닭가슴살구이, 나물무침, 저당김치', CURRENT_TIMESTAMP),
+(3, 1, 1, '2026-04-14', 'DINNER', 'LOW_SODIUM', '보리밥, 된장국(저염), 두부조림, 오이무침', CURRENT_TIMESTAMP),
+(4, 1, 1, '2026-04-15', 'BREAKFAST', 'SOFT', '야채죽, 스크램블에그, 바나나', CURRENT_TIMESTAMP);
+
+INSERT INTO SCHEDULE
+(schedule_id, facility_id, created_user_id, patient_id, title, content, schedule_type, scheduled_at, end_at, created_at, updated_at)
+VALUES
+(1, 1, 1, 260401001, '시설 전체 소독', '본관 3층 공용구역 정기 소독', 'FACILITY', '2026-04-15 14:00:00', '2026-04-15 16:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 1, 2, 260403001, '내과 외래 협진', '혈당 추적 검사 및 처방 조정', 'PATIENT', '2026-04-16 10:00:00', '2026-04-16 10:30:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 1, 4, 260406001, '야간 근무', 'A동 야간 순회 및 투약 확인', 'WORK_SHIFT', '2026-04-14 22:00:00', '2026-04-15 06:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 1, 5, 260409001, '개인 교육 일정', '낙상 예방 교육 자료 정리', 'PERSONAL', '2026-04-15 09:00:00', '2026-04-15 10:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO POST
+(post_id, facility_id, author_user_id, post_type, title, content, post_status, start_at, end_at, capacity, current_enrolled, attachment_urls, created_at, updated_at)
+VALUES
+(1, 1, 1, 'NOTICE', '4월 보호자 면회 안내', '면회 가능 시간과 준수사항을 확인해주세요.', 'ACTIVE', '2026-04-14 00:00:00', '2026-04-30 23:59:59', 999, 12, 'https://example.com/notice/visit-guide.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 1, 4, 'BOARD', '봄맞이 산책 프로그램 후기', '참여 환자들의 컨디션이 전반적으로 양호했습니다.', 'ACTIVE', '2026-04-10 10:00:00', '2026-04-30 18:00:00', 50, 17, 'https://example.com/board/walk.jpg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 1, 1, 'PROGRAM', '주간 인지활동 프로그램 모집', '미술치료와 음악치료를 포함한 주간 프로그램입니다.', 'ACTIVE', '2026-04-14 09:00:00', '2026-04-20 18:00:00', 10, 4, 'https://example.com/program/cognitive.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO POST_APPLICATION
+(application_id, post_id, guardian_user_id, patient_id, postapplication_status, applied_at, processed_by, processed_at, memo)
+VALUES
+(1, 3, 6, 260401001, 'WAITING', '2026-04-14 11:00:00', 1, '2026-04-14 11:00:00', '오전반 희망'),
+(2, 3, 7, 260404001, 'COMPLETED', '2026-04-14 11:10:00', 1, '2026-04-14 12:00:00', '참여 확정'),
+(3, 3, 6, 260403001, 'FULL', '2026-04-14 11:20:00', 1, '2026-04-14 12:05:00', '대기자 등록');
+
+INSERT INTO DOCUMENT
+(document_id, patient_id, facility_id, document_type, title, content, requester_user_id, approver_user_id, document_status, file_urls, requested_at, approved_at, issued_at, created_at, updated_at)
+VALUES
+(1, 260401001, 1, 'CERTIFICATE', '입원확인서 발급 요청', '보호자 제출용 입원확인서 발급 요청 건', 6, 1, 'ISSUED', 'https://example.com/docs/cert-260401001.pdf', '2026-04-12 09:00:00', '2026-04-12 12:00:00', '2026-04-12 13:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 260403001, 1, 'PAYMENT', '4월 수납 고지서', '4월 간병 및 치료비 고지 문서', 6, 1, 'PAID', 'https://example.com/docs/pay-260403001.pdf', '2026-04-13 09:00:00', '2026-04-13 10:00:00', '2026-04-13 10:30:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 260409001, 1, 'VISIT_REQUEST', '특별 면회 신청', '주말 특별 면회 신청서', 7, 1, 'PENDING_APPROVAL', 'https://example.com/docs/visit-260409001.pdf', '2026-04-14 08:00:00', '2026-04-14 08:00:00', '2026-04-14 08:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO EMERGENCY_CALL
+(emergency_call_id, patient_id, requested_by, responded_by, reason, called_at, responded_at)
+VALUES
+(1, 260405001, 5, 2, '낙상 위험 징후 및 어지럼 호소', '2026-04-14 03:10:00', '2026-04-14 03:17:00'),
+(2, 260409001, 4, 3, '혈압 급변 및 어지럼증 재발', '2026-04-14 07:45:00', '2026-04-14 07:53:00');
+
+INSERT INTO NOTIFICATION
+(notification_id, receiver_user_id, title, content, notification_type, ref_type, ref_id, is_read, created_at, read_at)
+VALUES
+(1, 1, '새 문서 승인 요청', '특별 면회 신청 문서 승인 대기 중입니다.', 'DOCUMENT', 'DOCUMENT', 3, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 4, '응급 호출 처리 완료', '260405001 환자 응급 호출이 처리되었습니다.', 'EMERGENCY', 'EMERGENCY_CALL', 1, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 6, '프로그램 신청 상태 변경', '주간 인지활동 프로그램 신청이 대기 상태입니다.', 'PROGRAM', 'POST_APPLICATION', 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 7, '프로그램 신청 확정', '주간 인지활동 프로그램 신청이 확정되었습니다.', 'PROGRAM', 'POST_APPLICATION', 2, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

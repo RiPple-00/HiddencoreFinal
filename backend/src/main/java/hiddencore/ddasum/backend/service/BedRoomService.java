@@ -1,6 +1,5 @@
 package hiddencore.ddasum.backend.service;
 
-
 import hiddencore.ddasum.backend.web.dto.BedResponseDto;
 import hiddencore.ddasum.backend.web.dto.PatientAssignSearchResponseDto;
 
@@ -72,8 +71,26 @@ public class BedRoomService {
         Patient patient = location.getPatientId();
         if (patient == null) {
             patient = patientRepository.findByLocationId_LocationId(location.getLocationId())
-            .orElse(null);
+                    .orElse(null);
         }
         return BedResponseDto.from(location, patient);
     }
+
+    @Transactional
+    public void deletePatientFromBed(Long locationId) {
+    Location location = locationRepository.findById(locationId)
+            .orElseThrow(() -> new IllegalArgumentException("병상을 찾을 수 없습니다."));
+    Patient patient = location.getPatientId();
+    if (patient == null) {
+        patient = patientRepository.findByLocationId_LocationId(locationId).orElse(null);
+    }
+    if (patient != null) {
+        patient.setLocationId(null);
+        patientRepository.save(patient);
+    }
+    location.setPatientId(null);
+    location.setIsOccupied(false);
+    locationRepository.save(location);
+}
+
 }

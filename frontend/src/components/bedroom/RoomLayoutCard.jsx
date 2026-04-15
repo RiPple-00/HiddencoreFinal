@@ -12,14 +12,7 @@ function RoomLayoutCard({ beds, onAssignClick, onBedClick}) {
         </h2>
 
         <div className="flex flex-wrap items-center gap-6 text-sm text-slate-600">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-blue-600" />
-            <span>입원 중</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full border border-dashed border-slate-400 bg-white" />
-            <span>비어 있음</span>
-          </div>
+         
           <div>
             <span className="font-semibold">병실 유형</span> 여성 병동
           </div>

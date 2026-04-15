@@ -147,7 +147,7 @@ export default function PatientListPage() {
           <div className="space-y-6">
             <div className="flex justify-center">
               <div className="w-full max-w-[1120px]">
-                <PatientTable patients={filteredPatients} />
+                <PatientTable patients={filteredPatients} onRowClick={(patientId) => navigate(`/patients/${patientId}`)}/>
               </div>
             </div>
           </div>

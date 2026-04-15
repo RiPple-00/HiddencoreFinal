@@ -24,10 +24,10 @@ const bedRoomApi = {
         });
     },
 
-    //병상 배정 환자 삭제
-    deleteAssignedPatient: () => {
-        
-    }
+     //병상 배정 환자 삭제
+    deletePatientFromBed: (locationId) => {
+          return api.delete(`/rooms/beds/${locationId}/assign`);
+     }
 
 };
 
