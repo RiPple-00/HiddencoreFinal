@@ -70,10 +70,10 @@ public class Location {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt; 
 
     @Column(name = "is_occupied", nullable = false)
-    private Boolean isOccupied;
+    private Boolean isOccupied; // 병동을 사용할 수 있는지 없는지
 
     @PrePersist
     protected void onCreate() {

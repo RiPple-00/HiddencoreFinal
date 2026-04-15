@@ -9,6 +9,7 @@ const WARDS = [
 ];
 const FLOORS = [1, 2, 3, 4, 5];
 const SPECIALS = ['중환자실', '격리실'];
+const ROOMS_PER_PAGE = 10;
 
 const ROOM_TYPE_MAP = {
   GENERAL: '일반실',
@@ -42,6 +43,7 @@ function HomePage() {
   const [selectedFloor, setSelectedFloor] = useState(1);
   const [selectedSpecial, setSelectedSpecial] = useState(null);
   const [roomCounts, setRoomCounts] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchRoomSummary = async () => {
@@ -53,7 +55,7 @@ function HomePage() {
 
         const counts = {};
         summary.forEach((item) => {
-          const roomKey = `${String(item.room).padStart(2, '0')}`;
+          const roomKey = `${item.room}`;
           counts[roomKey] = {
             patientCount: item.patientCount ?? 0,
             roomCapacity: item.roomCapacity ?? 4,
@@ -63,6 +65,7 @@ function HomePage() {
         });
 
         setRoomCounts(counts);
+        setCurrentPage(1); // 병동/층 바꾸면 1페이지로 초기화
       } catch (error) {
         console.error('병실 환자 수 조회 실패:', error);
         setRoomCounts({});
@@ -92,8 +95,10 @@ function HomePage() {
     });
   }, [roomCounts]);
 
-  const topRooms = roomData.slice(0, 5);
-  const bottomRooms = roomData.slice(5, 10);
+  const totalPages = Math.ceil(roomData.length / ROOMS_PER_PAGE);
+  const pagedRooms = roomData.slice((currentPage - 1) * ROOMS_PER_PAGE, currentPage * ROOMS_PER_PAGE);
+  const topRooms = pagedRooms.slice(0, 5);
+  const bottomRooms = pagedRooms.slice(5, 10);
 
   return (
     <section className="space-y-5">
@@ -158,6 +163,8 @@ function HomePage() {
               key={room.id}
               room={room}
               isDimmed={!isRoomHighlighted(room.roomType, selectedSpecial)}
+              // building={selectedWard}
+              // floor={selectedFloor}
             />
           ))}
         </div>
@@ -172,16 +179,24 @@ function HomePage() {
               key={room.id}
               room={room}
               isDimmed={!isRoomHighlighted(room.roomType, selectedSpecial)}
+              // building={selectedWard}
+              // floor={selectedFloor}
             />
           ))}
         </div>
 
+        {/* 페이지네이션 */}
         <div className="mt-5 flex items-center justify-center gap-3 text-xl font-semibold text-gray-500">
-          <button type="button" className="text-blue-600">1</button>
-          <button type="button" className="hover:text-gray-800">2</button>
-          <button type="button" className="hover:text-gray-800">3</button>
-          <button type="button" className="hover:text-gray-800">4</button>
-          <button type="button" className="hover:text-gray-800">5</button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              type="button"
+              onClick={() => setCurrentPage(page)}
+              className={`${page === currentPage ? 'text-blue-600' : 'hover:text-gray-800'}`}
+            >
+              {page}
+            </button>
+          ))}
         </div>
       </div>
     </section>

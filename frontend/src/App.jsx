@@ -2,6 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import WardPage from './pages/WardPage';
 
 function App(){
   return(
@@ -31,9 +32,10 @@ function App(){
   {/* 메인 콘텐츠 - 라우팅 <Routes> -> 메인 */}
             <main className="max-w-7xl mx-auto px-4 py-8">
                 <Routes>
-                    <Route path="/" element={<HomePage />} /> {/*<Routes> -> 페이지 이동 경로 </Routes>*/}
+                    <Route path="/" element={<WardPage />} /> {/*<Routes> -> 페이지 이동 경로 </Routes>*/}
                     <Route path="/signup" element={<SignUpPage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/rooms/:building/:floor/:room" element={<LoginPage />} />
                 </Routes>
             </main>
         </div>

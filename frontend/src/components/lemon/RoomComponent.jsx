@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const STATUS_STYLE = {
   FULL: {
@@ -18,13 +19,20 @@ const STATUS_STYLE = {
   },
 };
 
-function RoomComponent({ room, isDimmed = false }) {
+function RoomComponent({ room, isDimmed = false, building, floor }) {
+  const navigate = useNavigate();
   const statusStyle = STATUS_STYLE[room.status] || STATUS_STYLE.AVAILABLE;
   const occupiedRatio = Math.min(100, (room.patientCount / room.roomCapacity) * 100);
   const availableBeds = Math.max(0, room.roomCapacity - room.patientCount);
 
+  const handleClick = () => {
+    navigate(`/rooms/${building}/${floor}/${room.roomNumber}`);
+  }
+
   return (
-    <article
+    <button
+      type="button"
+      onClick={handleClick}
       className={`w-full rounded-xl border border-gray-200 border-l-4 bg-white p-4 shadow-sm transition ${isDimmed ? 'grayscale opacity-45' : ''} ${statusStyle.line}`}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -63,7 +71,7 @@ function RoomComponent({ room, isDimmed = false }) {
         </div>
         <p className="text-xs text-gray-500">{availableBeds} Available</p>
       </div>
-    </article>
+    </button>
   );
 }
 
