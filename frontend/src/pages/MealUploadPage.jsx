@@ -35,22 +35,34 @@ function MealExcelUploader() {
       });
 
       const parsed = parseMealSheet(rows);
-
-      console.log("최종 파싱 결과:", parsed);
       setMealData(parsed);
     };
 
     reader.readAsBinaryString(file);
   };
 
-  // 📌 드롭
+  //  드롭
   const onDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
     handleFileUpload(e.dataTransfer.files?.[0]);
   };
 
-  // 📌 핵심 파싱 (🔥 완전 안정화)
+  // "384/14" 형식 파싱 → { calorie: 384, protein: 14 }
+  const parseNutrientString = (value) => {
+    if (!value) return { calorie: 0, protein: 0 };
+    const str = String(value).trim();
+    const match = str.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+    if (match) {
+      return {
+        calorie: Math.round(Number(match[1])),
+        protein: Math.round(Number(match[2])),
+      };
+    }
+    return { calorie: 0, protein: 0 };
+  };
+
+  //  핵심 파싱
   const parseMealSheet = (rows) => {
     const temp = [];
 
@@ -62,30 +74,40 @@ function MealExcelUploader() {
 
         if (!isValidDate(cell)) continue;
 
+        // 아침/점심/저녁 영양값: dateRow+7, +14, +21
+        const bf = parseNutrientString(rows[r + 7]?.[c]);
+        const lu = parseNutrientString(rows[r + 14]?.[c]);
+        const di = parseNutrientString(rows[r + 21]?.[c]);
+
         temp.push({
           date: normalizeDate(cell),
           breakfast: collect(rows, r + 1, r + 6, c),
           lunch: collect(rows, r + 8, r + 13, c),
           dinner: collect(rows, r + 15, r + 20, c),
+          breakfastCalorie: bf.calorie,
+          breakfastProtein: bf.protein,
+          lunchCalorie: lu.calorie,
+          lunchProtein: lu.protein,
+          dinnerCalorie: di.calorie,
+          dinnerProtein: di.protein,
         });
       }
     }
 
-    // 🔥 중복 제거 ❌ → 중복 병합 ✅
+    // 중복 날짜 병합
     const merged = {};
 
     temp.forEach((item) => {
       if (!merged[item.date]) {
-        merged[item.date] = {
-          date: item.date,
-          breakfast: [...item.breakfast],
-          lunch: [...item.lunch],
-          dinner: [...item.dinner],
-        };
+        merged[item.date] = { ...item, breakfast: [...item.breakfast], lunch: [...item.lunch], dinner: [...item.dinner] };
       } else {
-        merged[item.date].breakfast.push(...item.breakfast);
-        merged[item.date].lunch.push(...item.lunch);
-        merged[item.date].dinner.push(...item.dinner);
+        const m = merged[item.date];
+        m.breakfast.push(...item.breakfast);
+        m.lunch.push(...item.lunch);
+        m.dinner.push(...item.dinner);
+        if (!m.breakfastCalorie && item.breakfastCalorie) { m.breakfastCalorie = item.breakfastCalorie; m.breakfastProtein = item.breakfastProtein; }
+        if (!m.lunchCalorie && item.lunchCalorie) { m.lunchCalorie = item.lunchCalorie; m.lunchProtein = item.lunchProtein; }
+        if (!m.dinnerCalorie && item.dinnerCalorie) { m.dinnerCalorie = item.dinnerCalorie; m.dinnerProtein = item.dinnerProtein; }
       }
     });
 
@@ -199,8 +221,11 @@ function MealExcelUploader() {
                   <tr>
                     <th className="p-3 text-left">날짜</th>
                     <th className="p-3">아침</th>
+                    <th className="p-3 text-orange-600">아침 열량/단백질</th>
                     <th className="p-3">점심</th>
+                    <th className="p-3 text-orange-600">점심 열량/단백질</th>
                     <th className="p-3">저녁</th>
+                    <th className="p-3 text-orange-600">저녁 열량/단백질</th>
                   </tr>
                 </thead>
 
@@ -209,8 +234,11 @@ function MealExcelUploader() {
                     <tr key={i} className="border-b hover:bg-gray-50">
                       <td className="p-3 font-semibold">{day.date}</td>
                       <td className="p-3 text-center">{day.breakfast.join(", ")}</td>
+                      <td className="p-3 text-center text-orange-600 font-medium">{day.breakfastCalorie}kcal / {day.breakfastProtein}g</td>
                       <td className="p-3 text-center">{day.lunch.join(", ")}</td>
+                      <td className="p-3 text-center text-orange-600 font-medium">{day.lunchCalorie}kcal / {day.lunchProtein}g</td>
                       <td className="p-3 text-center">{day.dinner.join(", ")}</td>
+                      <td className="p-3 text-center text-orange-600 font-medium">{day.dinnerCalorie}kcal / {day.dinnerProtein}g</td>
                     </tr>
                   ))}
                 </tbody>
@@ -240,11 +268,15 @@ function MealExcelUploader() {
                     mealTypes.forEach(({ type, items }) => {
                       const menu = items.filter(Boolean).map(String).join(", ");
                       if (menu) {
+                        const calorie = type === "BREAKFAST" ? day.breakfastCalorie : type === "LUNCH" ? day.lunchCalorie : day.dinnerCalorie;
+                        const protein = type === "BREAKFAST" ? day.breakfastProtein : type === "LUNCH" ? day.lunchProtein : day.dinnerProtein;
                         rows.push({
                           mealDate: date,
                           mealType: type,
                           dietType: "GENERAL",
                           menu,
+                          calorie: calorie ?? 0,
+                          protein: protein ?? 0,
                         });
                       }
                     });

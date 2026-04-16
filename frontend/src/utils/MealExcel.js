@@ -21,6 +21,9 @@ function transformRows(rows) {
     .filter(row => row[0] && String(row[0]).trim() !== "")
     .map(row => ({
       date: normalizeDate(row[0]),
+      calorie: Number(row[4]) || 0,   //
+      protein: Number(row[5]) || 0,   //
+
       meals: [
         { type: "BREAKFAST", menus: splitMenu(row[1]) },
         { type: "LUNCH", menus: splitMenu(row[2]) },

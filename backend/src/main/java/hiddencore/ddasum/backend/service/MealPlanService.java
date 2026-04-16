@@ -56,6 +56,8 @@ public class MealPlanService {
             mealPlan.setMealType(mealType);
             mealPlan.setDietType(dietType);
             mealPlan.setMenu(row.getMenu());
+            mealPlan.setCalorie(safe(row.getCalorie()));
+            mealPlan.setProtein(safe(row.getProtein()));
 
             mealPlanRepository.save(mealPlan);
             savedCount++;
@@ -103,6 +105,12 @@ public class MealPlanService {
                 .mealType(mealPlan.getMealType().name())
                 .dietType(mealPlan.getDietType().name())
                 .menu(mealPlan.getMenu())
+                .calorie(safe(mealPlan.getCalorie()))
+                .protein(safe(mealPlan.getProtein()))
                 .build();
+    }
+
+    private Integer safe(Integer value) {
+        return value != null ? value : 0;
     }
 }

@@ -3,38 +3,17 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import mealApi from "../api/mealApi";
 
 const sideMenus = [
-  "대시보드",
-  "환자 기록",
-  "식단 플래너",
-  "재고 관리",
-  "분석",
+  "식단 등록",
 ];
 
-const mealCards = [
-  {
-    type: "아침 식사",
-    title: "정갈한 한식 아침",
-    description: ["흰쌀밥", "미역국", "가지구이", "계절나물, 배추김치"],
-    calorie: 480,
-    protein: 24,
-  },
-  {
-    type: "점심 식사",
-    title: "영양 한우 불고기 & 쌈채소",
-    subtitle: "저 염가형 베이식 프리미엄 완주\n불고기육 이십삼가 풍부한 신선...",
-    description: ["흑미밥, 소고기무국", "고등어구이 / 시금치나물", "포기김치 / 과일샐러드"],
-    calorie: 620,
-    protein: 38,
-    featured: true,
-  },
-  {
-    type: "저녁 식사",
-    title: "속이 편안한 채소죽",
-    description: ["야채죽, 맑은 장국", "두부 양념조림", "백김치, 동치미"],
-    calorie: 320,
-    protein: 12,
-  },
-];
+const splitMenuItems = (menu) => {
+  if (!menu) return [];
+
+  return String(menu)
+    .split(/,|\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
 
 export default function MealType() {
   const { date } = useParams();
@@ -42,9 +21,9 @@ export default function MealType() {
   const navigate = useNavigate();
   const selectedDate = location.state?.selectedDate || date || "";
   const [mealData, setMealData] = useState({
-    breakfast: { menu: "", mealType: "BREAKFAST" },
-    lunch: { menu: "", mealType: "LUNCH" },
-    dinner: { menu: "", mealType: "DINNER" },
+    breakfast: { menu: "", mealType: "BREAKFAST", calorie: null, protein: null },
+    lunch: { menu: "", mealType: "LUNCH", calorie: null, protein: null },
+    dinner: { menu: "", mealType: "DINNER", calorie: null, protein: null },
   });
 
   const formatKoreanDate = (dateString) => {
@@ -83,31 +62,35 @@ export default function MealType() {
       DINNER: "저녁 식사",
     };
 
+    const breakfastItems = splitMenuItems(mealData.breakfast.menu);
+    const lunchItems = splitMenuItems(mealData.lunch.menu);
+    const dinnerItems = splitMenuItems(mealData.dinner.menu);
+
     return [
       {
         type: typeLabel.BREAKFAST,
         mealType: "BREAKFAST",
         menu: mealData.breakfast.menu,
-        description: mealData.breakfast.menu
-          ? mealData.breakfast.menu.split(",").map((item) => item.trim())
-          : [],
+        calorie: mealData.breakfast.calorie,
+        protein: mealData.breakfast.protein,
+        description: breakfastItems,
       },
       {
         type: typeLabel.LUNCH,
         mealType: "LUNCH",
         menu: mealData.lunch.menu,
-        description: mealData.lunch.menu
-          ? mealData.lunch.menu.split(",").map((item) => item.trim())
-          : [],
+        calorie: mealData.lunch.calorie,
+        protein: mealData.lunch.protein,
+        description: lunchItems,
         featured: true,
       },
       {
         type: typeLabel.DINNER,
         mealType: "DINNER",
         menu: mealData.dinner.menu,
-        description: mealData.dinner.menu
-          ? mealData.dinner.menu.split(",").map((item) => item.trim())
-          : [],
+        calorie: mealData.dinner.calorie,
+        protein: mealData.dinner.protein,
+        description: dinnerItems,
       },
     ];
   }, [mealData]);
@@ -119,28 +102,46 @@ export default function MealType() {
         const rows = response.data ?? [];
         
         const mealMap = {
-          breakfast: { menu: "", mealType: "BREAKFAST" },
-          lunch: { menu: "", mealType: "LUNCH" },
-          dinner: { menu: "", mealType: "DINNER" },
+          breakfast: { menu: "", mealType: "BREAKFAST", calorie: null, protein: null },
+          lunch: { menu: "", mealType: "LUNCH", calorie: null, protein: null },
+          dinner: { menu: "", mealType: "DINNER", calorie: null, protein: null },
         };
 
         rows.forEach((row) => {
           if (row.mealType === "BREAKFAST") {
-            mealMap.breakfast.menu = row.menu || "";
-          } else if (row.mealType === "LUNCH") {
-            mealMap.lunch.menu = row.menu || "";
-          } else if (row.mealType === "DINNER") {
-            mealMap.dinner.menu = row.menu || "";
+            mealMap.breakfast = {
+              ...mealMap.breakfast,
+              menu: row.menu || "",
+              calorie: row.calorie ?? null,
+              protein: row.protein ?? null,
+            };
+          }
+
+          if (row.mealType === "LUNCH") {
+            mealMap.lunch = {
+              ...mealMap.lunch,
+              menu: row.menu || "",
+              calorie: row.calorie ?? null,
+              protein: row.protein ?? null,
+            };
+          }
+
+          if (row.mealType === "DINNER") {
+            mealMap.dinner = {
+              ...mealMap.dinner,
+              menu: row.menu || "",
+              calorie: row.calorie ?? null,
+              protein: row.protein ?? null,
+            };
           }
         });
-
         setMealData(mealMap);
       } catch (error) {
         console.error("식단 조회 실패:", error);
         setMealData({
-          breakfast: { menu: "", mealType: "BREAKFAST" },
-          lunch: { menu: "", mealType: "LUNCH" },
-          dinner: { menu: "", mealType: "DINNER" },
+          breakfast: { menu: "", mealType: "BREAKFAST", calorie: null, protein: null },
+          lunch: { menu: "", mealType: "LUNCH", calorie: null, protein: null },
+          dinner: { menu: "", mealType: "DINNER", calorie: null, protein: null },
         });
       }
     };
@@ -262,16 +263,16 @@ export default function MealType() {
                     </div>
 
                     {/* 칼로리/단백질 정보 (있으면 표시) */}
-                    {(meal.calorie || meal.protein) && (
+                    {(meal.calorie != null || meal.protein != null) && (
                       <div className="mt-5 flex gap-4 rounded-lg bg-blue-50 p-4">
-                        {meal.calorie && (
+                        {meal.calorie != null && (
                           <div className="flex-1">
                             <p className="text-xs text-slate-500">열량</p>
                             <p className="text-2xl font-bold text-blue-600">{meal.calorie}</p>
                             <p className="text-xs text-slate-500">kcal</p>
                           </div>
                         )}
-                        {meal.protein && (
+                        {meal.protein != null && (
                           <div className="flex-1">
                             <p className="text-xs text-slate-500">단백질</p>
                             <p className="text-2xl font-bold text-blue-600">{meal.protein}</p>
