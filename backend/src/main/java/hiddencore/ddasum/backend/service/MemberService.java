@@ -47,7 +47,7 @@ public class MemberService {
                 .status(Users.UsersStatus.ACTIVE)
                 .build();
 
-        Users saved = memberRepository.save(users);
+        Users saved = memberRepository.save(users    );
         return toMemberResponse(saved);
     }
 
