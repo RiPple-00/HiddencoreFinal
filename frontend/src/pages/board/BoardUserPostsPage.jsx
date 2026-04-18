@@ -4,15 +4,19 @@ import postApi from '../../api/postApi';
 import { useAuth } from '../../contexts/AutoContext.jsx';
 import PostList from '../../components/board/PostList';
 
+// 작성 이력과 보관함
+
 const HEADINGS = {
   history: '작성 이력',
   draft: '보관함 (임시 저장)',
 };
 
-/**
+/*
  * 작성 이력(/history) · 보관함(/draft)
  * 백엔드는 userId 기준 전체 시설 글을 줄 수 있어, 현재 facilityId로 한 번 더 필터링
  */
+
+// TODO: 작성 이력과 보관함을 한 페이지에서 탭으로 구분하는 방식으로 변경 고려
 const BoardUserPostsPage = ({ variant }) => {
   const { facilityId } = useParams();
   const { user } = useAuth();
