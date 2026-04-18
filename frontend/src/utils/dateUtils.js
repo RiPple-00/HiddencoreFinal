@@ -36,7 +36,17 @@ export const toDate = (value) => {
   if (typeof value === 'number') return new Date(value);
 
   if (typeof value === 'string') {
-    const d = new Date(value.trim());
+    const trimmed = value.trim();
+    // LocalDate "YYYY-MM-DD"는 UTC 자정으로 파싱되며 타임존에 따라 날짜가 하루 밀릴 수 있음 → 로컬 날짜로 고정
+    const ymd = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (ymd) {
+      const y = Number(ymd[1]);
+      const m = Number(ymd[2]);
+      const d = Number(ymd[3]);
+      const dt = new Date(y, m - 1, d);
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    }
+    const d = new Date(trimmed);
     return Number.isNaN(d.getTime()) ? null : d;
   }
 

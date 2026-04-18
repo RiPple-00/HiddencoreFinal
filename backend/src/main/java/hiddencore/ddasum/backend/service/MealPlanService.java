@@ -56,6 +56,8 @@ public class MealPlanService {
             mealPlan.setMealType(mealType);
             mealPlan.setDietType(dietType);
             mealPlan.setMenu(row.getMenu());
+            mealPlan.setCalorie(safe(row.getCalorie()));
+            mealPlan.setProtein(safe(row.getProtein()));
 
             mealPlanRepository.save(mealPlan);
             savedCount++;
@@ -82,14 +84,26 @@ public class MealPlanService {
         mealPlanRepository.deleteById(id);
     }
 
-    public List<MealPlanDto.MealPlanResponse> getByDate(LocalDate mealDate) {
-        return mealPlanRepository.findByMealDateOrderByMealType(mealDate).stream()
+    public List<MealPlanDto.MealPlanResponse> getByDate(LocalDate mealDate, Long facilityId) {
+        if (facilityId != null) {
+            List<MealPlan> scoped = mealPlanRepository.findByMealDateAndFacilityPk(mealDate, facilityId);
+            if (!scoped.isEmpty()) {
+                return scoped.stream().map(this::toResponse).toList();
+            }
+        }
+        return mealPlanRepository.findByMealDateOrderByMealTypeAsc(mealDate).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public List<MealPlanDto.MealPlanResponse> getByRange(LocalDate startDate, LocalDate endDate) {
-        return mealPlanRepository.findByMealDateBetweenOrderByMealDate(startDate, endDate).stream()
+    public List<MealPlanDto.MealPlanResponse> getByRange(LocalDate startDate, LocalDate endDate, Long facilityId) {
+        if (facilityId != null) {
+            List<MealPlan> scoped = mealPlanRepository.findByMealDateBetweenAndFacilityPk(startDate, endDate, facilityId);
+            if (!scoped.isEmpty()) {
+                return scoped.stream().map(this::toResponse).toList();
+            }
+        }
+        return mealPlanRepository.findByMealDateBetweenOrderByMealDateAscMealTypeAsc(startDate, endDate).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -103,6 +117,12 @@ public class MealPlanService {
                 .mealType(mealPlan.getMealType().name())
                 .dietType(mealPlan.getDietType().name())
                 .menu(mealPlan.getMenu())
+                .calorie(safe(mealPlan.getCalorie()))
+                .protein(safe(mealPlan.getProtein()))
                 .build();
+    }
+
+    private Integer safe(Integer value) {
+        return value != null ? value : 0;
     }
 }

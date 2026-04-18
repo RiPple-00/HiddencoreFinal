@@ -71,6 +71,7 @@ public class MemberService {
                 .email(users.getEmail())
                 .phone(users.getPhone())
                 .role(users.getRole())
+                .facilityId(users.getFacilityId() != null ? users.getFacilityId().getFacilityId() : null)
                 .build();
     }
 

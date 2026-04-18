@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CalendarHeader from "../components/page/CalendarHeader";
 import CalendarGrid from "../components/page/CalendarGrid";
 import mealApi from "../api/mealApi";
+import { MEAL_TYPE_ORDER, normalizeMealListResponse } from "../utils/mealViewUtils";
 
 function CalendarPage() {
   const today = new Date();
@@ -44,28 +45,42 @@ function CalendarPage() {
     mealApi
       .getMealsByRange(startDate, endDate)
       .then((response) => {
-        const mapped = response.data.map((meal) => {
-          const typeLabel = meal.mealType === "BREAKFAST"
-            ? "아침"
-            : meal.mealType === "LUNCH"
-              ? "점심"
-              : meal.mealType === "DINNER"
-                ? "저녁"
-                : meal.mealType;
+        const raw = normalizeMealListResponse(response?.data);
+        const mapped = raw.map((meal) => {
+          const mt = String(meal.mealType ?? meal.meal_type ?? "").toUpperCase();
+          const typeLabel =
+            mt === "BREAKFAST"
+              ? "아침"
+              : mt === "LUNCH"
+                ? "점심"
+                : mt === "DINNER"
+                  ? "저녁"
+                  : mt || "식단";
 
-          // ✅ 더 짧은 텍스트 표시 (첫 번째 메뉴만, 최대 15자)
           const menuPreview = meal.menu
-            ? meal.menu.split(",")[0].trim().substring(0, 15)
+            ? String(meal.menu).split(",")[0].trim().substring(0, 15)
             : "식단";
 
           const title = `${typeLabel} ${menuPreview}`;
 
           return {
-            scheduleId: meal.mealPlanId ?? `${meal.mealDate}-${meal.mealType}-${meal.dietType}`,
+            scheduleId:
+              meal.mealPlanId ??
+              `${meal.mealDate}-${mt}-${meal.dietType ?? meal.diet_type ?? ""}`,
             title,
             scheduledAt: meal.mealDate,
+            mealType: mt,
             type: "PERSONAL",
           };
+        });
+
+        mapped.sort((a, b) => {
+          const da = String(a.scheduledAt ?? "");
+          const db = String(b.scheduledAt ?? "");
+          if (da !== db) return da.localeCompare(db);
+          return (
+            (MEAL_TYPE_ORDER[a.mealType] ?? 99) - (MEAL_TYPE_ORDER[b.mealType] ?? 99)
+          );
         });
 
         setSchedules(mapped);

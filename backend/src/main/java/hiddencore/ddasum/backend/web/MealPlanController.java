@@ -49,9 +49,10 @@ public class MealPlanController {
     @Operation(summary = "날짜별 식단 조회", description = "특정 날짜 식단 목록을 조회합니다.")
     @GetMapping("/by-date")
     public ResponseEntity<List<MealPlanDto.MealPlanResponse>> getByDate(
-            @RequestParam LocalDate date
+            @RequestParam LocalDate date,
+            @RequestParam(required = false) Long facilityId
     ) {
-        return ResponseEntity.ok(mealPlanService.getByDate(date));
+        return ResponseEntity.ok(mealPlanService.getByDate(date, facilityId));
     }
 
     /**
@@ -61,9 +62,10 @@ public class MealPlanController {
     @GetMapping("/by-range")
     public ResponseEntity<List<MealPlanDto.MealPlanResponse>> getByRange(
             @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam LocalDate endDate,
+            @RequestParam(required = false) Long facilityId
     ) {
-        return ResponseEntity.ok(mealPlanService.getByRange(startDate, endDate));
+        return ResponseEntity.ok(mealPlanService.getByRange(startDate, endDate, facilityId));
     }
 
     /**

@@ -1,12 +1,11 @@
 package hiddencore.ddasum.backend.web.dto;
 
-import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import hiddencore.ddasum.backend.domain.MealPlan.Mealtype;
+import lombok.Builder;
+import lombok.Data;
 
 public class MealPlanDto {
 
@@ -29,6 +28,8 @@ public class MealPlanDto {
         private String mealType;   // "BREAKFAST"
         private String dietType;   // "GENERAL"
         private String menu;
+        private Integer calorie;
+        private Integer protein;
     }
 
     /**
@@ -55,6 +56,8 @@ public class MealPlanDto {
         private String mealType;
         private String dietType;
         private String menu;
+        private Integer calorie;
+        private Integer protein;
 
         private LocalDateTime createdAt;
     }

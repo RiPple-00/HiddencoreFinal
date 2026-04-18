@@ -1,28 +1,96 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import mealApi from "../api/mealApi";
+import { normalizeMealListResponse, normalizeMealType } from "../utils/mealViewUtils";
 
 const tabs = ["아침", "점심", "저녁"];
 
-const mealData = {
+const mealTypeMap = {
+  아침: "BREAKFAST",
+  점심: "LUNCH",
+  저녁: "DINNER",
+};
+
+const defaultMealData = {
   아침: {
-    name: "오트밀 & 제철 과일",
-    items: "오트밀, 바나나, 블루베리, 삶은달걀, 두유",
+    name: "등록된 식단 없음",
+    items: "오늘 등록된 아침 식단이 없습니다.",
     special: false,
   },
   점심: {
-    name: "영양 한우 불고기 & 쌈채소",
-    items: "흑미밥, 소고기무국, 고등어구이,\n시금치나물, 포기김치, 과일샐러드",
+    name: "등록된 식단 없음",
+    items: "오늘 등록된 점심 식단이 없습니다.",
     special: false,
   },
   저녁: {
-    name: "닭가슴살 & 채소구이",
-    items: "잡곡밥, 닭가슴살구이, 된장국,\n브로콜리볶음, 깍두기, 요거트",
+    name: "등록된 식단 없음",
+    items: "오늘 등록된 저녁 식단이 없습니다.",
     special: false,
   },
 };
 
+const formatToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const splitMenuItems = (menu) => {
+  if (!menu) return [];
+
+  return String(menu)
+    .split(/,|\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
 export default function MealCardPage() {
   const [activeTab, setActiveTab] = useState("점심");
+  const [mealData, setMealData] = useState(defaultMealData);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const todayKey = useMemo(() => formatToday(), []);
+
+  useEffect(() => {
+    const loadMeals = async () => {
+      setLoading(true);
+      setErrorMessage("");
+
+      try {
+        const response = await mealApi.getMealsByDate(todayKey);
+        const rows = normalizeMealListResponse(response?.data);
+
+        const nextMealData = { ...defaultMealData };
+
+        tabs.forEach((tab) => {
+          const mealRow = rows.find((row) => normalizeMealType(row) === mealTypeMap[tab]);
+          const menuItems = splitMenuItems(mealRow?.menu);
+
+          if (menuItems.length > 0) {
+            nextMealData[tab] = {
+              name: menuItems[0],
+              items: menuItems.join(", "),
+              special: false,
+            };
+          }
+        });
+
+        setMealData(nextMealData);
+      } catch (error) {
+        console.error("식단 조회 실패:", error);
+        setMealData(defaultMealData);
+        setErrorMessage("식단을 불러오지 못했습니다. 엑셀 업로드 후 다시 확인하세요.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMeals();
+  }, [todayKey]);
 
   const meal = mealData[activeTab];
 
@@ -46,6 +114,10 @@ export default function MealCardPage() {
           ))}
         </div>
 
+        <p style={{ fontSize: 12, color: "#94a3b8", margin: "0 0 12px" }}>
+          {todayKey} 식단
+        </p>
+
         {/* 메뉴 이름 */}
         <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 10px" }}>
           <Link
@@ -59,16 +131,20 @@ export default function MealCardPage() {
             }}
             title="캘린더로 이동"
           >
-            {meal.name}
+            {loading ? "식단 불러오는 중..." : meal.name}
           </Link>
         </h2>
 
         {/* 구성 */}
         <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.7, margin: "0 0 16px", whiteSpace: "pre-line" }}>
-          {meal.items}
+          {loading ? "업로드된 식단 정보를 확인하고 있습니다." : meal.items}
         </p>
-          
-        
+
+        {errorMessage && (
+          <p style={{ fontSize: 13, color: "#dc2626", margin: 0 }}>
+            {errorMessage}
+          </p>
+        )}
       </div>
     </div>
   );

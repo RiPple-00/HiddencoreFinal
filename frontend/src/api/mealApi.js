@@ -1,25 +1,14 @@
-import axios from "axios";
+import api from './index';
 
-const API = axios.create({
-  baseURL: "http://localhost:8080/api",
-});
-
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
+/** 조회는 시설 파라미터 없이 전체 일자 기준 (저장 날짜와 조회 불일치 방지) */
 export default {
-  bulkUpsertMeals: (data) => API.post("/meals/bulk", data),
-  getMealsByDate: (date) => API.get("/meals/by-date", {
-    params: { date },
-  }),
-  getMealsByRange: (startDate, endDate) => API.get("/meals/by-range", {
-    params: { startDate, endDate },
-  }),
+  bulkUpsertMeals: (data) => api.post('/meals/bulk', data),
+  getMealsByDate: (date) =>
+    api.get('/meals/by-date', {
+      params: { date },
+    }),
+  getMealsByRange: (startDate, endDate) =>
+    api.get('/meals/by-range', {
+      params: { startDate, endDate },
+    }),
 };

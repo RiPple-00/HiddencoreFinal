@@ -8,7 +8,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      # 로컬: 엔티티와 테이블 스키마 동기화 (meal_plan에 calorie/protein 등 반영)
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
