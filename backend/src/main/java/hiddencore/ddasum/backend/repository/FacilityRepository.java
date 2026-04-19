@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 import hiddencore.ddasum.backend.domain.Facility;
 
 @Repository
-public interface FacilityRepository extends JpaRepository<Facility, Long> {}
+public interface FacilityRepository extends JpaRepository<Facility, Long> {
+    // findById(Long id)
+}

@@ -1,7 +1,5 @@
 package hiddencore.ddasum.backend.web.dto;
 
-import java.time.LocalDateTime;
-
 import hiddencore.ddasum.backend.domain.Users.UsersRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,9 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class MemberDto {
-
-    // ═══════════════════════════════════════════════════════════
-    // 회원가입 요청 DTO
     // ═══════════════════════════════════════════════════════════
     @Data // getter, setter, toString, equals, hashCode 자동 생성
     // @Data는 lombok에서 제공하는 어노테이션

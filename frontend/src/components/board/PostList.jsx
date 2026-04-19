@@ -81,11 +81,7 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
 
               {/* DATE */}
               <td className="py-3 text-center text-gray-400">
-<<<<<<< HEAD
-                {formatDate(post.createdAt)}
-=======
                 {formatDate(post.updatedAt ?? post.createdAt)}
->>>>>>> da75ec2f34c6a904572c302b1928372d7e308262
               </td>
 
               {/* VIEWS */}

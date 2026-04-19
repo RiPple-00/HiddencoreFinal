@@ -1,5 +1,8 @@
 package hiddencore.ddasum.backend.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,9 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MEDICATION")
@@ -39,7 +39,7 @@ public class Medication {
     private Patient patientId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_user_id", nullable = false)
+    @JoinColumn(name = "docter_user_id", nullable = false)
     private Users doctorUserId;
 
     @Column(name = "medication_name", nullable = false, length = 200)
