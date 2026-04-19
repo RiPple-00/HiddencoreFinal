@@ -39,7 +39,7 @@ public class Medication {
     private Patient patientId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "docter_user_id", nullable = false)
+    @JoinColumn(name = "doctor_user_id", nullable = false)
     private Users doctorUserId;
 
     @Column(name = "medication_name", nullable = false, length = 200)

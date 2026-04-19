@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import postApi from '../api/postApi';
-import { PAGE_SIZE } from '../utils/boardUtils';
+import { PAGE_SIZE, BOARD_OPTIONS } from '../utils/boardUtils';
 
 const BoardContext = createContext(null);
 
@@ -124,7 +124,7 @@ export const BoardProvider = ({ facilityId, children }) => {
     }
 
     return result;
-  }, [allPosts, currentTab, searchKeyword, searchType]);
+  }, [allPosts, selectedBoard, currentTab, searchKeyword, searchType]);
 
   /** 전체 페이지 수 */
   const totalPages = useMemo(

@@ -8,6 +8,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
+      # 로컬: 엔티티와 테이블 스키마 동기화 (meal_plan에 calorie/protein 등 반영)
       ddl-auto: update
     show-sql: true
     properties:
@@ -18,3 +19,6 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+server:
+  port: 8081

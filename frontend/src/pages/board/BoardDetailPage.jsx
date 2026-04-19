@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import postApi from '../../api/postApi';
 import { formatDate } from '../../utils/dateUtils';
 import { getBadgeStyle, BOARD_TABS_MAP } from '../../utils/boardUtils';
 import StatusBadge from '../../components/common/StatusBadge';
 import DetailActionBar from '../../components/board/detail/DetailActionBar';
 import AttachmentList from '../../components/board/detail/AttachmentList';
-// CHECK!!! AuthContext 연동 후 주석 해제
-// import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AutoContext.jsx';
 
 /**
  * post.type과 BOARD_TABS_MAP을 역참조해서 브레드크럼 라벨 반환
@@ -30,9 +30,8 @@ const BoardDetailPage = () => {
   const navigate = useNavigate();
   const { facilityId, postId } = useParams();
 
-  // CHECK!!! AuthContext 연동 후 주석 해제
-  // const { user } = useAuth();
-  const user = null; // 임시
+  const { user } = useAuth();
+  const authorPk = user?.id != null ? Number(user.id) : null;
 
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,8 +61,11 @@ const BoardDetailPage = () => {
   const handleDelete = async () => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
-      // CHECK!!! userId 실제 값으로 교체 - AuthContext 연동 후
-      await postApi.deletePost(facilityId, postId, user?.userId ?? null);
+      if (authorPk == null || Number.isNaN(authorPk)) {
+        toast.error('삭제하려면 로그인해 주세요.');
+        return;
+      }
+      await postApi.deletePost(facilityId, postId, authorPk);
       navigate(`/facilities/${facilityId}/board`);
     } catch {
       // 에러는 Axios 인터셉터에서 toast로 처리

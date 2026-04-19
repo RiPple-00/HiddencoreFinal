@@ -14,17 +14,26 @@ export const PanelHeader = ({
   <div className="flex flex-col gap-5">
 
     {/* 상단 고정 토글 */}
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-700">상단 고정</span>
+    <div className="flex items-center justify-between gap-3 min-w-0">
+      <span className="text-sm text-gray-700 shrink-0">상단 고정</span>
       <button
         type="button"
+        aria-pressed={isPinned}
+        aria-label="상단 고정"
         onClick={() => onPinnedChange(!isPinned)}
-        className={`relative w-10 h-6 rounded-full transition-colors ${isPinned ? 'bg-teal-600' : 'bg-gray-300'}`}
+        className={`
+          relative inline-flex h-6 w-10 shrink-0 cursor-pointer overflow-hidden rounded-full
+          transition-colors
+          ${isPinned ? 'bg-teal-600' : 'bg-gray-300'}
+        `}
       >
-        <span className={`
-          absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform
-          ${isPinned ? 'translate-x-5' : 'translate-x-1'}
-        `} />
+        <span
+          className={`
+            pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow
+            transition-transform duration-200 ease-out
+            ${isPinned ? 'translate-x-4' : 'translate-x-0'}
+          `}
+        />
       </button>
     </div>
 
