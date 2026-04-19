@@ -64,9 +64,7 @@ function CalendarPage() {
           const title = `${typeLabel} ${menuPreview}`;
 
           return {
-            scheduleId:
-              meal.mealPlanId ??
-              `${meal.mealDate}-${mt}-${meal.dietType ?? meal.diet_type ?? ""}`,
+            scheduleId: meal.mealPlanId ?? `${meal.mealDate}-${mt}-${meal.dietType ?? meal.diet_type ?? ""}`,
             title,
             scheduledAt: meal.mealDate,
             mealType: mt,

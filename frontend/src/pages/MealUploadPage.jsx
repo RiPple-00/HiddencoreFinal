@@ -18,16 +18,6 @@ function MealExcelUploader() {
   const currentUser = user ?? JSON.parse(localStorage.getItem("user") || "{}");
   const parsedAdminId = Number(currentUser.id);
   const facilityId = resolveFacilityId(currentUser);
-  const adminId = Number.isFinite(parsedAdminId) && parsedAdminId > 0 ? parsedAdminId : 1;
-
-  // 📌 파일 업로드
-  const handleFileUpload = (file) => {
-    if (!file) return;
-
-    setSelectedFileLabel(file.name || "선택된 파일");
-    setStatusMessage("");
-    setSaveSuccess(false);
-
     const reader = new FileReader();
 
     reader.onload = (event) => {

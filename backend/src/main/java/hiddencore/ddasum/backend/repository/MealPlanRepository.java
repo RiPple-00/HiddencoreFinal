@@ -26,6 +26,9 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
             @Param("start") LocalDate startDate,
             @Param("end") LocalDate endDate,
             @Param("facilityId") Long facilityId);
+    List<MealPlan> findByMealDateOrderByMealType(LocalDate mealDate);
+
+    List<MealPlan> findByMealDateBetweenOrderByMealDate(LocalDate startDate, LocalDate endDate);
 
     Optional<MealPlan> findByMealDateAndMealTypeAndDietType(
             LocalDate mealDate,

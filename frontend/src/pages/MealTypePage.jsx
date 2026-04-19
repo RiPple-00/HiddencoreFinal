@@ -233,7 +233,6 @@ export default function MealType() {
                     <h2 className="mt-4 text-2xl font-bold leading-tight text-slate-900">
                       {mealTitle}
                     </h2>
-
                     <div className="mt-5 rounded-lg bg-slate-50 p-4">
                       <p className="mb-3 text-sm font-semibold text-slate-700">메뉴</p>
                       <ul className="space-y-2">
