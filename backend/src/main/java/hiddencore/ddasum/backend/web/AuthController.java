@@ -1,6 +1,5 @@
 package hiddencore.ddasum.backend.web;
 
-import hiddencore.ddasum.backend.domain.Users;
 import hiddencore.ddasum.backend.service.MemberService;
 import hiddencore.ddasum.backend.web.dto.MemberDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
-
-
 
 @Tag(name = "Auth", description = "인증 API")
 @RestController

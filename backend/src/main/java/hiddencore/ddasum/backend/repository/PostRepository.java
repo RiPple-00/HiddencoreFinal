@@ -2,7 +2,6 @@ package hiddencore.ddasum.backend.repository;
 
 import hiddencore.ddasum.backend.domain.Post;
 import hiddencore.ddasum.backend.domain.Post.PostType;
-import hiddencore.ddasum.backend.domain.Post.PostStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

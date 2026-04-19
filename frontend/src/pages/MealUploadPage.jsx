@@ -18,6 +18,9 @@ function MealExcelUploader() {
   const currentUser = user ?? JSON.parse(localStorage.getItem("user") || "{}");
   const parsedAdminId = Number(currentUser.id);
   const facilityId = resolveFacilityId(currentUser);
+
+  const handleFileUpload = (file) => {
+    if (!file) return;
     const reader = new FileReader();
 
     reader.onload = (event) => {
@@ -36,8 +39,8 @@ function MealExcelUploader() {
     };
 
     reader.readAsBinaryString(file);
-  };
 
+  };
   // 📌 드롭
   const onDrop = (e) => {
     e.preventDefault();
@@ -365,11 +368,10 @@ function MealExcelUploader() {
               </button>
             </div>
             {statusMessage && (
-              <div className={`mt-4 p-3 rounded-lg flex items-center justify-between ${
-                saveSuccess 
-                  ? "bg-green-50 border border-green-200" 
+              <div className={`mt-4 p-3 rounded-lg flex items-center justify-between ${saveSuccess
+                  ? "bg-green-50 border border-green-200"
                   : "bg-red-50 border border-red-200"
-              }`}>
+                }`}>
                 <p className={`text-sm ${saveSuccess ? "text-green-700" : "text-red-700"}`}>
                   {statusMessage}
                 </p>
