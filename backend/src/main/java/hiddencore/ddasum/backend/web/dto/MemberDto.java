@@ -77,6 +77,8 @@ public class MemberDto {
         private String email;
         private String phone;
         private UsersRole role;
+        /** 소속 시설 PK (식단 등 시설 단위 데이터와 매칭) */
+        private Long facilityId;
     }
 
     // ═══════════════════════════════════════════════════════════

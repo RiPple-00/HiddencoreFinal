@@ -15,7 +15,6 @@ export const getEndOfMonth = (date) => {
 // 달력 6주 배열 만들기
 export const generateCalendar = (date) => {
   const startOfMonth = getStartOfMonth(date);
-  const endOfMonth = getEndOfMonth(date);
   const calendar = [
     [null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null],

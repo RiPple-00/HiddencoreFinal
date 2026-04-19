@@ -96,10 +96,17 @@ const buildWeekBars = (weekDates, schedules) => {
     });
   }
 
+  const mealLaneOrder = (seg) => {
+    const m = String(seg?.schedule?.mealType ?? "").toUpperCase();
+    const o = { BREAKFAST: 0, LUNCH: 1, DINNER: 2 };
+    return o[m] ?? 99;
+  };
+
   segments.sort((a, b) => {
     if (a.isMultiDay !== b.isMultiDay) return a.isMultiDay ? -1 : 1;
     if (a.startIdx !== b.startIdx) return a.startIdx - b.startIdx;
-    return b.endIdx - a.endIdx;
+    if (a.endIdx !== b.endIdx) return b.endIdx - a.endIdx;
+    return mealLaneOrder(a) - mealLaneOrder(b);
   });
 
   const lanes = [];

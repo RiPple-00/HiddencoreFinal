@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import mealApi from "../api/mealApi";
+import { mapMealRowsToSlots, normalizeMealListResponse, toIsoDateKey } from "../utils/mealViewUtils";
 
 const sideMenus = [
   "대시보드",
@@ -10,46 +11,36 @@ const sideMenus = [
   "분석",
 ];
 
-const mealCards = [
-  {
-    type: "아침 식사",
-    title: "정갈한 한식 아침",
-    description: ["흰쌀밥", "미역국", "가지구이", "계절나물, 배추김치"],
-    calorie: 480,
-    protein: 24,
-  },
-  {
-    type: "점심 식사",
-    title: "영양 한우 불고기 & 쌈채소",
-    subtitle: "저 염가형 베이식 프리미엄 완주\n불고기육 이십삼가 풍부한 신선...",
-    description: ["흑미밥, 소고기무국", "고등어구이 / 시금치나물", "포기김치 / 과일샐러드"],
-    calorie: 620,
-    protein: 38,
-    featured: true,
-  },
-  {
-    type: "저녁 식사",
-    title: "속이 편안한 채소죽",
-    description: ["야채죽, 맑은 장국", "두부 양념조림", "백김치, 동치미"],
-    calorie: 320,
-    protein: 12,
-  },
-];
+const splitMenuItems = (menu) => {
+  if (!menu) return [];
+
+  return String(menu)
+    .split(/,|\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
 
 export default function MealType() {
   const { date } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const selectedDate = location.state?.selectedDate || date || "";
+  const selectedDate = toIsoDateKey(location.state?.selectedDate || date || "");
   const [mealData, setMealData] = useState({
-    breakfast: { menu: "", mealType: "BREAKFAST" },
-    lunch: { menu: "", mealType: "LUNCH" },
-    dinner: { menu: "", mealType: "DINNER" },
+    breakfast: { menu: "", mealType: "BREAKFAST", calorie: null, protein: null },
+    lunch: { menu: "", mealType: "LUNCH", calorie: null, protein: null },
+    dinner: { menu: "", mealType: "DINNER", calorie: null, protein: null },
   });
 
   const formatKoreanDate = (dateString) => {
     if (!dateString) return "04월08일 (수)";
-    const parsed = new Date(`${dateString}T00:00:00`);
+    const iso = toIsoDateKey(dateString);
+    const parts = iso.split("-");
+    if (parts.length < 3) return "04월08일 (수)";
+    const y = Number(parts[0]);
+    const mo = Number(parts[1]);
+    const d = Number(parts[2]);
+    if ([y, mo, d].some((n) => Number.isNaN(n))) return "04월08일 (수)";
+    const parsed = new Date(y, mo - 1, d);
     if (Number.isNaN(parsed.getTime())) return "04월08일 (수)";
 
     const days = ["일", "월", "화", "수", "목", "금", "토"];
@@ -61,14 +52,19 @@ export default function MealType() {
   };
 
   const displayDate = formatKoreanDate(selectedDate);
-  const parsedSelectedDate = selectedDate ? new Date(`${selectedDate}T00:00:00`) : null;
+  const parsedSelectedDate = selectedDate
+    ? (() => {
+        const p = selectedDate.split("-").map(Number);
+        return new Date(p[0], p[1] - 1, p[2]);
+      })()
+    : null;
   const displayMonth =
     parsedSelectedDate && !Number.isNaN(parsedSelectedDate.getTime())
       ? `${parsedSelectedDate.getFullYear()}년 ${parsedSelectedDate.getMonth() + 1}월`
       : "2025년 4월";
 
   const activeDateKey = useMemo(() => {
-    if (selectedDate) return selectedDate;
+    if (selectedDate) return toIsoDateKey(selectedDate);
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -83,64 +79,61 @@ export default function MealType() {
       DINNER: "저녁 식사",
     };
 
+    const breakfastItems = splitMenuItems(mealData.breakfast.menu);
+    const lunchItems = splitMenuItems(mealData.lunch.menu);
+    const dinnerItems = splitMenuItems(mealData.dinner.menu);
+
     return [
       {
         type: typeLabel.BREAKFAST,
         mealType: "BREAKFAST",
         menu: mealData.breakfast.menu,
-        description: mealData.breakfast.menu
+        calorie: mealData.breakfast.calorie,
+        protein: mealData.breakfast.protein,
+        description: breakfastItems.length ? breakfastItems : (mealData.breakfast.menu
           ? mealData.breakfast.menu.split(",").map((item) => item.trim())
-          : [],
+          : []),
       },
       {
         type: typeLabel.LUNCH,
         mealType: "LUNCH",
         menu: mealData.lunch.menu,
-        description: mealData.lunch.menu
+        calorie: mealData.lunch.calorie,
+        protein: mealData.lunch.protein,
+        description: lunchItems.length ? lunchItems : (mealData.lunch.menu
           ? mealData.lunch.menu.split(",").map((item) => item.trim())
-          : [],
+          : []),
         featured: true,
       },
       {
         type: typeLabel.DINNER,
         mealType: "DINNER",
         menu: mealData.dinner.menu,
-        description: mealData.dinner.menu
+        calorie: mealData.dinner.calorie,
+        protein: mealData.dinner.protein,
+        description: dinnerItems.length ? dinnerItems : (mealData.dinner.menu
           ? mealData.dinner.menu.split(",").map((item) => item.trim())
-          : [],
+          : []),
       },
     ];
   }, [mealData]);
 
   useEffect(() => {
     const loadByDate = async () => {
+      if (!activeDateKey || !/^\d{4}-\d{2}-\d{2}$/.test(activeDateKey)) {
+        return;
+      }
       try {
         const response = await mealApi.getMealsByDate(activeDateKey);
-        const rows = response.data ?? [];
-        
-        const mealMap = {
-          breakfast: { menu: "", mealType: "BREAKFAST" },
-          lunch: { menu: "", mealType: "LUNCH" },
-          dinner: { menu: "", mealType: "DINNER" },
-        };
+        const rows = normalizeMealListResponse(response?.data);
 
-        rows.forEach((row) => {
-          if (row.mealType === "BREAKFAST") {
-            mealMap.breakfast.menu = row.menu || "";
-          } else if (row.mealType === "LUNCH") {
-            mealMap.lunch.menu = row.menu || "";
-          } else if (row.mealType === "DINNER") {
-            mealMap.dinner.menu = row.menu || "";
-          }
-        });
-
-        setMealData(mealMap);
+        setMealData(mapMealRowsToSlots(rows));
       } catch (error) {
         console.error("식단 조회 실패:", error);
         setMealData({
-          breakfast: { menu: "", mealType: "BREAKFAST" },
-          lunch: { menu: "", mealType: "LUNCH" },
-          dinner: { menu: "", mealType: "DINNER" },
+          breakfast: { menu: "", mealType: "BREAKFAST", calorie: null, protein: null },
+          lunch: { menu: "", mealType: "LUNCH", calorie: null, protein: null },
+          dinner: { menu: "", mealType: "DINNER", calorie: null, protein: null },
         });
       }
     };
@@ -188,11 +181,6 @@ export default function MealType() {
             >
               + 식단 등록
             </button>
-            {/* <button className="w-full rounded-xl border border-[#dce8fa] bg-white py-3 text-left text-sm font-semibold text-slate-700">
-            <span className="px-4">
-                식단 수정하기
-                </span>
-            </button> */}
           </div>
 
           <div className="mt-auto px-4 pb-7 pt-10 text-sm text-slate-500">
@@ -225,10 +213,10 @@ export default function MealType() {
             </button>
           </div>
 
-         <div>
+          <div>
             {activeMealCards.map((meal) => {
               const mealTitle = meal.description[0] || "식단 없음";
-              
+
               return (
                 <article
                   key={meal.type}
@@ -245,8 +233,6 @@ export default function MealType() {
                     <h2 className="mt-4 text-2xl font-bold leading-tight text-slate-900">
                       {mealTitle}
                     </h2>
-                    
-                    {/* 메뉴 목록 표시 */}
                     <div className="mt-5 rounded-lg bg-slate-50 p-4">
                       <p className="mb-3 text-sm font-semibold text-slate-700">메뉴</p>
                       <ul className="space-y-2">
@@ -261,17 +247,16 @@ export default function MealType() {
                       </ul>
                     </div>
 
-                    {/* 칼로리/단백질 정보 (있으면 표시) */}
-                    {(meal.calorie || meal.protein) && (
+                    {(meal.calorie != null || meal.protein != null) && (
                       <div className="mt-5 flex gap-4 rounded-lg bg-blue-50 p-4">
-                        {meal.calorie && (
+                        {meal.calorie != null && (
                           <div className="flex-1">
                             <p className="text-xs text-slate-500">열량</p>
                             <p className="text-2xl font-bold text-blue-600">{meal.calorie}</p>
                             <p className="text-xs text-slate-500">kcal</p>
                           </div>
                         )}
-                        {meal.protein && (
+                        {meal.protein != null && (
                           <div className="flex-1">
                             <p className="text-xs text-slate-500">단백질</p>
                             <p className="text-2xl font-bold text-blue-600">{meal.protein}</p>
