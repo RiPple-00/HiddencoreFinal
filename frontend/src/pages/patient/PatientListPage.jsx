@@ -84,7 +84,7 @@ export default function PatientListPage() {
   const fetchBedsForCreateModal = async () => {
     try {
       // A동 1층 전체 호실의 병상 데이터를 모두 불러온다.
-      const summary = await getRoomSummary({ building: "A동", floor: 1 });
+      const summary = await getRoomSummary({ building: "", floor: 1 });
       const roomList = Array.isArray(summary)
         ? summary
             .map((item) => String(item.room))
