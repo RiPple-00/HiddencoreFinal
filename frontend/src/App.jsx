@@ -5,6 +5,9 @@ import LoginPage from "./pages/LoginPage";
 import BedRoomPage from "./pages/BedRoomPage";
 import PatientListPage from "./pages/patient/PatientListPage";
 import PatientDetailPage from "./pages/patient/PatientDetailPage";
+import WardPage from './pages/WardPage';
+
+
 // import PatientCreatePage from "./pages/patient/PatientCreatePage";
 
 function MainLayout({ children }) {
@@ -19,9 +22,7 @@ function App() {
         <Route
           path="/"
           element={
-            <MainLayout>
-              <HomePage />
-            </MainLayout>
+            <WardPage />
           }
         />
         <Route

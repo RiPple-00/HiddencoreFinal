@@ -59,17 +59,21 @@ public class Location {
     @Column(name = "room_type", nullable = false, length = 50)
     private RoomType roomType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "roomgender_type", nullable = false, length = 50)
+    private RoomGenderType roomGenderType; // -> 추가
+
     @Column(name = "room_capacity", nullable = false)
-    private Integer roomCapacity;
+    private Integer roomCapacity; // 4인실인지 6인실인지 확인하는 용
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt; 
 
     @Column(name = "is_occupied", nullable = false)
-    private Boolean isOccupied; // 
+    private Boolean isOccupied; // 병동을 사용할 수 있는지 없는지
 
     @PrePersist
     protected void onCreate() {
@@ -102,5 +106,11 @@ public class Location {
         public String getDescription() {
             return description;
         }
+    }
+
+    public enum RoomGenderType {
+        MALE,
+        FEMALE,
+        CONCOCTION
     }
 }

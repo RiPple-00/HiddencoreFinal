@@ -158,10 +158,14 @@ function BedRoomPage() {
     if (!selectedBed?.locationId || !patient?.assignable) return;
     try {
       setAssigningPatientId(patient.patientId);
-      await bedRoomApi.assignPatientToBed(
+      const res = await bedRoomApi.assignPatientToBed(
         selectedBed.locationId,
         patient.patientId,
       );
+      if (res?.data?.ok === false) {
+        toast.error("배정할 수 없습니다. (이미 배정됨/병상 사용중/성별 불일치)");
+        return;
+      }
       toast.success("환자를 침상에 배정했습니다.");
       closeAssignModal();
       await loadBeds();
