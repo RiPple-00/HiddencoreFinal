@@ -75,6 +75,9 @@ public class Location {
     @Column(name = "is_occupied", nullable = false)
     private Boolean isOccupied; // 병동을 사용할 수 있는지 없는지
 
+    @Column(name = "is_occupied", nullable = false)
+    private Boolean isOccupied; // 
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();

@@ -31,6 +31,5 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
           AND (p.dischargeDate IS NULL OR p.dischargeDate > CURRENT_DATE)
     """)
     long countActiveByRoom(String building, Integer floor, String room);
+    
 }
-
-
