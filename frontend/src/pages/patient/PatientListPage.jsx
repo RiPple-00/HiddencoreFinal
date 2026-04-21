@@ -9,6 +9,7 @@ import PatientCreateModal from "../../components/patient/PatientCreateModal";
 import bedRoomApi from "../../api/bedRoomApi";
 import { useNavigate } from "react-router-dom";
 import patientApi from "../../api/patientApi";
+import { getRoomSummary } from "../../api/LocationApi";
 
 export default function PatientListPage() {
   const [patients, setPatients] = useState([]);
@@ -82,8 +83,23 @@ export default function PatientListPage() {
   // 나중에 room 선택 방식으로 바꾸면 이 부분 수정하면 됨
   const fetchBedsForCreateModal = async () => {
     try {
-      const res = await bedRoomApi.getBedsByRoom("303");
-      const data = res?.data ?? [];
+      // A동 1층 전체 호실의 병상 데이터를 모두 불러온다.
+      const summary = await getRoomSummary({ building: "", floor: 1 });
+      const roomList = Array.isArray(summary)
+        ? summary
+            .map((item) => String(item.room))
+            .filter((room) => room && room.trim() !== "")
+        : [];
+
+      if (roomList.length === 0) {
+        setBeds([]);
+        return;
+      }
+
+      const roomResponses = await Promise.all(
+        roomList.map((room) => bedRoomApi.getBedsByRoom(room)),
+      );
+      const data = roomResponses.flatMap((res) => res?.data ?? []);
 
       const mappedBeds = data.map((bed) => ({
         locationId: bed.locationId,

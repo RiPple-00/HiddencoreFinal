@@ -1,4 +1,4 @@
-import {useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from 'react-router-dom'; // 페이지 이동
 import postApi from '../api/postApi'; // 게시글 API
 
@@ -40,12 +40,12 @@ function PostListPage() {
             }
         })();
     }, [boardId, page, totalPages]);
-    
 
 
-return (
-    <div>
-    </div>
+
+    return (
+        <div>
+        </div>
     )
 }
 

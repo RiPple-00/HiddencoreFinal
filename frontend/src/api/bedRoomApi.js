@@ -14,6 +14,7 @@ const bedRoomApi = {
 
     // 환자 상세 정보 불러오기
     getPatientDetail: (patientId) => {
+        // BedRoomPage is using patientApi.getPatientById; keep this as-is for other pages.
         return api.get(`/patients/${patientId}`);
     },
 

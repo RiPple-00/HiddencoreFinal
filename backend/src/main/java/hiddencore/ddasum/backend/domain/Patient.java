@@ -56,7 +56,8 @@ public class Patient {
      * 읽기 시 레거시·한글·깨진 문자열이 있어도 매핑 실패로 전체 조회가 죽지 않도록 컨버터 사용.
      */
     @Convert(converter = PatientGenderConverter.class)
-    @Column(name = "gender", length = 20)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false, length = 20)
     private Gender gender;
 
     @Column(name = "birth_date", nullable = false)
@@ -190,4 +191,6 @@ public class Patient {
             };
         }
     }
+
+   
 }

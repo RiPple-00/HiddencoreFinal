@@ -147,7 +147,26 @@ export default function PatientCreateModal({ //create 페이지에서 모달로 
   }
 };
 
+  const getRoomAssignedGender = (room) => {
+    if (!room) return null;
+    const occupiedBedsInRoom = beds.filter(
+      (item) => String(item.room) === String(room) && item.occupied && item.gender,
+    );
+    if (occupiedBedsInRoom.length === 0) return null;
+    return occupiedBedsInRoom[0].gender;
+  };
+
+  const isGenderMismatchRoom = (room, patientGender) => {
+    if (!patientGender) return false;
+    const roomGender = getRoomAssignedGender(room);
+    return Boolean(roomGender && roomGender !== patientGender);
+  };
+
   const handleSelectBedFromLayout = (bed) => {
+    if (isGenderMismatchRoom(bed.room, formData.gender)) {
+      alert("해당 병실은 현재 다른 성별 환자 병실입니다.");
+      return;
+    }
     setSelectedBed(bed);
 
     setFormData((prev) => ({
@@ -220,11 +239,18 @@ export default function PatientCreateModal({ //create 페이지에서 모달로 
 
       return acc;
     }, {}),
-  ).sort((a, b) => Number(a.room) - Number(b.room));
+  )
+    .map((roomItem) => ({
+      ...roomItem,
+      roomGender: getRoomAssignedGender(roomItem.room),
+    }))
+    .sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
 
   const simpleBedOptions = filteredSimpleLocations.filter((bedItem) => {
     if (!formData.room) return false;
-    return String(bedItem.room) === String(formData.room);
+    if (String(bedItem.room) !== String(formData.room)) return false;
+    if (isGenderMismatchRoom(bedItem.room, formData.gender)) return false;
+    return true;
   });
 
   return (
@@ -455,15 +481,21 @@ export default function PatientCreateModal({ //create 페이지에서 모달로 
                       const remainCount =
                         roomItem.totalCount - roomItem.occupiedCount;
                       const isFull = remainCount === 0;
+                      const isGenderMismatch = isGenderMismatchRoom(
+                        roomItem.room,
+                        formData.gender,
+                      );
 
                       return (
                         <option
                           key={roomItem.room}
                           value={roomItem.room}
-                          disabled={isFull}
+                          disabled={isFull || isGenderMismatch}
                         >
                           {roomItem.room}호{" "}
-                          {isFull
+                          {isGenderMismatch
+                            ? "(성별 불일치)"
+                            : isFull
                             ? "(마감)"
                             : `(${roomItem.occupiedCount}/${roomItem.totalCount} 사용중)`}
                         </option>
@@ -510,6 +542,12 @@ export default function PatientCreateModal({ //create 페이지에서 모달로 
                   )}
                 </div>
               </div>
+
+              {formData.gender && formData.room && isGenderMismatchRoom(formData.room, formData.gender) && (
+                <p className="mt-3 text-sm text-red-600">
+                  선택한 환자 성별과 병실 성별이 달라 해당 병실에는 배정할 수 없습니다.
+                </p>
+              )}
             </div>
           )}
 

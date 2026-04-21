@@ -1,10 +1,12 @@
 package hiddencore.ddasum.backend.repository;
 
+import hiddencore.ddasum.backend.web.dto.LocationDto;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import hiddencore.ddasum.backend.domain.Location;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
@@ -12,4 +14,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findByRoomOrderByBedAsc(String room);
 
     Optional<Location> findByBuildingAndRoomAndBed(String building, String room, String bed);
+
+    List<Location> findByBuildingAndFloorOrderByRoomAscBedAsc(String building, Integer floor);
+
+    List<Location> findByBuildingAndFloorAndRoomOrderByBedAsc(String building, Integer floor, String room);
 }
