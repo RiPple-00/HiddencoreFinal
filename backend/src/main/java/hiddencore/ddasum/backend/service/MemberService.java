@@ -24,7 +24,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 회원가입
     // ═══════════════════════════════════════════════════════════
-
     @Transactional
     public MemberDto.MemberResponse signUp(MemberDto.SignUpRequest request) {
         if (memberRepository.existsByLoginId(request.getUserId())) {
@@ -54,7 +53,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 로그인
     // ═══════════════════════════════════════════════════════════
-
     public MemberDto.LoginResponse login(MemberDto.LoginRequest request) {
         Users users = memberRepository.findByLoginId(request.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."));
@@ -78,7 +76,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 사용자명 중복 체크 (회원가입 폼에서 사용)
     // ═══════════════════════════════════════════════════════════
-
     public boolean isUsernameAvailable(String username) {
         return !memberRepository.existsByName(username);
     }
@@ -86,7 +83,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 이메일 중복 체크 (회원가입 폼에서 사용)
     // ═══════════════════════════════════════════════════════════
-
     public boolean isEmailAvailable(String email) {
         return !memberRepository.existsByEmail(email);
     }
@@ -94,7 +90,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 회원 조회(사용자명으로)
     // ═══════════════════════════════════════════════════════════
-
     public MemberDto.MemberResponse getMember(Long id) {
         Users users = getUsersOrThrow(id);
         return toMemberResponse(users);
@@ -103,7 +98,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 전체 회원 목록 조회
     // ═══════════════════════════════════════════════════════════
-
     public List<MemberDto.MemberResponse> getAllMembers() {
         return memberRepository.findAll().stream()
                 .map(this::toMemberResponse)
@@ -113,7 +107,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 회원 정보 수정
     // ═══════════════════════════════════════════════════════════
-
     @Transactional
     public MemberDto.MemberResponse updateMember(Long id, MemberDto.UpdateRequest request) {
         Users users = getUsersOrThrow(id);
@@ -140,7 +133,6 @@ public class MemberService {
     // ═══════════════════════════════════════════════════════════
     // 회원 삭제
     // ═══════════════════════════════════════════════════════════
-
     @Transactional
     public void deleteMember(Long id) {
         Users users = getUsersOrThrow(id);

@@ -2,6 +2,7 @@ spring:
   application:
     name: ddasum
   datasource:
+    # 로컬 MySQL 비밀번호가 다르면 환경 변수로 지정: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_URL
     url: ${MYSQL_URL:jdbc:mysql://localhost:3306/ddasum?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
     username: root
     password: 12345
@@ -17,8 +18,21 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
 springdoc:
+  api-docs:
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+    # localhost 스펙을 외부 validator.swagger.io 가 검증하지 못해 빨간 오류 배지가 뜨는 것을 막음
+    validator-url: ""
+    display-request-duration: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
 
 server:
   port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true

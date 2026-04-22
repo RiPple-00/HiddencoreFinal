@@ -20,5 +20,4 @@ public class DdasumApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DdasumApplication.class, args);
 	}
-
 }
