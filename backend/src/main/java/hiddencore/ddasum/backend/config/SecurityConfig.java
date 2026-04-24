@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/patients/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/locations/**").permitAll()
-                        .anyRequest().permitAll()
+                        // .anyRequest().permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

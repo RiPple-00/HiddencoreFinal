@@ -17,7 +17,11 @@ import BedRoomPage from './pages/BedRoomPage';
 import PatientListPage from './pages/patient/PatientListPage';
 import PatientDetailPage from './pages/patient/PatientDetailPage';
 import WardPage from './pages/WardPage';
+import GuardianMainPage from './pages/guardian/GuardianMainPage.jsx';
+
 import { useAuth } from './contexts/AutoContext.jsx';
+
+
 
 function App() {
   const navigate = useNavigate();
@@ -110,7 +114,9 @@ function App() {
           </div>
         )}
         <Routes>
-          <Route path="/" element={<WardPage />} />
+          {/* <Route path="/" element={<WardPage />} /> */}
+          <Route path="/" element={<GuardianMainPage />} />
+ 
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
