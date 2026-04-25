@@ -3,19 +3,31 @@ spring:
     name: ddasum
   datasource:
     # 로컬 MySQL 비밀번호가 다르면 환경 변수로 지정: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_URL
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/ddasum?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    # 한글(환자명·관계 등): utf8mb4 + useUnicode (Connector/J 8)
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/ddasum?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=utf-8&connectionCollation=utf8mb4_unicode_ci}
     username: root
     password: 12345
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
   jpa:
     hibernate:
       # 로컬: 엔티티와 테이블 스키마 동기화 (meal_plan에 calorie/protein 등 반영)
       ddl-auto: update
+    # 스키마(Hibernate) 반영 후 classpath SQL 실행 (면회 앱 최소 더미)
+    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  sql:
+    init:
+      # 운영 등에서 끄려면 환경 변수: SQL_INIT_MODE=never
+      mode: ${SQL_INIT_MODE:always}
+      continue-on-error: true
+      data-locations:
+        - classpath:db/seed-expo-visit-minimal.sql
 
 springdoc:
   api-docs:
@@ -36,3 +48,4 @@ server:
     encoding:
       charset: UTF-8
       enabled: true
+      force: true
