@@ -65,21 +65,27 @@ public class Document {
     @Column(name = "document_status", nullable = false, length = 50)
     private DocumentStatus status;
 
+    // 문서에 첨부된 파일 URL 목록(쉼표 구분 문자열)
     @Column(name = "file_urls", columnDefinition = "TEXT")
     private String fileUrls;
 
+    // 문서 요청 시각(요청 워크플로우 시작 시점)
     @Column(name = "requested_at")
     private LocalDateTime requestedAt;
 
+    // 문서 승인 시각(결재/승인 완료 시점)
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
+    // 문서 발급 시각(최종 산출물 발급 완료 시점)
     @Column(name = "issued_at")
     private LocalDateTime issuedAt;
 
+    // 문서 레코드 생성 시각(최초 저장 시 자동 설정)
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    // 문서 레코드 수정 시각(갱신 시 자동 업데이트)
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -101,6 +107,7 @@ public class Document {
         PAYMENT, // 결제/수납 문서
         VISIT_REQUEST, // 면회 신청
         CERTIFICATE, // 증명서
+        GALLERYCARD, //프로그램 게시물 카드
         ETC
     }
 
