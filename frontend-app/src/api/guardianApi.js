@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 🔥 여기가 핵심 (네 PC IP로 바꿔야함)
 const API = axios.create({
-  baseURL: "http://10.100.0.168:8081",
+  baseURL: "http://10.100.0.168:8080",
 });
 
 // 공지사항
