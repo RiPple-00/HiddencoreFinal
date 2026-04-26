@@ -17,9 +17,10 @@ import BedRoomPage from './pages/BedRoomPage';
 import PatientListPage from './pages/patient/PatientListPage';
 import PatientDetailPage from './pages/patient/PatientDetailPage';
 import WardPage from './pages/WardPage';
-import GuardianGalleryPage from './pages/guardian/activePhoto/GuardianGalleryPage';
-import GuardianMorePage from './pages/guardian/activePhoto/GuardianMorePage';
+import GuardianMainPage from './pages/guardian/GuardianMainPage.jsx';
 import { useAuth } from './contexts/AutoContext.jsx';
+
+
 
 function App() {
   const navigate = useNavigate();
@@ -59,8 +60,8 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         
         <Routes>
-          <Route path="/" element={<GuardianGalleryPage />} />
-          <Route path="/guardian/active-photo/more/:range" element={<GuardianMorePage />} />
+          {/* <Route path="/" element={<WardPage />} /> */}
+          <Route path="/" element={<GuardianMainPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/schedule" element={<SchedulePage />} />

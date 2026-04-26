@@ -92,7 +92,7 @@ export default function GuardianMainPage({ navigation }) {
                   <Image
                     key={index}
                     source={{ uri: image }}
-                    style={[styles.galleryImage]}
+                    style={[styles.galleryImage,  { width: galleryWidth }]}
                   />
                 ))}
               </ScrollView>

@@ -284,7 +284,6 @@ export const styles = StyleSheet.create({
     drawerItem: {
         paddingVertical: 15,
     },
-
     heroCard: {
         marginBottom: 20,
         borderRadius: 16,
@@ -327,8 +326,5 @@ export const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 22,
         color: '#475569',
-    },
-    section: {
-        marginBottom: 20,
     },
 });
