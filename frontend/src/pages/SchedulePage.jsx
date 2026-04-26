@@ -10,6 +10,7 @@ import CalendarGrid from "../components/choco/CalendarGrid";
 import ScheduleFormModal from "../components/choco/ScheduleFormModal";
 import ScheduleDetailPanel from "../components/choco/ScheduleDetailPanel";
 import TodayScheduleList from "../components/choco/TodayScheduleList";
+import TopNavBar from "../components/bedroom/TopNavBar";
 import { formatDate, toDate } from "../utils/dateUtils";
 
 const pad2 = (n) => String(n).padStart(2, "0");
@@ -181,7 +182,9 @@ function SchedulePage() {
   const displayDateLabel = formatDisplayDate(selectedDate);
 
   return (
-    <div className="space-y-6">
+    <>
+      <TopNavBar activeNav="calendar" />
+      <div className="space-y-6 px-6 py-6">
       <CalendarHeader
         year={year}
         month={month}
@@ -226,7 +229,8 @@ function SchedulePage() {
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

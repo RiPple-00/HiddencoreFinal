@@ -1,6 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import GuardianLoginPage from "./src/pages/auth/GuardianLoginPage";
 import GuardianMainPage from "./src/pages/guardian/GuardianMainPage";
 import ReportPage from "./src/pages/guardian/ReportPage";
 import ConsentPage from "./src/pages/guardian/ConsentPage";
@@ -20,7 +21,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="GuardianMain">
+      <Stack.Navigator initialRouteName="GuardianLogin">
+        <Stack.Screen name="GuardianLogin" component={GuardianLoginPage} options={{ title: "로그인" }} />
         <Stack.Screen name="GuardianMain" component={GuardianMainPage} options={{ headerShown: false }} />
         <Stack.Screen name="Report" component={ReportPage} options={{ title: "보고서 확인" }} />
         <Stack.Screen name="Consent" component={ConsentPage} options={{ title: "동의서 확인" }} />

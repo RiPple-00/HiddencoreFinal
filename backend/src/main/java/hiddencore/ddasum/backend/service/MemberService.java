@@ -1,7 +1,10 @@
 package hiddencore.ddasum.backend.service;
 
+import java.time.LocalDateTime;
+
 import hiddencore.ddasum.backend.domain.Users;
 import hiddencore.ddasum.backend.repository.MemberRepository;
+import hiddencore.ddasum.backend.security.JwtService;
 import hiddencore.ddasum.backend.web.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     // ═══════════════════════════════════════════════════════════
     // 회원가입
@@ -36,6 +39,7 @@ public class MemberService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 전화번호입니다.");
         }
 
+        boolean agreed = Boolean.TRUE.equals(request.getEmailAgreed());
         Users users = Users.builder()
                 .loginId(request.getUserId())
                 .name(request.getUsername())
@@ -44,6 +48,9 @@ public class MemberService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Users.UsersRole.GUARDIAN)
                 .status(Users.UsersStatus.ACTIVE)
+                .mustChangePassword(false)
+                .emailAgreed(agreed)
+                .emailAgreedAt(agreed ? LocalDateTime.now() : null)
                 .build();
 
         Users saved = memberRepository.save(users);
@@ -61,15 +68,19 @@ public class MemberService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        Long facilityPk = users.getFacilityId() != null ? users.getFacilityId().getFacilityId() : null;
+        String jwt = jwtService.createAccessToken(users.getUserId(), users.getRole().name(), facilityPk);
+
         return MemberDto.LoginResponse.builder()
-                .token("token-" + UUID.randomUUID())
+                .token(jwt)
                 .id(users.getUserId())
                 .userId(users.getLoginId())
                 .username(users.getName())
                 .email(users.getEmail())
                 .phone(users.getPhone())
                 .role(users.getRole())
-                .facilityId(users.getFacilityId() != null ? users.getFacilityId().getFacilityId() : null)
+                .facilityId(facilityPk)
+                .mustChangePassword(Boolean.TRUE.equals(users.getMustChangePassword()))
                 .build();
     }
 

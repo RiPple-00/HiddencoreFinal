@@ -25,9 +25,10 @@ export const AuthProvider = ({ children }) => { // children : 모든 자식 컴�
 
     // 로그인 성공시 호출
     const login = (userDate) => {
-        setUser(userDate)
-        localStorage.setItem('user' , JSON.stringify(userDate)); // 브라우저 저장
-        localStorage.setItem('token', userDate.token); // 토큰 저장
+        setUser(userDate);
+        localStorage.setItem('user', JSON.stringify(userDate));
+        const t = userDate.token || userDate.accessToken;
+        if (t) localStorage.setItem('token', t);
     };
 
     // 로그아웃
@@ -40,14 +41,15 @@ export const AuthProvider = ({ children }) => { // children : 모든 자식 컴�
     // 로그인 여부
     const isAuthenticated = !!user;
 
-    // 관리자 여부
     const isAdmin = user?.role === 'ADMIN';
+    const canIssueEmployees = user?.role === 'OFFICE' || user?.role === 'ADMIN';
 
     const value = {
         user,
         loading,
         isAuthenticated,
         isAdmin,
+        canIssueEmployees,
         login,
         logout,
     };

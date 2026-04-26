@@ -5,6 +5,7 @@ import TopNavBar from "../components/bedroom/TopNavBar";
 import GuardianPanel from "../components/bedroom/GuardianPanel";
 import AdminMenuPanel from "../components/bedroom/AdminMenuPanel";
 import VisitorsPanel from "../components/bedroom/VisitorsPanel";
+import MealCarePage from "./MealCarePage";
 const WARDS = [
   { value: 'A동', label: 'A동' },
   { value: 'B동', label: 'B동' },
@@ -207,6 +208,7 @@ function HomePage() {
           <GuardianPanel />
           <AdminMenuPanel />
           <VisitorsPanel />
+          <MealCarePage />
         </aside>
         </div>
         </div>

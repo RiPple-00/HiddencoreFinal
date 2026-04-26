@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 /* CHECK!!!: DELETE 삭제 필수 */
 
 const defaultNavItems = [
-  { key: "rooms", label: "병실 조회", to: "/" },
+  { key: "rooms", label: "병실 조회", to: "/ward" },
   { key: "patients", label: "환자 조회", to: "/patients" },
-  { key: "calendar", label: "캘린더", to: null },
-  { key: "notice", label: "공지사항", to: null },
+  { key: "calendar", label: "캘린더", to: "/schedule" },
+  { key: "notice", label: "공지사항", to: "/facilities/1/board" },
 ];
 
 function SearchIcon({ className }) {

@@ -39,6 +39,10 @@ public class Facility {
     @Column(name = "phone", nullable = false, length = 50)
     private String phone;
 
+    /** 시설 식별용 8자리 코드 (직원 로그인 등). 기존 DB 호환을 위해 nullable이며, 직원 기능 사용 전 반드시 채워야 한다. */
+    @Column(name = "facility_code", unique = true, length = 8)
+    private String facilityCode;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

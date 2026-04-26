@@ -5,6 +5,7 @@ import TopNavBar from "../../components/bedroom/TopNavBar";
 import GuardianPanel from "../../components/bedroom/GuardianPanel";
 import AdminMenuPanel from "../../components/bedroom/AdminMenuPanel";
 import VisitorsPanel from "../../components/bedroom/VisitorsPanel";
+import MealCarePage from "../MealCarePage";
 import PatientCreateModal from "../../components/patient/PatientCreateModal";
 import bedRoomApi from "../../api/bedRoomApi";
 import { useNavigate } from "react-router-dom";
@@ -132,8 +133,8 @@ export default function PatientListPage() {
       <TopNavBar activeNav="patients" />
 
       <div className="min-h-screen bg-slate-50">
-        <div className="mx-auto flex max-w-[1440px] gap-6 px-6 py-6">
-          <main className="flex-1">
+        <div className="mx-auto flex w-full max-w-[1680px] items-start gap-8 px-8 py-6">
+          <main className="min-w-0 flex-1">
             <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
               {/* 맨위 제목이랑 환자등록 버튼 */}
               <div className="mb-8 flex items-center justify-between">
@@ -229,10 +230,11 @@ export default function PatientListPage() {
             onSuccess={fetchPatients}
             beds={beds}
           />
-          <aside className="w-[320px] space-y-6">
+          <aside className="w-[360px] shrink-0 space-y-6 self-start lg:sticky lg:top-6">
             <GuardianPanel />
             <AdminMenuPanel />
             <VisitorsPanel />
+            <MealCarePage />
           </aside>
         </div>
       </div>

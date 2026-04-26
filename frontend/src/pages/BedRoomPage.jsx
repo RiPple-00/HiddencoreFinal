@@ -5,6 +5,7 @@ import TransferRequestCard from "../components/bedroom/TransferRequestCard";
 import GuardianPanel from "../components/bedroom/GuardianPanel";
 import AdminMenuPanel from "../components/bedroom/AdminMenuPanel";
 import VisitorsPanel from "../components/bedroom/VisitorsPanel";
+import MealCarePage from "./MealCarePage";
 
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -295,6 +296,7 @@ function BedRoomPage() {
             <GuardianPanel />
             <AdminMenuPanel />
             <VisitorsPanel />
+            <MealCarePage />
           </aside>
         </div>
       </div>

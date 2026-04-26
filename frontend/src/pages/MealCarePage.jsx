@@ -95,57 +95,41 @@ export default function MealCardPage() {
   const meal = mealData[activeTab];
 
   return (
-    <div style={{ padding: "40px", fontFamily: "'Noto Sans KR', sans-serif" }}>
-      <div style={{
-        background: "#fff", borderRadius: 20, padding: "28px",
-        maxWidth: 400, boxShadow: "0 2px 12px rgba(0,0,0,0.06)"
-      }}>
-        {/* 탭 */}
-        <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
-          {tabs.map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              background: "none", border: "none",
-              borderBottom: activeTab === tab ? "2px solid #1a9e75" : "2px solid transparent",
-              color: activeTab === tab ? "#1a9e75" : "#94a3b8",
-              fontWeight: activeTab === tab ? 700 : 400,
-              fontSize: 15, cursor: "pointer", paddingBottom: 4,
-              fontFamily: "inherit", transition: "all 0.15s"
-            }}>{tab}</button>
-          ))}
-        </div>
-
-        <p style={{ fontSize: 12, color: "#94a3b8", margin: "0 0 12px" }}>
-          {todayKey} 식단
-        </p>
-
-        {/* 메뉴 이름 */}
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 10px" }}>
-          <Link
-            to="/calendar"
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              cursor: "pointer",
-              display: "inline-block",
-              width: "100%",
-            }}
-            title="캘린더로 이동"
+    <section className="w-full rounded-3xl border border-slate-200 bg-white p-5 font-['Noto_Sans_KR',sans-serif] shadow-sm">
+      <div className="mb-5 flex gap-5">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`border-b-2 bg-transparent pb-1 text-[15px] transition-colors ${
+              activeTab === tab
+                ? "border-[#1a9e75] font-bold text-[#1a9e75]"
+                : "border-transparent font-normal text-slate-400"
+            }`}
           >
-            {loading ? "식단 불러오는 중..." : meal.name}
-          </Link>
-        </h2>
-
-        {/* 구성 */}
-        <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.7, margin: "0 0 16px", whiteSpace: "pre-line" }}>
-          {loading ? "업로드된 식단 정보를 확인하고 있습니다." : meal.items}
-        </p>
-
-        {errorMessage && (
-          <p style={{ fontSize: 13, color: "#dc2626", margin: 0 }}>
-            {errorMessage}
-          </p>
-        )}
+            {tab}
+          </button>
+        ))}
       </div>
-    </div>
+
+      <p className="mb-3 text-xs text-slate-400">{todayKey} 식단</p>
+
+      <h2 className="mb-2.5 text-[22px] font-extrabold text-slate-800">
+        <Link
+          to="/calendar"
+          className="block w-full text-inherit no-underline"
+          title="캘린더로 이동"
+        >
+          {loading ? "식단 불러오는 중..." : meal.name}
+        </Link>
+      </h2>
+
+      <p className="mb-4 whitespace-pre-line text-sm leading-relaxed text-slate-500">
+        {loading ? "업로드된 식단 정보를 확인하고 있습니다." : meal.items}
+      </p>
+
+      {errorMessage && <p className="m-0 text-[13px] text-red-600">{errorMessage}</p>}
+    </section>
   );
 }

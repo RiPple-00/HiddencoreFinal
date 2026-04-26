@@ -1,8 +1,10 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import HomePage from './pages/HomePage';
-import SignUpPage from './pages/SignUpPage';
-import LoginPage from './pages/LoginPage';
+import StaffLoginPage from './pages/StaffLoginPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import AdminEmployeeIssuePage from './pages/AdminEmployeeIssuePage';
+import EmailConsentPage from './pages/EmailConsentPage';
 import SchedulePage from './pages/SchedulePage';
 import BoardListPage from './pages/board/BoardListPage';
 import BoardDetailPage from './pages/board/BoardDetailPage';
@@ -17,7 +19,6 @@ import BedRoomPage from './pages/BedRoomPage';
 import PatientListPage from './pages/patient/PatientListPage';
 import PatientDetailPage from './pages/patient/PatientDetailPage';
 import WardPage from './pages/WardPage';
-import GuardianMainPage from './pages/guardian/GuardianMainPage.jsx';
 import { useAuth } from './contexts/AutoContext.jsx';
 
 
@@ -55,17 +56,26 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50">
-    
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        
         <Routes>
           {/* <Route path="/" element={<WardPage />} /> */}
-          <Route path="/" element={<GuardianMainPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<StaffLoginPage />} />
+          <Route path="/home" element={<WardPage />} />
+          <Route path="/ward" element={<WardPage />} />
+          <Route path="/signup" element={<StaffLoginPage />} />
+          <Route path="/login" element={<StaffLoginPage />} />
+          <Route path="/staff-login" element={<StaffLoginPage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
+          <Route path="/admin/employees" element={<AdminEmployeeIssuePage />} />
+          <Route path="/email-consent" element={<EmailConsentPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
-          <Route path="/meal-care" element={<MealCarePage />} />
+          <Route
+            path="/meal-care"
+            element={
+              <div className="mx-auto max-w-md p-6">
+                <MealCarePage />
+              </div>
+            }
+          />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/meal-edit" element={<MealEditPage />} />
           <Route path="/meal-edit/:date" element={<MealEditPage />} />
@@ -82,8 +92,6 @@ function App() {
           <Route path="/patients" element={<PatientListPage />} />
           <Route path="/patients/:patientId" element={<PatientDetailPage />} />
         </Routes>
-      </main>
-    </div>
   );
 }
 

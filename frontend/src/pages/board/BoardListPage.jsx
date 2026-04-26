@@ -7,6 +7,7 @@ import SearchBar from '../../components/common/SearchBar';
 import Pagination from '../../components/common/Pagination';
 import PostList from '../../components/board/PostList';
 import Button from '../../components/Button';
+import TopNavBar from '../../components/bedroom/TopNavBar';
 
 /**
  * 게시판 내부 콘텐츠
@@ -184,9 +185,12 @@ const BoardListPage = () => {
   const { facilityId } = useParams();
 
   return (
-    <BoardProvider facilityId={Number(facilityId)}>
-      <BoardListContent />
-    </BoardProvider>
+    <>
+      <TopNavBar activeNav="notice" />
+      <BoardProvider facilityId={Number(facilityId)}>
+        <BoardListContent />
+      </BoardProvider>
+    </>
   );
 };
 

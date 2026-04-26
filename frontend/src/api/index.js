@@ -1,9 +1,11 @@
 import axios from 'axios'; // http 요청(API 호출)
 import toast from 'react-hot-toast'; // 알림 메세지
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+
 // axios 인스턴스 생성
 const api = axios.create({
-    baseURL: 'http://localhost:8081/api',
+    baseURL,
     timeout: 10000, // 10초안에 응답 없으면 자동으로 요청 취소
     headers : {
         'Content-Type' : 'application/json',
@@ -35,10 +37,15 @@ api.interceptors.response.use(
         const message = error.response?.data?.message || '오류가 발생했습니다';
         toast.error(message);
 
-        // 401 에러(인증실패) 시 로그인 페이지로 이동
-        if(error.response?.status === 401){
-            localStorage.removeItem('token'); // 만료된 토큰 삭제
-            window.location.href = '/login'; // 로그인 페이지로 강제 이동
+        // 401 에러(인증실패) 시 직원 로그인 페이지로 이동
+        if (error.response?.status === 401) {
+            const path = window.location.pathname || '';
+            const publicAuth = ['/staff-login'].some((p) => path.startsWith(p));
+            if (!publicAuth) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/staff-login';
+            }
         }
         return Promise.reject(error);
     }

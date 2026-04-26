@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -63,6 +64,25 @@ public class Users {
     @Builder.Default
     private UsersStatus status = UsersStatus.ACTIVE;
 
+    /** 직원 10자리 로그인 ID (보호자는 null) */
+    @Column(name = "employee_login_id", length = 10)
+    private String employeeLoginId;
+
+    /** 직원 발급 시 입사일 (보호자는 null) */
+    @Column(name = "hire_date")
+    private LocalDate hireDate;
+
+    @Column(name = "must_change_password", nullable = false)
+    @Builder.Default
+    private Boolean mustChangePassword = false;
+
+    @Column(name = "email_agreed", nullable = false)
+    @Builder.Default
+    private Boolean emailAgreed = false;
+
+    @Column(name = "email_agreed_at")
+    private LocalDateTime emailAgreedAt;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -82,10 +102,12 @@ public class Users {
     }
 
     public enum UsersRole {
-        ADMIN,
+        OFFICE,
         DOCTOR,
         CAREGIVER,
-        GUARDIAN
+        GUARDIAN,
+        /** 레거시·초기 시드 전용 (신규 발급 계정에는 사용하지 않음) */
+        ADMIN
     }
 
     public enum UsersStatus {

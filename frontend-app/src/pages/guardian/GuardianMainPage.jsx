@@ -73,8 +73,13 @@ export default function GuardianMainPage({ navigation }) {
 
           {/* 사진 영역 */}
           <View style={styles.section} >
-            <Text style={styles.sectionTitle}>활동 갤러리</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Gallery")}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate("ActivePhotoGallery")}
+            >
+              <Text style={styles.sectionTitle}>활동 갤러리</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("ActivePhotoGallery")}>
             <View style={styles.galleryCard}>
               <ScrollView
                 ref={scrollRef}

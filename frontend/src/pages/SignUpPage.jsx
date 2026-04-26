@@ -11,13 +11,14 @@ export default function SignUpPage() {
     // ======================================================
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-    const [formData, setFormData] = useState({          // 회원가입 폼 데이터 전체
+    const [formData, setFormData] = useState({
         userId: '',
         username: '',
         email: '',
         password: '',
         passwordConfirm: '',
         phone: '',
+        emailAgreed: false,
     })
     const [errors, setErrors] = useState({})            // 각 필드별 에러 메시지 객체 (예: { username: '사용자명을 입력해주세요.' })
 
@@ -29,8 +30,8 @@ export default function SignUpPage() {
 
         if (!formData.userId) {
             newErrors.userId = '아이디를 입력해주세요.'
-        } else if (formData.userId.length < 6) {
-            newErrors.userId = '아이디는 6자 이상이어야 합니다.'
+        } else if (formData.userId.length < 4) {
+            newErrors.userId = '아이디는 4자 이상이어야 합니다.'
         }
 
         if (!formData.username) {
@@ -94,12 +95,13 @@ export default function SignUpPage() {
 
         try {
             setLoading(true)
-            await authApi.signUp({
-                userId: formData.userId,
-                username: formData.username,
+            await authApi.guardianSignUp({
+                loginId: formData.userId,
+                name: formData.username,
                 email: formData.email,
                 password: formData.password,
                 phone: formData.phone,
+                emailAgreed: Boolean(formData.emailAgreed),
             })
             
             toast.success('회원가입이 완료되었습니다!')
@@ -128,7 +130,7 @@ export default function SignUpPage() {
                         name="userId"
                         value={formData.userId}
                         onChange={handleChange}
-                        placeholder="아이디 (6자 이상)"
+                        placeholder="아이디 (4자 이상)"
                         error={errors.userId}
                     />
 
@@ -179,6 +181,19 @@ export default function SignUpPage() {
                         placeholder="010-1234-5678"
                         error={errors.phone}
                     />
+
+                    <label className="flex items-start gap-2 text-sm text-gray-700">
+                        <input
+                            type="checkbox"
+                            name="emailAgreed"
+                            checked={formData.emailAgreed}
+                            onChange={(e) =>
+                                setFormData((prev) => ({ ...prev, emailAgreed: e.target.checked }))
+                            }
+                            className="mt-1"
+                        />
+                        <span>이메일로 정보·마케팅 메일 수신에 동의합니다. (필수 서비스 안내 메일과 별개입니다.)</span>
+                    </label>
 
                     <Button
                         type="submit"

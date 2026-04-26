@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // 페이지 이동
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast'; // 토스트 알림 
 import authApi from '../api/authApi'; // 회원가입 API
 import Input from '../components/Input'; 
@@ -52,15 +52,29 @@ function LoginPage(){
 
         try {
             setLoading(true);
-            const response = await authApi.login(formData);
+            const response = await authApi.guardianLogin({
+                loginId: formData.userId,
+                password: formData.password,
+            });
+            const token = response.data.accessToken;
+            const userPayload = {
+                token,
+                accessToken: token,
+                userId: formData.userId,
+                username: formData.userId,
+                role: response.data.role,
+                mustChangePassword: response.data.mustChangePassword,
+            };
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(userPayload));
+            login(userPayload);
             
-            // 토큰 저장 JWT 토큰 발급 
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data));
-            login(response.data);
-            
-            toast.success(`${response.data.nickname || response.data.username}님, 환영합니다!`);
-            navigate('/');
+            toast.success(`${userPayload.username}님, 환영합니다!`);
+            if (userPayload.mustChangePassword) {
+                navigate('/change-password');
+            } else {
+                navigate('/home');
+            }
         } catch (error) {
             console.error('로그인 실패:', error);
         } finally {
@@ -71,9 +85,10 @@ function LoginPage(){
 return (
         <div className="max-w-md mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
-                <h1 className="text-2xl font-bold text-center mb-8">
-                    로그인
-                </h1>
+                <h1 className="text-2xl font-bold text-center mb-2">보호자 로그인</h1>
+                <p className="text-center text-sm text-gray-500 mb-6">
+                    직원은 <Link to="/staff-login" className="text-blue-600 hover:underline">직원 로그인</Link>
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
