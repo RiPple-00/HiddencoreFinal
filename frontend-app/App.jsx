@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Platform, StyleSheet, View } from "react-native";
 
 import GuardianLoginPage from "./src/pages/auth/GuardianLoginPage";
 import GuardianMainPage from "./src/pages/guardian/GuardianMainPage";
@@ -25,7 +26,7 @@ import InvoicePaymentList from "./src/components/billing/InvoicePaymentList";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  return (
+  const content = (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="GuardianLogin">
         <Stack.Screen name="GuardianLogin" component={GuardianLoginPage} options={{ title: "로그인" }} />
@@ -56,4 +57,27 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
+
+  if (Platform.OS !== "web") return content;
+
+  return (
+    <View style={webFrameStyles.page}>
+      <View style={webFrameStyles.frame}>{content}</View>
+    </View>
+  );
 }
+
+const webFrameStyles = StyleSheet.create({
+  page: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: "#F4F6F8",
+  },
+  frame: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 430,
+    alignSelf: "center",
+    backgroundColor: "#F4F6F8",
+  },
+});

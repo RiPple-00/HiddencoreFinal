@@ -10,13 +10,15 @@ import {
 } from "react-native";
 import { styles } from "../../styles/guardianMain.styles";
 
-const screenWidth = Dimensions.get("window").width;
-const galleryWidth = screenWidth - 40;
-
 export default function GuardianMainPage({ navigation }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
   const scrollRef = useRef(null);
+
+  const fallbackWidth = Dimensions.get("window").width;
+  const effectiveWidth = containerWidth || fallbackWidth;
+  const galleryWidth = Math.max(0, effectiveWidth - 40);
 
   const notices = [
     { id: 1, title: "춘계 보호자 간담회 안내", date: "2024.03.28" },
@@ -31,6 +33,7 @@ export default function GuardianMainPage({ navigation }) {
   ];
 
   useEffect(() => {
+    if (!galleryWidth) return;
     const interval = setInterval(() => {
       const nextIndex =
         currentImage === galleryImages.length - 1 ? 0 : currentImage + 1;
@@ -44,11 +47,14 @@ export default function GuardianMainPage({ navigation }) {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [currentImage]);
+  }, [currentImage, galleryWidth]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <View
+        style={styles.container}
+        onLayout={(e) => setContainerWidth(e?.nativeEvent?.layout?.width ?? 0)}
+      >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
