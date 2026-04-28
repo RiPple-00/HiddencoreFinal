@@ -16,6 +16,12 @@ import GalleryPage from "./src/pages/guardian/GalleryPage";
 import ActivePhotoGalleryPage from "./src/pages/guardian/activePhoto/GalleryPage";
 import GuardianMorePage from "./src/pages/guardian/activePhoto/GuardianMorePage";
 
+import StoragePage from "./src/pages/billing/StoragePage";
+import StorageList from "./src/components/billing/StorageList";
+import StorageDetail from "./src/components/billing/StorageDetail";
+import PaymentHistory from "./src/components/billing/PaymentHistory";
+import InvoicePaymentList from "./src/components/billing/InvoicePaymentList";
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -29,21 +35,24 @@ export default function App() {
         <Stack.Screen name="VisitApply" component={VisitApplyPage} options={{ title: "면회 신청" }} />
         <Stack.Screen name="Notice" component={NoticePage} options={{ title: "공지사항" }} />
         <Stack.Screen name="Calendar" component={CalendarPage} options={{ title: "달력" }} />
-        <Stack.Screen name="Payment" component={PaymentPage} options={{ title: "수납" }} />
+        <Stack.Screen name="Payment" component={PaymentPage} options={{ headerShown: false }} />
+
+        {/* 수납 플로우 */}
+        <Stack.Screen name="StoragePage" component={StoragePage} options={{ headerShown: false }} />
+        <Stack.Screen name="PaymentHistory" component={PaymentHistory} options={{ headerShown: false }} />
+        <Stack.Screen name="StorageList" component={StorageList} options={{ headerShown: false }} />
+        <Stack.Screen name="InvoicePaymentList" component={InvoicePaymentList} options={{ headerShown: false }} />
+        <Stack.Screen name="StorageDetail" component={StorageDetail} options={{ headerShown: false }} />
         <Stack.Screen name="LiveCheck" component={LiveCheckPage} options={{ title: "실시간" }} />
         <Stack.Screen name="Chatbot" component={ChatbotPage} options={{ title: "챗봇" }} />
         <Stack.Screen name="MyPage" component={MyPage} options={{ title: "마이페이지" }} />
-        <Stack.Screen name="Gallery" component={GalleryPage} options={{ title: "갤러리"}} />
+        <Stack.Screen name="Gallery" component={GalleryPage} options={{ title: "갤러리" }} />
         <Stack.Screen
           name="ActivePhotoGallery"
           component={ActivePhotoGalleryPage}
           options={{ title: "활동 사진" }}
         />
-        <Stack.Screen
-          name="GalleryMore"
-          component={GuardianMorePage}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="GalleryMore" component={GuardianMorePage} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

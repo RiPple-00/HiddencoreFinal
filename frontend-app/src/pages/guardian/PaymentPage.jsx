@@ -1,23 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
+import StoragePage from "../billing/StoragePage";
 
-export default function ReportPage() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>수납 페이지</Text>
-    </View>
-  );
+export default function PaymentPage({ navigation }) {
+  return <StoragePage navigation={navigation} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F4F6F8",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#0B4EA2",
-  },
-});
