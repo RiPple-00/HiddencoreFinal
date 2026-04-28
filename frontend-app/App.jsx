@@ -16,6 +16,9 @@ import MyPage from "./src/pages/guardian/MyPage";
 import GalleryPage from "./src/pages/guardian/GalleryPage";
 import ActivePhotoGalleryPage from "./src/pages/guardian/activePhoto/GalleryPage";
 import GuardianMorePage from "./src/pages/guardian/activePhoto/GuardianMorePage";
+import CaregiverMainPage from "./src/pages/caregiver/CaregiverMainPage";
+import CaregiverWorkCheckPage from "./src/pages/caregiver/CaregiverWorkCheckPage";
+import CaregiverPatientListPage from "./src/pages/caregiver/CaregiverPatientListPage";
 
 import StoragePage from "./src/pages/billing/StoragePage";
 import StorageList from "./src/components/billing/StorageList";
@@ -31,6 +34,9 @@ export default function App() {
       <Stack.Navigator initialRouteName="GuardianLogin">
         <Stack.Screen name="GuardianLogin" component={GuardianLoginPage} options={{ title: "로그인" }} />
         <Stack.Screen name="GuardianMain" component={GuardianMainPage} options={{ headerShown: false }} />
+        <Stack.Screen name="CaregiverMain" component={CaregiverMainPage} options={{ headerShown: false }} />
+        <Stack.Screen name="CaregiverWorkCheck" component={CaregiverWorkCheckPage} options={{ headerShown: false }} />
+        <Stack.Screen name="CaregiverPatientList" component={CaregiverPatientListPage} options={{ headerShown: false }} />
         <Stack.Screen name="Report" component={ReportPage} options={{ title: "보고서 확인" }} />
         <Stack.Screen name="Consent" component={ConsentPage} options={{ title: "동의서 확인" }} />
         <Stack.Screen name="VisitApply" component={VisitApplyPage} options={{ title: "면회 신청" }} />

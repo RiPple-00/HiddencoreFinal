@@ -45,7 +45,7 @@ springdoc:
   default-produces-media-type: application/json
 
 server:
-  # Metro/Expo 웹이 8081을 쓰는 경우가 많아 API 기본은 8080 (필요 시 SERVER_PORT 로 덮어쓰기)
+  # 기본 API 포트는 8080 사용 (필요 시 SERVER_PORT 로 덮어쓰기)
   port: ${SERVER_PORT:8080}
   servlet:
     encoding:

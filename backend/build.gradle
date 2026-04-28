@@ -45,3 +45,28 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('freePort8080') {
+	doLast {
+		if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+			return
+		}
+
+		exec {
+			commandLine 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command',
+				'$connections = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue; ' +
+				'if ($connections) { ' +
+				'  $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique; ' +
+				'  foreach ($targetPid in $pids) { ' +
+				'    try { Stop-Process -Id $targetPid -Force -ErrorAction Stop; Write-Host \"Stopped PID $($targetPid) on port 8080\" } ' +
+				'    catch { Write-Host \"Failed to stop PID $($targetPid). Error: $($_.Exception.Message)\" } ' +
+				'  } ' +
+				'}'
+			ignoreExitValue true
+		}
+	}
+}
+
+tasks.named('bootRun') {
+	dependsOn tasks.named('freePort8080')
+}

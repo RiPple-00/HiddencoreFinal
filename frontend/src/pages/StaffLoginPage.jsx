@@ -60,7 +60,7 @@ export default function StaffLoginPage() {
             if (data.mustChangePassword) {
                 navigate('/change-password');
             } else {
-                navigate('/ward');
+                navigate(data.role === 'DOCTOR' ? '/doctor' : '/ward');
             }
         } catch {
             /* axios interceptor */

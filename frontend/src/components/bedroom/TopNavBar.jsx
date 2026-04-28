@@ -82,7 +82,7 @@ function BellIcon({ className }) {
 function TopNavBar({
   activeNav = "rooms",
   navItems = defaultNavItems,
-  brandLabel = "메디컬 어드민",
+  brandLabel = "따숨",
   userName = "김관리자 (Admin Kim)",
   userRole = "SUPERUSER",
   searchPlaceholder = "환자 검색...",

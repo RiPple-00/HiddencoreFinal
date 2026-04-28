@@ -73,6 +73,54 @@ public class DataSeeder {
             office.setEmailAgreedAt(LocalDateTime.now());
             memberRepository.save(office);
 
+            String demoDoctorEmployeeId = "2120010101";
+            String doctorLoginId = StaffLoginIdCodec.encode(facility.getFacilityCode(), demoDoctorEmployeeId);
+            Users doctor =
+                    memberRepository
+                            .findByLoginId(doctorLoginId)
+                            .orElse(
+                                    Users.builder()
+                                            .loginId(doctorLoginId)
+                                            .employeeLoginId(demoDoctorEmployeeId)
+                                            .build());
+            doctor.setFacilityId(facility);
+            doctor.setEmployeeLoginId(demoDoctorEmployeeId);
+            doctor.setHireDate(LocalDate.of(2020, 1, 1));
+            doctor.setPassword(passwordEncoder.encode("office123!"));
+            doctor.setName("데모 의사");
+            doctor.setPhone("01020000001");
+            doctor.setEmail("doctor-demo@ddasum.local");
+            doctor.setRole(UsersRole.DOCTOR);
+            doctor.setStatus(UsersStatus.ACTIVE);
+            doctor.setMustChangePassword(false);
+            doctor.setEmailAgreed(true);
+            doctor.setEmailAgreedAt(LocalDateTime.now());
+            memberRepository.save(doctor);
+
+            String demoCaregiverEmployeeId = "3120010101";
+            String caregiverLoginId = StaffLoginIdCodec.encode(facility.getFacilityCode(), demoCaregiverEmployeeId);
+            Users caregiver =
+                    memberRepository
+                            .findByLoginId(caregiverLoginId)
+                            .orElse(
+                                    Users.builder()
+                                            .loginId(caregiverLoginId)
+                                            .employeeLoginId(demoCaregiverEmployeeId)
+                                            .build());
+            caregiver.setFacilityId(facility);
+            caregiver.setEmployeeLoginId(demoCaregiverEmployeeId);
+            caregiver.setHireDate(LocalDate.of(2020, 1, 1));
+            caregiver.setPassword(passwordEncoder.encode("office123!"));
+            caregiver.setName("데모 요양사");
+            caregiver.setPhone("01030000001");
+            caregiver.setEmail("caregiver-demo@ddasum.local");
+            caregiver.setRole(UsersRole.CAREGIVER);
+            caregiver.setStatus(UsersStatus.ACTIVE);
+            caregiver.setMustChangePassword(false);
+            caregiver.setEmailAgreed(true);
+            caregiver.setEmailAgreedAt(LocalDateTime.now());
+            memberRepository.save(caregiver);
+
             Users guardian =
                     memberRepository
                             .findByLoginId("guardian001")
