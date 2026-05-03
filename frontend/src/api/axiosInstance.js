@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 공통 axios 설정
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8081/api", // 백엔드 API의 기본 URL
+  baseURL: "http://localhost:8080/api", // 백엔드 API의 기본 URL
   headers: {
     "Content-Type": "application/json",
   },

@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -80,7 +79,8 @@ public class ScheduleService {
     }
 
     // 필터링 조회
-    public List<ScheduleResponse> getSchedulesByTypeAndMonth(Long facilityId, ScheduleType type, LocalDateTime referenceDate) {
+    public List<ScheduleResponse> getSchedulesByTypeAndMonth(Long facilityId, ScheduleType type,
+            LocalDateTime referenceDate) {
         Long resolvedFacilityId = resolveFacilityId(facilityId);
         LocalDateTime start = startOfMonth(referenceDate);
         LocalDateTime end = endOfMonth(referenceDate);
@@ -133,11 +133,13 @@ public class ScheduleService {
             createdUser = usersRepository.findById(request.getCreatedUserId()).orElse(null);
         } else {
             createdUser = usersRepository.findAll().stream().findFirst()
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "createdUserId is required"));
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "createdUserId is required"));
         }
         if (createdUser == null) {
             createdUser = usersRepository.findAll().stream().findFirst()
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "createdUserId is required"));
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "createdUserId is required"));
         }
 
         Facility facility = null;
@@ -211,10 +213,14 @@ public class ScheduleService {
             schedule.setPatientId(patient);
         }
 
-        if (request.getTitle() != null) schedule.setTitle(request.getTitle());
-        if (request.getContent() != null) schedule.setContent(request.getContent());
-        if (request.getScheduledAt() != null) schedule.setScheduledAt(request.getScheduledAt());
-        if (request.getEndAt() != null) schedule.setEndAt(request.getEndAt());
+        if (request.getTitle() != null)
+            schedule.setTitle(request.getTitle());
+        if (request.getContent() != null)
+            schedule.setContent(request.getContent());
+        if (request.getScheduledAt() != null)
+            schedule.setScheduledAt(request.getScheduledAt());
+        if (request.getEndAt() != null)
+            schedule.setEndAt(request.getEndAt());
 
         Schedule saved = scheduleRepository.save(schedule);
         return ScheduleResponse.fromEntity(saved);
@@ -230,6 +236,31 @@ public class ScheduleService {
         }
 
         scheduleRepository.delete(schedule);
+    }
+
+    // Post -> Schedule로 등록
+    @Transactional
+    public ScheduleResponse createFacilitySchedule(ScheduleCreateRequest request, Long userId, ScheduleType type) {
+        if (request.getScheduledAt() == null)
+            return null;
+
+        Users createdUser = usersRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자를 찾을 수 없습니다."));
+
+        Facility facility = facilityRepository.findById(request.getFacilityId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "시설을 찾을 수 없습니다."));
+
+        Schedule schedule = Schedule.builder()
+                .facilityId(facility)
+                .createdUserId(createdUser)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .type(type) // FACILITY 또는 PROGRAM
+                .scheduledAt(request.getScheduledAt())
+                .endAt(request.getEndAt())
+                .build();
+
+        return ScheduleResponse.fromEntity(scheduleRepository.save(schedule));
     }
 
 }

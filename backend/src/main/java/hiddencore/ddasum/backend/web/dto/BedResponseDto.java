@@ -34,7 +34,7 @@ public class BedResponseDto {
         return BedResponseDto.builder()
                 .locationId(location.getLocationId())
                 .patientId(patient != null ? patient.getPatientId() : null)
-                .bedId(location.getRoom() + "-" + location.getBed())
+                .bedId(location.getRoom() + "-" + String.valueOf(location.getBed()))
                 .occupied(patient != null)
                 .status(patient != null
                         ? (patient.getStatus() != null ? patient.getStatus().getDescription() : "-")

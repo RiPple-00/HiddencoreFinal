@@ -27,11 +27,11 @@ public class MealPlanService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MealPlanDto.BulkUpsertResponse bulkUpsert(MealPlanDto.BulkUpsertRequest request) {
+    public MealPlanDto.BulkUpsertResponse bulkUpsert(MealPlanDto.BulkUpsertRequest request,  Long adminId) {
         Facility facility = facilityRepository.findById(request.getFacilityId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "시설을 찾을 수 없습니다."));
 
-        Users admin = memberRepository.findByUserId(request.getAdminId())
+        Users admin = memberRepository.findByUserId(adminId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관리자 사용자를 찾을 수 없습니다."));
 
         int savedCount = 0;

@@ -1,4 +1,5 @@
 import BedCard from "./BedCard";
+import WardLayoutCard from "./WardLayoutCard";
 
 
 function RoomLayoutCard({ beds, onAssignClick, onBedClick}) {

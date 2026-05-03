@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hiddencore.ddasum.backend.security.AuthenticatedUser;
 import hiddencore.ddasum.backend.service.MealPlanService;
 import hiddencore.ddasum.backend.web.dto.MealPlanDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,9 +39,11 @@ public class MealPlanController {
     @Operation(summary = "식단 일괄 등록/수정", description = "날짜별 식단을 여러 건 업데이트합니다.")
     @PostMapping("/bulk")
     public ResponseEntity<MealPlanDto.BulkUpsertResponse> bulkUpsert(
-            @Valid @RequestBody MealPlanDto.BulkUpsertRequest request
+            @Valid @RequestBody MealPlanDto.BulkUpsertRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        return ResponseEntity.ok(mealPlanService.bulkUpsert(request));
+        Long adminId = authenticatedUser.userId();
+        return ResponseEntity.ok(mealPlanService.bulkUpsert(request, adminId));
     }
 
     /**

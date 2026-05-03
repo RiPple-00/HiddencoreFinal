@@ -1,9 +1,19 @@
 /** 로그인 사용자·localStorage user 기준 시설 ID (엑셀 저장·식단 조회를 같은 시설로 맞춤) */
 export function resolveFacilityId(user) {
+  // JWT에서 facilityId 추출 시도
+  const token = user?.accessToken ?? user?.token;
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const n = Number(payload.facilityId);
+      if (Number.isFinite(n) && n > 0) return n;
+    } catch {}
+  }
+  // fallback: user 객체에서 직접 찾기
   const raw = user?.facilityId ?? user?.facility_id;
   const n = Number(raw);
   if (Number.isFinite(n) && n > 0) return n;
-  return 1;
+  return null; // 기본값 1 대신 null 반환 -> null check 후 토큰 확인에 사용
 }
 
 /** API 한 줄(row)에서 끼니 구분값을 통일 (대소문자·스네이크 케이스 허용) */

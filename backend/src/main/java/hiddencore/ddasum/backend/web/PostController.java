@@ -13,9 +13,11 @@ package hiddencore.ddasum.backend.web;
 import hiddencore.ddasum.backend.domain.Post.PostType;
 import hiddencore.ddasum.backend.service.PostService;
 import hiddencore.ddasum.backend.web.dto.PostDto;
+import hiddencore.ddasum.backend.security.AuthenticatedUser;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -89,9 +91,9 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostDto.PostResponse> createPost(
             @PathVariable Long facilityId,
-            @RequestParam Long userId, // 추후 Security 적용 시 SecurityContext에서 추출
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestBody @Valid PostDto.CreateRequest request) {
-
+        Long userId = authenticatedUser.userId();
         return ResponseEntity.ok(postService.createPost(facilityId, userId, request));
     }
 
@@ -101,9 +103,9 @@ public class PostController {
     public ResponseEntity<PostDto.PostResponse> updatePost(
             @PathVariable Long facilityId,
             @PathVariable Long postId,
-            @RequestParam Long userId, // 추후 Security 적용 시 SecurityContext에서 추출
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestBody @Valid PostDto.UpdateRequest request) {
-
+        Long userId = authenticatedUser.userId();
         return ResponseEntity.ok(postService.updatePost(facilityId, postId, userId, request));
     }
 
@@ -113,8 +115,8 @@ public class PostController {
     public ResponseEntity<Void> deletePost(
             @PathVariable Long facilityId,
             @PathVariable Long postId,
-            @RequestParam Long userId) { // 추후 Security 적용 시 SecurityContext에서 추출
-
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        Long userId = authenticatedUser.userId();
         postService.deletePost(facilityId, postId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -127,10 +129,10 @@ public class PostController {
     @GetMapping("/my")
     public ResponseEntity<List<PostDto.PostListResponse>> getUserActivePosts(
             @PathVariable Long facilityId,
-            @RequestParam Long userId,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestParam(required = false) PostType type,
             @PageableDefault(size = 20) Pageable pageable) {
-
+        Long userId = authenticatedUser.userId();
         return ResponseEntity.ok(postService.getUserActivePosts(userId, type, pageable));
     }
 
@@ -139,10 +141,10 @@ public class PostController {
     @GetMapping("/draft")
     public ResponseEntity<List<PostDto.PostListResponse>> getUserDrafts(
             @PathVariable Long facilityId,
-            @RequestParam Long userId,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestParam(required = false) PostType type,
             @PageableDefault(size = 20) Pageable pageable) {
-
+        Long userId = authenticatedUser.userId();
         return ResponseEntity.ok(postService.getUserDrafts(userId, type, pageable));
     }
 }

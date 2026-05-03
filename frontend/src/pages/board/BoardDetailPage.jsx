@@ -29,10 +29,7 @@ const getBreadcrumbLabel = (type) => {
 const BoardDetailPage = () => {
   const navigate = useNavigate();
   const { facilityId, postId } = useParams();
-
   const { user } = useAuth();
-  const authorPk = user?.id != null ? Number(user.id) : null;
-
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -61,11 +58,11 @@ const BoardDetailPage = () => {
   const handleDelete = async () => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
-      if (authorPk == null || Number.isNaN(authorPk)) {
+      if (!user) {
         toast.error('삭제하려면 로그인해 주세요.');
         return;
       }
-      await postApi.deletePost(facilityId, postId, authorPk);
+      await postApi.deletePost(facilityId, postId);
       navigate(`/facilities/${facilityId}/board`);
     } catch {
       // 에러는 Axios 인터셉터에서 toast로 처리

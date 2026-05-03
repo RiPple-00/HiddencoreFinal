@@ -152,8 +152,8 @@ export const parseAttachmentUrls = (attachmentUrls) => {
  * (NOTICE/PROGRAM 문자열은 DB enum에 없음)
  */
 export const BOARD_UI_TO_POST_TYPE = {
-  NOTICE: 'FACILITY',
   PROGRAM: 'APPLY',
+  GENERAL: 'GENERAL',
 };
 
 /**

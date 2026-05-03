@@ -1,13 +1,5 @@
 import { Link } from "react-router-dom";
-
-/* CHECK!!!: DELETE 삭제 필수 */
-
-const defaultNavItems = [
-  { key: "rooms", label: "병실 조회", to: "/ward" },
-  { key: "patients", label: "환자 조회", to: "/patients" },
-  { key: "calendar", label: "캘린더", to: "/schedule" },
-  { key: "notice", label: "공지사항", to: "/facilities/1/board" },
-];
+import { useAuth } from "../../contexts/AutoContext";
 
 function SearchIcon({ className }) {
   return (
@@ -81,13 +73,26 @@ function BellIcon({ className }) {
  */
 function TopNavBar({
   activeNav = "rooms",
-  navItems = defaultNavItems,
+  navItems,
   brandLabel = "따숨",
   userName = "김관리자 (Admin Kim)",
   userRole = "SUPERUSER",
   searchPlaceholder = "환자 검색...",
   showNotificationDot = true,
 }) {
+  const { user } = useAuth();
+  const token = user?.accessToken ?? user?.token;
+  const jwtPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const facilityId = jwtPayload.facilityId ?? null;
+
+  const defaultNavItems = [
+    { key: "rooms", label: "병실 조회", to: "/ward" },
+    { key: "patients", label: "환자 조회", to: "/patients" },
+    { key: "calendar", label: "캘린더", to: "/schedule" },
+    { key: "notice", label: "공지사항", to: facilityId ? `/facilities/${facilityId}/board` : null },
+  ];
+  const resolvedNavItems = navItems ?? defaultNavItems;
+
   const renderNavLink = (item) => {
     const isActive = item.key === activeNav;
     const base =
@@ -121,7 +126,7 @@ function TopNavBar({
         <div className="flex min-w-0 flex-1 items-center">
           <span className="shrink-0 text-lg font-bold text-[#2c52a1]">{brandLabel}</span>
           <nav className="ml-10 hidden items-center md:flex" aria-label="메인">
-            {navItems.map((item) => renderNavLink(item))}
+            {resolvedNavItems.map((item) => renderNavLink(item))}
           </nav>
         </div>
 

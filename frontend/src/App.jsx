@@ -36,7 +36,9 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const facilityId = user?.facilityId ?? 1;
+  const token = user?.accessToken ?? user?.token;
+  const jwtPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const facilityId = jwtPayload.facilityId ?? null;
 
   useEffect(() => {
     const onDocClick = (e) => {

@@ -20,26 +20,18 @@ const HEADINGS = {
 const BoardUserPostsPage = ({ variant }) => {
   const { facilityId } = useParams();
   const { user } = useAuth();
-  const userId = user?.id != null ? Number(user.id) : null;
-
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userId == null || Number.isNaN(userId)) {
-      setLoading(false);
-      setPosts([]);
-      return;
-    }
-
     let cancelled = false;
     (async () => {
       setLoading(true);
       try {
         const res =
           variant === 'draft'
-            ? await postApi.getMyDrafts(facilityId, userId, null, 0, 500)
-            : await postApi.getMyPosts(facilityId, userId, null, 0, 500);
+            ? await postApi.getMyDrafts(facilityId, null, 0, 500)
+            : await postApi.getMyPosts(facilityId, null, 0, 500);
         const raw = Array.isArray(res.data) ? res.data : [];
         const fid = String(facilityId);
         const filtered = raw.filter(
@@ -56,9 +48,9 @@ const BoardUserPostsPage = ({ variant }) => {
     return () => {
       cancelled = true;
     };
-  }, [facilityId, userId, variant]);
+  }, [facilityId, user, variant]);
 
-  if (userId == null || Number.isNaN(userId)) {
+  if (!user) {
     return (
       <div className="max-w-lg mx-auto text-center py-16 px-4">
         <p className="text-gray-600 mb-4">로그인 후 이용할 수 있습니다.</p>

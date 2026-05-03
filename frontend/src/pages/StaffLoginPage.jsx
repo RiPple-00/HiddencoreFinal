@@ -97,6 +97,7 @@ export default function StaffLoginPage() {
                         label="비밀번호"
                         name="password"
                         type="password"
+                        autoComplete="current-password" 
                         value={form.password}
                         onChange={handleChange}
                         error={errors.password}

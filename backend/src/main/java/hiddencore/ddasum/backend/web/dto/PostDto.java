@@ -42,6 +42,9 @@ public class PostDto {
         private LocalDateTime endAt; // PROGRAM일 때만 사용
         private String attachmentUrls;
         private LocalDateTime reservationAt; // 예약 시간. null이면 즉시 게시, 값이 있으면 RESERVE 상태로 처리
+        
+        private LocalDateTime scheduledAt;   // 실제 시작일 (SCHEDULE용)
+        private LocalDateTime scheduleEndAt; // 실제 종료일 (SCHEDULE용)
 
     } //
 

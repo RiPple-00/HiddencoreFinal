@@ -21,6 +21,7 @@ public class LocationDto {
         private String building;
         private Integer floor;
         private String room;
+        private Integer bed;
         private RoomType roomType;
         private RoomGenderType roomGenderType;
         private Boolean isOccupied;
@@ -35,6 +36,7 @@ public class LocationDto {
                 .building(location.getBuilding())
                 .floor(location.getFloor())
                 .room(location.getRoom())
+                .bed(location.getBed())
                 .roomType(location.getRoomType())
                 .roomGenderType(location.getRoomGenderType())
                 .isOccupied(location.getIsOccupied())

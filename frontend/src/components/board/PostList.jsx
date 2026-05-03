@@ -46,14 +46,14 @@ const PostList = ({ posts = [], mode = 'table', facilityId }) => {
           </tr>
         </thead>
         <tbody>
-          {posts.map((post) => (
+          {posts.map((post, index) => (
             <tr
               key={rowId(post) ?? post.title}
               onClick={() => handleRowClick(post)}
               className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
             >
               {/* NO */}
-              <td className="py-3 text-center text-gray-400">{rowId(post)}</td>
+              <td className="py-3 text-center text-gray-400">{index + 1}</td>
 
               {/* TITLE: 배지 + 제목 + 첨부파일 아이콘 + 댓글 수 */}
               <td className="py-3">

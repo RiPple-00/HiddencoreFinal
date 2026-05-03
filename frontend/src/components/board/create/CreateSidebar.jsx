@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 // 타입 선택 버튼 목록
 // disabled: true면 화면에 보이되 클릭 불가 (미확정 타입)
 const TYPE_BUTTONS = [
-  { label: '공지사항 작성', type: 'NOTICE',   disabled: false },
-  { label: '프로그램 작성', type: 'PROGRAM',  disabled: false },
-  { label: '게시글 작성',   type: 'GENERAL',  disabled: true  }, // CHECK!!! 일반 게시글 확정 후 disabled: false로 변경
+  { label: '공지사항 작성', type: 'NOTICE', officialOnly: true },
+  { label: '프로그램 작성', type: 'PROGRAM', officialOnly: true },
+  { label: '게시글 작성', type: 'GENERAL', officialOnly: false },
 ];
 
 const ListIcon = () => (
-  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{shrink: 0}}>
+  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ shrink: 0 }}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
       d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
   </svg>
@@ -17,9 +17,8 @@ const ListIcon = () => (
 
 /**
  * 게시글 작성 페이지 좌측 사이드바
- * 미확정 타입(GENERAL)은 버튼을 보여주되 비활성화 스타일로 표시
  */
-const CreateSidebar = ({ postType, onTypeChange, facilityId, title, content }) => {
+const CreateSidebar = ({ postType, onTypeChange, facilityId, title, content, canWriteOfficial }) => {
   const navigate = useNavigate();
 
   return (
@@ -27,25 +26,28 @@ const CreateSidebar = ({ postType, onTypeChange, facilityId, title, content }) =
       <p className="text-xs text-gray-400 font-medium mb-2 px-2">새 게시글 작성</p>
 
       {/* 타입 선택 버튼 */}
-      {TYPE_BUTTONS.map((btn) => (
-        <button
-          key={btn.type}
-          onClick={() => !btn.disabled && onTypeChange(btn.type)}
-          disabled={btn.disabled}
-          className={`
-            flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors
-            ${btn.disabled
-              ? 'text-gray-300 cursor-not-allowed'
-              : postType === btn.type
-                ? 'bg-teal-50 text-teal-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100'
-            }
-          `}
-        >
-          <ListIcon />
-          {btn.label}
-        </button>
-      ))}
+      {TYPE_BUTTONS.map((btn) => {
+        const disabled = btn.officialOnly && !canWriteOfficial;
+        return (
+          <button
+            key={btn.type}
+            onClick={() => !disabled && onTypeChange(btn.type)}
+            disabled={disabled}
+            className={`
+        flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors
+        ${disabled
+                ? 'text-gray-300 cursor-not-allowed'
+                : postType === btn.type
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }
+      `}
+          >
+            <ListIcon />
+            {btn.label}
+          </button>
+        );
+      })}
 
       <hr className="border-gray-200 my-2" />
 

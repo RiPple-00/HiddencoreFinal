@@ -16,7 +16,6 @@ function MealExcelUploader() {
   const { user } = useAuth();
 
   const currentUser = user ?? JSON.parse(localStorage.getItem("user") || "{}");
-  const parsedAdminId = Number(currentUser.id);
   const facilityId = resolveFacilityId(currentUser);
 
   const handleFileUpload = (file) => {
@@ -325,13 +324,7 @@ function MealExcelUploader() {
                   setStatusMessage("");
 
                   try {
-                    if (!Number.isFinite(adminId) || adminId <= 0) {
-                      setStatusMessage("❌ 사용자 정보가 올바르지 않습니다. 다시 로그인 후 시도해주세요.");
-                      setSaveSuccess(false);
-                      return;
-                    }
-
-                    await mealApi.bulkUpsertMeals({ facilityId, adminId, rows: payload });
+                    await mealApi.bulkUpsertMeals({ facilityId, rows: payload });
                     setSaveSuccess(true);
                     setStatusMessage("✅ 식단을 저장했습니다. 아래 미리보기는 유지됩니다. 확인은 식단 플래너에서 날짜를 눌러 주세요.");
 

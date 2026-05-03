@@ -34,6 +34,13 @@ const INITIAL_PANEL = {
     authorName: null,
     updatedAt: null,
   },
+  GENERAL: {
+    isPinned: false,
+    publishType: 'IMMEDIATE',
+    reservationAt: '',
+    authorName: null,
+    updatedAt: null,
+  },
 };
 
 const resolveStatus = (publishType, isDraft) => {
@@ -52,23 +59,28 @@ const BoardCreatePage = () => {
   const navigate = useNavigate();
   const { facilityId } = useParams();
   const { user } = useAuth();
-
-  /** 백엔드 `@RequestParam Long userId`(회원 PK) — 로그인 응답의 `id` */
-  const authorPk = user?.id != null ? Number(user.id) : null;
-
-  const [postType, setPostType] = useState('NOTICE');
+  const [noticeType, setNoticeType] = useState('ADMIN');
   const [formState, setFormState] = useState({
     title: '',
     content: '',
     attachmentUrls: [],
+    scheduledAt: '',    // 프로그램/시설 실제 시작
+    scheduleEndAt: '',  // 프로그램/시설 실제 종료
   });
+
+  /* 권한 설정 */
+  const token = user?.accessToken ?? user?.token;
+  const jwtPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const userRole = jwtPayload.role ?? null;
+  const canWriteOfficial = userRole === 'ADMIN' || userRole === 'OFFICE';
+  const [postType, setPostType] = useState(canWriteOfficial ? 'NOTICE' : 'GENERAL');
 
   const buildInitialPanel = (type) => ({
     ...INITIAL_PANEL[type],
     authorName: user?.username ?? null,
   });
 
-  const [panelState, setPanelState] = useState(() => buildInitialPanel('NOTICE'));
+  const [panelState, setPanelState] = useState(() => buildInitialPanel(canWriteOfficial ? 'NOTICE' : 'GENERAL'));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleTypeChange = (type) => {
@@ -85,7 +97,9 @@ const BoardCreatePage = () => {
   };
 
   const buildRequestData = (isDraft) => {
-    const domainType = BOARD_UI_TO_POST_TYPE[postType];
+    const domainType = postType === 'NOTICE'
+      ? noticeType  // URGENT, CLINICAL, ADMIN, FACILITY 중 선택값
+      : BOARD_UI_TO_POST_TYPE[postType];
     if (!domainType) {
       throw new Error('지원하지 않는 게시판 유형입니다.');
     }
@@ -119,16 +133,18 @@ const BoardCreatePage = () => {
           return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 30;
         })(),
       }),
+      scheduledAt: formState.scheduledAt || null,
+      scheduleEndAt: formState.scheduleEndAt || null,
     };
   };
 
   const handleSaveDraft = async () => {
-    if (authorPk == null || Number.isNaN(authorPk)) {
+    if (!user) {
       toast.error('임시 저장하려면 로그인해 주세요.');
       return;
     }
     try {
-      await postApi.createPost(facilityId, authorPk, buildRequestData(true));
+      await postApi.createPost(facilityId, buildRequestData(true));
       toast.success('임시 저장되었습니다.');
       navigate(`/facilities/${facilityId}/board`);
     } catch {
@@ -145,13 +161,13 @@ const BoardCreatePage = () => {
       alert('내용을 입력해주세요.');
       return;
     }
-    if (authorPk == null || Number.isNaN(authorPk)) {
-      toast.error('게시글을 등록하려면 로그인해 주세요.');
+    if (!user) {
+      toast.error('임시 저장하려면 로그인해 주세요.');
       return;
     }
     setIsSubmitting(true);
     try {
-      await postApi.createPost(facilityId, authorPk, buildRequestData(false));
+      await postApi.createPost(facilityId, buildRequestData(false));
       toast.success('게시글이 등록되었습니다.');
       navigate(`/facilities/${facilityId}/board`);
     } catch {
@@ -174,6 +190,7 @@ const BoardCreatePage = () => {
     };
     if (postType === 'NOTICE') return <NoticePanel {...commonProps} />;
     if (postType === 'PROGRAM') return <ProgramPanel {...commonProps} />;
+    if (postType === 'GENERAL') return null; // 패널 없음
     return null;
   };
 
@@ -185,6 +202,7 @@ const BoardCreatePage = () => {
         facilityId={facilityId}
         title={formState.title}
         content={formState.content}
+        canWriteOfficial={canWriteOfficial}
       />
       <CreateForm
         postType={postType}
@@ -193,6 +211,12 @@ const BoardCreatePage = () => {
         attachmentUrls={formState.attachmentUrls}
         facilityId={facilityId}
         onChange={handleFormChange}
+        noticeType={noticeType}
+        onNoticeTypeChange={setNoticeType}
+        scheduledAt={formState.scheduledAt}
+        scheduleEndAt={formState.scheduleEndAt}
+        onCancel={handleCancel}
+        onSubmit={handleSubmit}
       />
       {renderPanel()}
     </div>

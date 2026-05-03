@@ -2,21 +2,30 @@ package hiddencore.ddasum.backend.web;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+
+import hiddencore.ddasum.backend.domain.Schedule.ScheduleType;
+import hiddencore.ddasum.backend.security.AuthenticatedUser;
 import hiddencore.ddasum.backend.service.ScheduleService;
 import hiddencore.ddasum.backend.web.dto.ScheduleResponse;
 import hiddencore.ddasum.backend.web.dto.ScheduleCreateRequest;
 import hiddencore.ddasum.backend.web.dto.ScheduleUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -90,4 +99,13 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
+    // 시설 일정 등록
+    @Operation(summary = "시설 일정 등록")
+    @PostMapping("/facility")
+    public ResponseEntity<ScheduleResponse> createFacilitySchedule(
+            @RequestBody ScheduleCreateRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ScheduleResponse created = scheduleService.createFacilitySchedule(request, authenticatedUser.userId(),  ScheduleType.FACILITY);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
 }

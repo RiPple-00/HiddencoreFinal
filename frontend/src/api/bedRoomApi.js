@@ -3,8 +3,10 @@ import api from "./index";
 const bedRoomApi = {
 
     //병상 배치도 불러오기
-    getBedsByRoom: (room) => {
-        return api.get(`/rooms/${room}/beds`);
+    getBedsByRoom: (room, building) => {
+        return api.get(`/rooms/${room}/beds`, {
+            params: { building }
+        });
     },
 
     /** 환자를 침상에 배정 (이미 등록된 환자 → location 연결) */
@@ -25,10 +27,10 @@ const bedRoomApi = {
         });
     },
 
-     //병상 배정 환자 삭제
+    //병상 배정 환자 삭제
     deletePatientFromBed: (locationId) => {
-          return api.delete(`/rooms/beds/${locationId}/assign`);
-     }
+        return api.delete(`/rooms/beds/${locationId}/assign`);
+    }
 
 };
 

@@ -10,7 +10,8 @@ import PatientCreateModal from "../../components/patient/PatientCreateModal";
 import bedRoomApi from "../../api/bedRoomApi";
 import { useNavigate } from "react-router-dom";
 import patientApi from "../../api/patientApi";
-import { getRoomSummary } from "../../api/LocationApi";
+import { getRoomSummary, getAllBeds } from '../../api/LocationApi';
+import { useAuth } from '../../contexts/AutoContext.jsx';
 
 export default function PatientListPage() {
   const [patients, setPatients] = useState([]);
@@ -24,10 +25,15 @@ export default function PatientListPage() {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  const { user } = useAuth();
+  const token = user?.accessToken ?? user?.token;
+  const jwtPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const facilityId = jwtPayload.facilityId ?? null;
+
   useEffect(() => {
     fetchPatients(); // 환자 목록 불러오기
-    fetchBedsForCreateModal(); // 병상 배정 방식에서 사용할 병상 데이터 불러오기
-  }, []);
+    if (facilityId) fetchBedsForCreateModal();// 병상 배정 방식에서 사용할 병상 데이터 불러오기
+  }, [facilityId]);
 
   const fetchPatients = async () => {
     try {
@@ -41,7 +47,7 @@ export default function PatientListPage() {
   };
 
   const summary = useMemo(() => {
-    const patientList = Array.isArray(patients) ? patients : []; 
+    const patientList = Array.isArray(patients) ? patients : [];
 
     return {
       admittedCount: patientList.length,
@@ -57,7 +63,7 @@ export default function PatientListPage() {
   }, [patients]);
 
   const filteredPatients = useMemo(() => {// 검색/필터를 적용한 뒤 최신 등록 환자가 위로 오도록 patientId 내림차순 정렬
-  // (현재 구조에서는 patientId가 클수록 최신 환자로 가정) 우리 이름 규칙 어딨었는지 기억 안나
+    // (현재 구조에서는 patientId가 클수록 최신 환자로 가정) 우리 이름 규칙 어딨었는지 기억 안나
     const lowerKeyword = keyword.toLowerCase();
 
     return (Array.isArray(patients) ? patients : []).filter((patient) => {
@@ -73,7 +79,7 @@ export default function PatientListPage() {
         (quickFilter === "UNASSIGNED" && (!patient.building || !patient.room));
 
       return matchesKeyword && matchesStatus && matchesQuickFilter;
-    }) .sort((a, b) => b.patientId - a.patientId); // 최신 환자 먼저
+    }).sort((a, b) => b.patientId - a.patientId); // 최신 환자 먼저
   }, [patients, keyword, statusFilter, quickFilter]);
 
   const handleGoCreatePage = () => {
@@ -84,27 +90,10 @@ export default function PatientListPage() {
   // 나중에 room 선택 방식으로 바꾸면 이 부분 수정하면 됨
   const fetchBedsForCreateModal = async () => {
     try {
-      // A동 1층 전체 호실의 병상 데이터를 모두 불러온다.
-      const summary = await getRoomSummary({ building: "", floor: 1 });
-      const roomList = Array.isArray(summary)
-        ? summary
-            .map((item) => String(item.room))
-            .filter((room) => room && room.trim() !== "")
-        : [];
-
-      if (roomList.length === 0) {
-        setBeds([]);
-        return;
-      }
-
-      const roomResponses = await Promise.all(
-        roomList.map((room) => bedRoomApi.getBedsByRoom(room)),
-      );
-      const data = roomResponses.flatMap((res) => res?.data ?? []);
-
+      const data = await getAllBeds(facilityId);
       const mappedBeds = data.map((bed) => ({
         locationId: bed.locationId,
-        id: bed.bedId,
+        id: bed.bed,
         room: bed.room,
         building: bed.building,
         floor: bed.floor,
@@ -173,11 +162,10 @@ export default function PatientListPage() {
                       prev === "UNASSIGNED" ? "" : "UNASSIGNED",
                     )
                   }
-                  className={`cursor-pointer rounded-2xl border px-6 py-5 ${
-                    quickFilter === "UNASSIGNED"
-                      ? "border-red-400 bg-red-50"
-                      : "border-slate-200 bg-slate-50"
-                  }`}
+                  className={`cursor-pointer rounded-2xl border px-6 py-5 ${quickFilter === "UNASSIGNED"
+                    ? "border-red-400 bg-red-50"
+                    : "border-slate-200 bg-slate-50"
+                    }`}
                 >
                   <p className="text-sm font-medium text-slate-500">
                     병실 미배정 환자

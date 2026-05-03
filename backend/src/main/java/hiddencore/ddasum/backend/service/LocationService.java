@@ -61,7 +61,8 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     public LocationDto.RoomSummaryDto getRoomPatientCount(String building, Integer floor, String room) {
-        List<Location> roomLocations = locationRepository.findByBuildingAndFloorAndRoomOrderByBedAsc(building, floor, room);
+        List<Location> roomLocations = locationRepository.findByBuildingAndFloorAndRoomOrderByBedAsc(building, floor,
+                room);
 
         if (roomLocations.isEmpty()) {
             throw new IllegalArgumentException("해당 병실이 존재하지 않습니다.");
@@ -80,6 +81,14 @@ public class LocationService {
                 .patientCount(patientCount)
                 .roomCapacity(first.getRoomCapacity())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationDto.LocationCardDto> getAllLocations(Long facilityId) {
+        return locationRepository.findByFacilityId_FacilityId(facilityId)
+                .stream()
+                .map(LocationDto.LocationCardDto::from)
+                .toList();
     }
 
 }

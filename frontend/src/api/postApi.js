@@ -14,29 +14,23 @@ const postApi = {
       params: { type, searchType, keyword, page, size },
     }),
 
-  createPost: (facilityId, userId, data) =>
-    api.post(`/facilities/${facilityId}/posts`, data, {
-      params: { userId },
-    }),
+  createPost: (facilityId, data) =>
+    api.post(`/facilities/${facilityId}/posts`, data),
 
-  updatePost: (facilityId, postId, userId, data) =>
-    api.put(`/facilities/${facilityId}/posts/${postId}`, data, {
-      params: { userId },
-    }),
+  updatePost: (facilityId, postId, data) =>
+    api.put(`/facilities/${facilityId}/posts/${postId}`, data),
 
-  deletePost: (facilityId, postId, userId) =>
-    api.delete(`/facilities/${facilityId}/posts/${postId}`, {
-      params: { userId },
-    }),
+  deletePost: (facilityId, postId) =>
+    api.delete(`/facilities/${facilityId}/posts/${postId}`),
 
-  getMyPosts: (facilityId, userId, type = null, page = 0, size = 20) =>
+  getMyPosts: (facilityId, type = null, page = 0, size = 20) =>
     api.get(`/facilities/${facilityId}/posts/my`, {
-      params: { userId, page, size, ...(type != null ? { type } : {}) },
+      params: { page, size, ...(type != null ? { type } : {}) },
     }),
 
-  getMyDrafts: (facilityId, userId, type = null, page = 0, size = 20) =>
+  getMyDrafts: (facilityId, type = null, page = 0, size = 20) =>
     api.get(`/facilities/${facilityId}/posts/draft`, {
-      params: { userId, page, size, ...(type != null ? { type } : {}) },
+      params: { page, size, ...(type != null ? { type } : {}) },
     }),
 
   uploadFile: (facilityId, file) => {

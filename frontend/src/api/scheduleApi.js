@@ -121,4 +121,10 @@ const scheduleApi = {
   getScheduleDetail,
 };
 
+// Create Schedule on Post
+export const createFacilitySchedule = async (scheduleData) => {
+  const response = await api.post('/schedules/facility', scheduleData);
+  return response.data;
+};
+
 export default scheduleApi;

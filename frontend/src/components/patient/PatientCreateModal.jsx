@@ -1,6 +1,7 @@
 import { useState } from "react";
 import patientApi from "../../api/patientApi";
 import RoomLayoutCard from "../bedroom/RoomLayoutCard";
+import WardPage from '../../pages/WardPage'
 
 export default function PatientCreateModal({ //create 페이지에서 모달로 변경 - simple 방식 재형꺼 합친 후 수정 예정
   open,

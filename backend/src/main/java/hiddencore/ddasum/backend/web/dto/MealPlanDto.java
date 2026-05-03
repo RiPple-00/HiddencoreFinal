@@ -15,7 +15,6 @@ public class MealPlanDto {
     @Data
     public static class BulkUpsertRequest {
         private Long facilityId;
-        private Long adminId;
         private List<RowRequest> rows;
     }
 

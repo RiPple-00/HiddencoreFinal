@@ -117,7 +117,7 @@ public class PatientDto {
         private Patient.BloodType bloodType;
         private String building;
         private String room;
-        private String bed;
+        private Integer bed;
         private String memo;
         private Long locationId; // 병실 배정 안할 때 null로 보내기
     }

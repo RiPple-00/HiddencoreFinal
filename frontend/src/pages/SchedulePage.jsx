@@ -12,6 +12,7 @@ import ScheduleDetailPanel from "../components/choco/ScheduleDetailPanel";
 import TodayScheduleList from "../components/choco/TodayScheduleList";
 import TopNavBar from "../components/bedroom/TopNavBar";
 import { formatDate, toDate } from "../utils/dateUtils";
+import { useAuth } from '../contexts/AutoContext.jsx';
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
@@ -35,9 +36,11 @@ function formatDisplayDate(dateKey) {
 
 function SchedulePage() {
   const today = new Date();
-  const authUser = getAuthUserFromStorage();
-  const facilityId = authUser?.facilityId ?? 1;
-  const createdUserId = authUser?.id ?? 1;
+  const { user } = useAuth();
+  const token = user?.accessToken ?? user?.token;
+  const jwtPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const facilityId = jwtPayload.facilityId ?? null;
+  const createdUserId = jwtPayload.sub ?? null;
 
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);

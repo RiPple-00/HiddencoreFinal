@@ -21,8 +21,10 @@ public class BedRoomService {
     private final PatientRepository patientRepository;
 
     @Transactional(readOnly = true)
-    public List<BedResponseDto> getBedsByRoom(String room) {
-        List<Location> locations = locationRepository.findByRoomOrderByBedAsc(room);
+    public List<BedResponseDto> getBedsByRoom(String room, String building) {
+        List<Location> locations = (building != null && !building.isBlank())
+                ? locationRepository.findByBuildingAndRoomOrderByBedAsc(building, room)
+                : locationRepository.findByRoomOrderByBedAsc(room);
         return locations.stream()
                 .map(this::toDto)
                 .toList();
@@ -78,19 +80,19 @@ public class BedRoomService {
 
     @Transactional
     public void deletePatientFromBed(Long locationId) {
-    Location location = locationRepository.findById(locationId)
-            .orElseThrow(() -> new IllegalArgumentException("병상을 찾을 수 없습니다."));
-    Patient patient = location.getPatientId();
-    if (patient == null) {
-        patient = patientRepository.findByLocationId_LocationId(locationId).orElse(null);
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new IllegalArgumentException("병상을 찾을 수 없습니다."));
+        Patient patient = location.getPatientId();
+        if (patient == null) {
+            patient = patientRepository.findByLocationId_LocationId(locationId).orElse(null);
+        }
+        if (patient != null) {
+            patient.setLocationId(null);
+            patientRepository.save(patient);
+        }
+        location.setPatientId(null);
+        location.setIsOccupied(false);
+        locationRepository.save(location);
     }
-    if (patient != null) {
-        patient.setLocationId(null);
-        patientRepository.save(patient);
-    }
-    location.setPatientId(null);
-    location.setIsOccupied(false);
-    locationRepository.save(location);
-}
 
 }

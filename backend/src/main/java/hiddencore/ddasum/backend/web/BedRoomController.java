@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,8 +32,9 @@ public class BedRoomController {
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/{room}/beds")
     public ResponseEntity<List<BedResponseDto>> getBedsByRoom(
-            @Parameter(description = "병실 식별자 (LOCATION.room)", example = "303") @PathVariable String room) {
-        List<BedResponseDto> beds = bedRoomService.getBedsByRoom(room);
+            @Parameter(description = "병실 식별자 (LOCATION.room)", example = "303") @PathVariable String room,
+            @RequestParam(required = false) String building) {
+        List<BedResponseDto> beds = bedRoomService.getBedsByRoom(room, building);
         return ResponseEntity.ok(beds);
     }
 

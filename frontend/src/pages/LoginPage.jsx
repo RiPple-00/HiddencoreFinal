@@ -104,6 +104,7 @@ return (
                         label="비밀번호"
                         name="password"
                         type="password"
+                        autoComplete="current-password"
                         value={formData.password}
                         onChange={handleChange}
                         placeholder="비밀번호"

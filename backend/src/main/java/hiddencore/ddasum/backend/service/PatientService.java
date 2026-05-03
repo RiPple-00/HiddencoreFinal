@@ -49,7 +49,7 @@ public class PatientService {
                 } else {
                         boolean hasLocation = request.getBuilding() != null && !request.getBuilding().isBlank() &&
                                         request.getRoom() != null && !request.getRoom().isBlank() &&
-                                        request.getBed() != null && !request.getBed().isBlank();
+                                        request.getBed() != null;
 
                         if (hasLocation) {
                                 location = locationRepository

@@ -53,7 +53,7 @@ public class Location {
     private String room;
 
     @Column(name = "bed", length = 50)
-    private String bed;
+    private Integer bed;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "room_type", nullable = false, length = 50)

@@ -24,4 +24,5 @@ public class ScheduleCreateRequest {
     private String content;
     private LocalDateTime scheduledAt;
     private LocalDateTime endAt;
+    private String scheduleType;
 }

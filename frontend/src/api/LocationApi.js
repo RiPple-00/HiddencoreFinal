@@ -13,3 +13,8 @@ export const getRoomPatientCount = async ({ building, floor, room }) => {
   });
   return response.data;
 };
+
+export const getAllBeds = async (facilityId) => {
+  const response = await api.get('/locations/all', { params: { facilityId } });
+  return response.data;
+};
