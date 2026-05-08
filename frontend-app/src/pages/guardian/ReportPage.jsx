@@ -1,14 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
+
+const checklistData = [
+  {
+    label: "식사 도움",
+    percent: "70%",
+    percentStyle: "red",
+    dailyComments: [
+      "반찬 거부 있음",
+      "정상 섭취",
+      "반찬 거부 있음",
+      "정상 섭취",
+      "죽으로 대체",
+      "정상 섭취",
+      "-",
+    ],
+  },
+  {
+    label: "개인 위생 관리",
+    percent: "100%",
+    percentStyle: "blue",
+    dailyComments: ["-", "-", "-", "-", "-", "-", "-"],
+  },
+  {
+    label: "배변 관리",
+    percent: "60%",
+    percentStyle: "orange",
+    dailyComments: [
+      "변비 증세 관찰",
+      "정상",
+      "변비 증세 관찰",
+      "변비 증세 관찰",
+      "정상",
+      "-",
+      "-",
+    ],
+  },
+];
+
 export default function ReportPage() {
+  const [expandedRows, setExpandedRows] = useState({});
+
+  const toggleRow = (index) => {
+    setExpandedRows((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -55,7 +101,6 @@ export default function ReportPage() {
         <View style={styles.card}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>✨ AI 분석 요약</Text>
-            <button style={styles.moreText}>자세히 보기 &gt;</button>
           </View>
 
           <Text style={styles.description}>
@@ -91,10 +136,30 @@ export default function ReportPage() {
 
           <View style={styles.commentBox}>
             <Text style={styles.commentTitle}>💡 AI 분석 코멘트</Text>
-            <Text style={styles.commentText}>
-              식사량이 평소보다 낮으니 부드러운 유동식 위주로 식단을
-              조정하고 충분한 수분 섭취를 유도해 주세요.
-            </Text>
+
+            <View style={styles.commentItem}>
+              <Text style={styles.commentBullet}>🍽️</Text>
+              <Text style={styles.commentText}>
+                이번 주 <Text style={styles.commentBold}>반찬 거부가 월·수요일에 반복</Text>
+                되었습니다. 부드러운 유동식 위주로 식단을 조정하고, 선호 반찬을 파악해 자발적 섭취를 유도해 주세요.
+              </Text>
+            </View>
+
+            <View style={styles.commentItem}>
+              <Text style={styles.commentBullet}>🚻</Text>
+              <Text style={styles.commentText}>
+                <Text style={styles.commentBold}>월·수·목 3일간 변비 증세</Text>가 관찰되었습니다.
+                수분 섭취량을 늘리고 가벼운 복부 마사지를 권장드립니다. 증세가 지속될 경우 의료진에게 보고해 주세요.
+              </Text>
+            </View>
+
+            <View style={styles.commentItem}>
+              <Text style={styles.commentBullet}>📈</Text>
+              <Text style={styles.commentText}>
+                금·토요일에는 컨디션이 회복되는 흐름이 확인됩니다.
+                <Text style={styles.commentBold}> 위생 관리 루틴은 이번 주 내내 양호</Text>하게 유지되었으니 지속해 주세요.
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -113,23 +178,65 @@ export default function ReportPage() {
           </View>
 
           <View style={styles.table}>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>식사 도움</Text>
-              <Text style={styles.redText}>70%</Text>
-              <Text style={styles.tableEtc}>반찬 거부 있음</Text>
-            </View>
+            {checklistData.map((item, index) => {
+              const isExpanded = !!expandedRows[index];
+              const uniqueComments = [...new Set(item.dailyComments.filter((c) => c !== "-"))];
+              const summaryComment =
+                uniqueComments.length === 0
+                  ? "-"
+                  : uniqueComments.length === 1
+                  ? uniqueComments[0]
+                  : `${uniqueComments[0]} 외 ${uniqueComments.length - 1}건`;
+              const percentStyle =
+                item.percentStyle === "red"
+                  ? styles.redText
+                  : item.percentStyle === "blue"
+                  ? styles.blueText
+                  : styles.orangeText;
+              const hasMultiple = uniqueComments.length > 1 || (uniqueComments.length === 1 && item.dailyComments.some((c) => c === "-"));
 
-            <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>개인 위생 관리</Text>
-              <Text style={styles.blueText}>100%</Text>
-              <Text style={styles.tableEtc}>-</Text>
-            </View>
+              return (
+                <View key={index}>
+                  <TouchableOpacity
+                    style={styles.tableRow}
+                    onPress={() => toggleRow(index)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.tableLabel}>{item.label}</Text>
+                    <Text style={percentStyle}>{item.percent}</Text>
+                    <View style={styles.tableEtcRow}>
+                      <Text style={styles.tableEtc} numberOfLines={1}>
+                        {summaryComment}
+                      </Text>
+                      {hasMultiple && (
+                        <Text style={styles.expandIcon}>
+                          {isExpanded ? "▲" : "▼"}
+                        </Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
 
-            <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>배변 관리</Text>
-              <Text style={styles.orangeText}>60%</Text>
-              <Text style={styles.tableEtc}>변비 증세 관찰</Text>
-            </View>
+                  {isExpanded && (
+                    <View style={styles.dailyBox}>
+                      {DAYS.map((day, di) => (
+                        <View key={di} style={styles.dailyRow}>
+                          <Text style={styles.dayLabel}>{day}</Text>
+                          <Text
+                            style={
+                              item.dailyComments[di] === "-"
+                                ? styles.dailyCommentNone
+                                : styles.dailyComment
+                            }
+                          >
+                            {item.dailyComments[di]}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </View>
         </View>
 
@@ -377,12 +484,30 @@ const styles = StyleSheet.create({
   commentTitle: {
     color: "#2563EB",
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: 10,
+  },
+
+  commentItem: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 10,
+  },
+
+  commentBullet: {
+    fontSize: 14,
+    marginTop: 1,
   },
 
   commentText: {
+    flex: 1,
     color: "#334155",
     lineHeight: 20,
+    fontSize: 13,
+  },
+
+  commentBold: {
+    fontWeight: "700",
+    color: "#1E293B",
   },
 
   percent: {
@@ -430,11 +555,58 @@ const styles = StyleSheet.create({
     color: "#1E293B",
   },
 
-  tableEtc: {
+  tableEtcRow: {
     flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  tableEtc: {
     textAlign: "right",
     color: "#64748B",
     fontSize: 12,
+    flexShrink: 1,
+  },
+
+  expandIcon: {
+    fontSize: 10,
+    color: "#94A3B8",
+  },
+
+  dailyBox: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 4,
+    gap: 6,
+  },
+
+  dailyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  dayLabel: {
+    width: 20,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2563EB",
+  },
+
+  dailyComment: {
+    fontSize: 13,
+    color: "#334155",
+    flex: 1,
+  },
+
+  dailyCommentNone: {
+    fontSize: 13,
+    color: "#CBD5E1",
+    flex: 1,
   },
 
   redText: {
