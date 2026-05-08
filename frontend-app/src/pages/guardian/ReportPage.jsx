@@ -11,6 +11,16 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
+const dailyRates = [
+  { day: "월", rate: 75 },
+  { day: "화", rate: 90 },
+  { day: "수", rate: 70 },
+  { day: "목", rate: 80 },
+  { day: "금", rate: 95 },
+  { day: "토", rate: 85 },
+  { day: "일", rate: 82 },
+];
+
 const checklistData = [
   {
     label: "식사 도움",
@@ -76,7 +86,7 @@ export default function ReportPage() {
 
               <View style={styles.dateRow}>
                 <Ionicons name="document-text-outline" size={14} color="#64748B" />
-                <Text style={styles.dateText}>2024.05.01</Text>
+                <Text style={styles.dateText}>2024.05.01~</Text>
               </View>
 
               <Text style={styles.dateText}>2024.05.07</Text>
@@ -175,6 +185,43 @@ export default function ReportPage() {
           <View style={styles.progressCircle}>
             <Text style={styles.progressText}>82%</Text>
             <Text style={styles.progressSub}>수행률</Text>
+          </View>
+
+          {/* 일별 수행률 추이 */}
+          <View style={styles.dailyRateSection}>
+            <Text style={styles.dailyRateTitle}>📊 일별 수행률 추이</Text>
+            <View style={styles.dailyRateChart}>
+              {dailyRates.map((item) => {
+                const barColor =
+                  item.rate >= 90
+                    ? "#22C55E"
+                    : item.rate >= 75
+                    ? "#F59E0B"
+                    : "#EF4444";
+                return (
+                  <View key={item.day} style={styles.dailyRateCol}>
+                    <Text style={styles.dailyRatePercent}>{item.rate}%</Text>
+                    <View style={styles.dailyRateBarBg}>
+                      <View
+                        style={[
+                          styles.dailyRateBarFill,
+                          {
+                            height: `${item.rate}%`,
+                            backgroundColor: barColor,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.dailyRateDay}>{item.day}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={styles.dailyRateLegend}>
+              <Text style={styles.legendItem}>🟢 90% 이상</Text>
+              <Text style={styles.legendItem}>🟡 75~89%</Text>
+              <Text style={styles.legendItem}>🔴 75% 미만</Text>
+            </View>
           </View>
 
           <View style={styles.table}>
@@ -303,6 +350,34 @@ export default function ReportPage() {
             <Text style={styles.effectDesc}>
               식물과의 교감을 통해 심리적 평온함 유지 및 사회적 유대감 형성
             </Text>
+          </View>
+
+          <View style={styles.aiRecommendBox}>
+            <Text style={styles.aiRecommendTitle}>🧠 AI 다음 주 프로그램 추천</Text>
+
+            <View style={styles.aiRecommendItem}>
+              <Text style={styles.aiRecommendBullet}>🧘</Text>
+              <View style={styles.aiRecommendContent}>
+                <Text style={styles.aiRecommendLabel}>신체 기능 강화</Text>
+                <Text style={styles.aiRecommendDesc}>소화 기능 저하로 식욕이 감소된 상태입니다. 눈서르게 누워서 하는 스트레칭이나 업다운동작 위주의 활동으로 신체 스트레스를 줄이면 식욕 회복에 도움이 될 수 있습니다.</Text>
+              </View>
+            </View>
+
+            <View style={styles.aiRecommendItem}>
+              <Text style={styles.aiRecommendBullet}>🎨</Text>
+              <View style={styles.aiRecommendContent}>
+                <Text style={styles.aiRecommendLabel}>인지 자극</Text>
+                <Text style={styles.aiRecommendDesc}>간단한 색칠화 또는 백일장 쓰기 활동을 추가하면 인지 자극과 집중력 유지에 효과적입니다.</Text>
+              </View>
+            </View>
+
+            <View style={[styles.aiRecommendItem, { marginBottom: 0 }]}>
+              <Text style={styles.aiRecommendBullet}>🍺</Text>
+              <View style={styles.aiRecommendContent}>
+                <Text style={styles.aiRecommendLabel}>소화 지원</Text>
+                <Text style={styles.aiRecommendDesc}>변비 증세가 반복되고 있어 한방 보다는 가벼운 복부 마사지, 수분 보칮력 활동 등을 프로그램에 포함하면 좋겠습니다.</Text>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -516,6 +591,146 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 
+  dailyRateSection: {
+    marginBottom: 16,
+  },
+
+  dailyRateTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 12,
+  },
+
+  dailyRateChart: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    height: 100,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 0,
+  },
+
+  dailyRateCol: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    height: "100%",
+  },
+
+  dailyRatePercent: {
+    fontSize: 9,
+    color: "#64748B",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+
+  dailyRateBarBg: {
+    width: 16,
+    height: 60,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 8,
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  },
+
+  dailyRateBarFill: {
+    width: "100%",
+    borderRadius: 8,
+  },
+
+  dailyRateDay: {
+    marginTop: 6,
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#475569",
+  },
+
+  dailyRateLegend: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 10,
+  },
+
+  legendItem: {
+    fontSize: 11,
+    color: "#64748B",
+  },
+
+  dailyRateSection: {
+    marginBottom: 16,
+  },
+
+  dailyRateTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 12,
+  },
+
+  dailyRateChart: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    height: 100,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 0,
+  },
+
+  dailyRateCol: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    height: "100%",
+  },
+
+  dailyRatePercent: {
+    fontSize: 9,
+    color: "#64748B",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+
+  dailyRateBarBg: {
+    width: 16,
+    height: 60,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 8,
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  },
+
+  dailyRateBarFill: {
+    width: "100%",
+    borderRadius: 8,
+  },
+
+  dailyRateDay: {
+    marginTop: 6,
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#475569",
+  },
+
+  dailyRateLegend: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 10,
+  },
+
+  legendItem: {
+    fontSize: 11,
+    color: "#64748B",
+  },
+
   progressCircle: {
     width: 130,
     height: 130,
@@ -717,6 +932,50 @@ const styles = StyleSheet.create({
 
   effectDesc: {
     color: "#64748B",
+    lineHeight: 20,
+  },
+
+  aiRecommendBox: {
+    backgroundColor: "#F0FDF4",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: "#22C55E",
+  },
+
+  aiRecommendTitle: {
+    color: "#16A34A",
+    fontWeight: "700",
+    fontSize: 14,
+    marginBottom: 12,
+  },
+
+  aiRecommendItem: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 12,
+  },
+
+  aiRecommendBullet: {
+    fontSize: 18,
+    marginTop: 1,
+  },
+
+  aiRecommendContent: {
+    flex: 1,
+  },
+
+  aiRecommendLabel: {
+    fontWeight: "700",
+    color: "#1E293B",
+    fontSize: 13,
+    marginBottom: 3,
+  },
+
+  aiRecommendDesc: {
+    fontSize: 13,
+    color: "#475569",
     lineHeight: 20,
   },
 });
