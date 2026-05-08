@@ -1,23 +1,550 @@
-import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ReportPage() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>보고서 확인 페이지</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>정기 보고서</Text>
+        </View>
+
+        {/* Patient Card */}
+        <View style={styles.card}>
+          <View style={styles.patientRow}>
+            <View style={styles.profileImage} />
+
+            <View style={styles.patientInfo}>
+              <Text style={styles.patientName}>김OO 어르신</Text>
+
+              <View style={styles.dateRow}>
+                <Ionicons name="document-text-outline" size={14} color="#64748B" />
+                <Text style={styles.dateText}>2024.05.01</Text>
+              </View>
+
+              <Text style={styles.dateText}>2024.05.07</Text>
+
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>주간 보고서</Text>
+              </View>
+            </View>
+
+            <View style={styles.warningBox}>
+              <MaterialCommunityIcons
+                name="alert-outline"
+                size={28}
+                color="#EF4444"
+              />
+              <Text style={styles.warningText}>주의</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* AI Summary */}
+        <View style={styles.card}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>✨ AI 분석 요약</Text>
+            <button style={styles.moreText}>자세히 보기 &gt;</button>
+          </View>
+
+          <Text style={styles.description}>
+            이번 주 동안 어르신의 건강 데이터와 기록을 종합 분석한 결과,
+            전반적인 상태는 주의가 필요한 수준으로 확인되었습니다.
+          </Text>
+
+          <View style={styles.gridContainer}>
+            <View style={styles.gridBox}>
+              <Text style={styles.gridEmoji}>🍽️</Text>
+              <Text style={styles.gridTitle}>식사</Text>
+              <Text style={styles.gridDesc}>70% 달성</Text>
+            </View>
+
+            <View style={styles.gridBox}>
+              <Text style={styles.gridEmoji}>🪥</Text>
+              <Text style={styles.gridTitle}>위생</Text>
+              <Text style={styles.gridDesc}>완벽 관리</Text>
+            </View>
+
+            <View style={styles.gridBox}>
+              <Text style={styles.gridEmoji}>🚻</Text>
+              <Text style={styles.gridTitle}>배변</Text>
+              <Text style={styles.gridDesc}>변비 증상</Text>
+            </View>
+
+            <View style={styles.gridBox}>
+              <Text style={styles.gridEmoji}>🟩</Text>
+              <Text style={styles.gridTitle}>환자 상태</Text>
+              <Text style={styles.gridDesc}>안정</Text>
+            </View>
+          </View>
+
+          <View style={styles.commentBox}>
+            <Text style={styles.commentTitle}>💡 AI 분석 코멘트</Text>
+            <Text style={styles.commentText}>
+              식사량이 평소보다 낮으니 부드러운 유동식 위주로 식단을
+              조정하고 충분한 수분 섭취를 유도해 주세요.
+            </Text>
+          </View>
+        </View>
+
+        {/* Checklist */}
+        <View style={styles.card}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              1. 요양사 체크리스트 요약
+            </Text>
+            <Text style={styles.percent}>82%</Text>
+          </View>
+
+          <View style={styles.progressCircle}>
+            <Text style={styles.progressText}>82%</Text>
+            <Text style={styles.progressSub}>수행률</Text>
+          </View>
+
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableLabel}>식사 도움</Text>
+              <Text style={styles.redText}>70%</Text>
+              <Text style={styles.tableEtc}>반찬 거부 있음</Text>
+            </View>
+
+            <View style={styles.tableRow}>
+              <Text style={styles.tableLabel}>개인 위생 관리</Text>
+              <Text style={styles.blueText}>100%</Text>
+              <Text style={styles.tableEtc}>-</Text>
+            </View>
+
+            <View style={styles.tableRow}>
+              <Text style={styles.tableLabel}>배변 관리</Text>
+              <Text style={styles.orangeText}>60%</Text>
+              <Text style={styles.tableEtc}>변비 증세 관찰</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Doctor Summary */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>2. 의료진 소견 요약</Text>
+
+          <View style={styles.doctorBox}>
+            <View style={styles.doctorImage} />
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.doctorName}>김완치 주치의</Text>
+              <Text style={styles.doctorComment}>
+                “식단 조정 및 수분 섭취 집중 관리 필요”
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>건강 상태</Text>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>주의 관찰</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>주요 소견</Text>
+            <Text style={styles.infoValue}>
+              소화 기능 저하로 인한 식욕 부진
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>복용 약물</Text>
+            <Text style={styles.infoValue}>
+              위장 보호제 1종 추가 처방
+            </Text>
+          </View>
+        </View>
+
+        {/* Program Section */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>
+            3. 프로그램 활동 및 증진 효과
+          </Text>
+
+          <View style={styles.programBox}>
+            <Text style={styles.programTitle}>실내 가드닝 활동</Text>
+            <Text style={styles.programDesc}>
+              작은 식물을 심고 물을 주며 소근육 자극 및 심리적 안정감을
+              도와주었습니다.
+            </Text>
+          </View>
+
+          <View style={styles.effectBox}>
+            <Text style={styles.effectTitle}>신체 기능 개선</Text>
+            <Text style={styles.effectDesc}>
+              소근육 조절 능력 및 손가락 민첩성 향상 관찰
+            </Text>
+          </View>
+
+          <View style={styles.effectBox}>
+            <Text style={styles.effectTitle}>정서적 안정</Text>
+            <Text style={styles.effectDesc}>
+              식물과의 교감을 통해 심리적 평온함 유지 및 사회적 유대감 형성
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F3F6FB",
+  },
+
   container: {
     flex: 1,
+    paddingHorizontal: 16,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 18,
+  },
+
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111827",
+  },
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  patientRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  profileImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#D9E4F5",
+  },
+
+  patientInfo: {
+    flex: 1,
+    marginLeft: 14,
+  },
+
+  patientName: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 6,
+  },
+
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  dateText: {
+    fontSize: 13,
+    color: "#64748B",
+    marginTop: 3,
+  },
+
+  badge: {
+    marginTop: 10,
+    backgroundColor: "#EEF2FF",
+    alignSelf: "flex-start",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+
+  badgeText: {
+    fontSize: 12,
+    color: "#4F46E5",
+    fontWeight: "600",
+  },
+
+  warningBox: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#FECACA",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F4F6F8",
+    backgroundColor: "#FEF2F2",
   },
-  title: {
+
+  warningText: {
+    marginTop: 6,
+    color: "#DC2626",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1E293B",
+  },
+
+  moreText: {
+    color: "#2563EB",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+
+  description: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#475569",
+    marginBottom: 18,
+  },
+
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+
+  gridBox: {
+    width: "48%",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  gridEmoji: {
     fontSize: 22,
+  },
+
+  gridTitle: {
+    marginTop: 8,
+    fontWeight: "700",
+    color: "#1E293B",
+  },
+
+  gridDesc: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#64748B",
+  },
+
+  commentBox: {
+    backgroundColor: "#EFF6FF",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 6,
+  },
+
+  commentTitle: {
+    color: "#2563EB",
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  commentText: {
+    color: "#334155",
+    lineHeight: 20,
+  },
+
+  percent: {
+    color: "#2563EB",
+    fontSize: 24,
     fontWeight: "800",
-    color: "#0B4EA2",
+  },
+
+  progressCircle: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 10,
+    borderColor: "#2563EB",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginVertical: 20,
+  },
+
+  progressText: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#111827",
+  },
+
+  progressSub: {
+    color: "#64748B",
+  },
+
+  table: {
+    marginTop: 10,
+  },
+
+  tableRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+
+  tableLabel: {
+    flex: 1,
+    color: "#1E293B",
+  },
+
+  tableEtc: {
+    flex: 1,
+    textAlign: "right",
+    color: "#64748B",
+    fontSize: 12,
+  },
+
+  redText: {
+    color: "#DC2626",
+    fontWeight: "700",
+  },
+
+  blueText: {
+    color: "#2563EB",
+    fontWeight: "700",
+  },
+
+  orangeText: {
+    color: "#EA580C",
+    fontWeight: "700",
+  },
+
+  doctorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 18,
+  },
+
+  doctorImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#D6E4F0",
+    marginRight: 14,
+  },
+
+  doctorName: {
+    fontWeight: "700",
+    color: "#2563EB",
+    marginBottom: 4,
+  },
+
+  doctorComment: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1E293B",
+    lineHeight: 22,
+  },
+
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 14,
+    alignItems: "center",
+  },
+
+  infoLabel: {
+    color: "#64748B",
+    fontWeight: "600",
+  },
+
+  infoValue: {
+    flex: 1,
+    textAlign: "right",
+    color: "#1E293B",
+    marginLeft: 20,
+  },
+
+  statusBadge: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+
+  statusText: {
+    color: "#D97706",
+    fontWeight: "700",
+    fontSize: 12,
+  },
+
+  programBox: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+  },
+
+  programTitle: {
+    fontWeight: "700",
+    color: "#1E293B",
+    marginBottom: 8,
+  },
+
+  programDesc: {
+    color: "#475569",
+    lineHeight: 20,
+  },
+
+  effectBox: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 14,
+  },
+
+  effectTitle: {
+    fontWeight: "700",
+    marginBottom: 6,
+    color: "#1E293B",
+  },
+
+  effectDesc: {
+    color: "#64748B",
+    lineHeight: 20,
   },
 });
