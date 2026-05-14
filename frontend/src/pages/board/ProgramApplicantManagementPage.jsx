@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import TopNavBar from '../../components/bedroom/TopNavBar';
+import Header from '../../components/common/Header';
 import ApplicantStatsCards from '../../components/board/applicants/ApplicantStatsCards';
 import ApplicantSection from '../../components/board/applicants/ApplicantSection';
 import ApplicantTable from '../../components/board/applicants/ApplicantTable';
@@ -9,6 +9,7 @@ import postApplicationApi from '../../api/postApplicationApi';
 import { programApplicantMock } from '../../mocks/programApplicantMock';
 
 const ProgramApplicantManagementPage = () => {
+  const navigate = useNavigate();
   const { facilityId, postId } = useParams();
   const [managementData, setManagementData] = useState(programApplicantMock);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,12 +61,20 @@ const ProgramApplicantManagementPage = () => {
   };
 
   const handleApprove = (applicationId) => updateStatus(applicationId, 'COMPLETED');
+  const handleCancel = (applicationId) => updateStatus(applicationId, 'CANCELLED');
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate(`/facilities/${facilityId}/board`);
+  };
   const handleReject = (applicationId) => updateStatus(applicationId, 'REJECTED');
   const handleMoveToWaiting = (applicationId) => updateStatus(applicationId, 'WAITING');
 
   return (
     <>
-      <TopNavBar activeNav="notice" />
+      <Header activeNav="notice" />
 
       <div className="min-h-screen bg-slate-50">
         <div className="mx-auto w-full max-w-[1440px] px-6 py-8">
@@ -126,6 +135,16 @@ const ProgramApplicantManagementPage = () => {
                 />
               )}
             </ApplicantSection>
+          </div>
+
+          <div className="mt-8 flex justify-start">
+            <button
+              type="button"
+              onClick={handleGoBack}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              뒤로 가기
+            </button>
           </div>
         </div>
       </div>
