@@ -14,32 +14,32 @@ export default function GuardianBottomTab({
     {
       label: "홈",
       route: "GuardianMain",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
+      activeIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
+      inactiveIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
     },
     {
-      label: "달력",
-      route: "Calendar",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/calendar-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/calendar.svg"),
+      label: "스캔",
+      route: "MedicationQrScan",
+      activeIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/calendar-active.svg"),
+      inactiveIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/calendar.svg"),
     },
     {
       label: "수납",
       route: "Payment",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/card-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/card.svg"),
+      activeIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/card-active.svg"),
+      inactiveIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/card.svg"),
     },
     {
       label: "실시간",
       route: "LiveCheck",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/report-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/report.svg"),
+      activeIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/report-active.svg"),
+      inactiveIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/report.svg"),
     },
     {
       label: "챗봇",
       route: "Chatbot",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/chatbot-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/chatbot.svg"),
+      activeIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/chatbot-active.svg"),
+      inactiveIcon: require("C:/AAfinalproject/HiddencoreFinal/frontend-app/assets/guardian/chatbot.svg"),
     },
   ];
 
@@ -74,11 +74,10 @@ export default function GuardianBottomTab({
               />
 
               <Text
-                className={`text-[10px] font-bold mt-1 ${
-                  active
-                    ? "text-guardian-text-secondary"
-                    : "text-guardian-text-neutral"
-                }`}
+                className={`text-[10px] font-bold mt-1 ${active
+                  ? "text-guardian-text-secondary"
+                  : "text-guardian-text-neutral"
+                  }`}
               >
                 {label}
               </Text>

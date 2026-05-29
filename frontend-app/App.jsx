@@ -16,7 +16,6 @@ import ReportPage from "./src/pages/guardian/ReportPage";
 import ConsentPage from "./src/pages/guardian/ConsentPage";
 import VisitApplyPage from "./src/pages/guardian/VisitApplyPage";
 import NoticePage from "./src/pages/guardian/NoticePage";
-import CalendarPage from "./src/pages/guardian/CalendarPage";
 import PaymentPage from "./src/pages/guardian/PaymentPage";
 import LiveCheckPage from "./src/pages/guardian/LiveCheckPage";
 import ChatbotPage from "./src/pages/guardian/ChatbotPage";
@@ -34,6 +33,9 @@ import StorageList from "./src/components/billing/StorageList";
 import StorageDetail from "./src/components/billing/StorageDetail";
 import PaymentHistory from "./src/components/billing/PaymentHistory";
 import InvoicePaymentList from "./src/components/billing/InvoicePaymentList";
+
+import MedicationQrScanPage from "./src/pages/guardian/MedicationQrScanPage";
+
 
 import { useFonts } from "expo-font";
 import {
@@ -105,9 +107,9 @@ function CaregiverAppHeader({ navigationRef, currentRouteName }) {
 
   const onBack =
     currentRouteName &&
-    currentRouteName !== "CaregiverMain" &&
-    navigationRef.isReady() &&
-    navigationRef.canGoBack()
+      currentRouteName !== "CaregiverMain" &&
+      navigationRef.isReady() &&
+      navigationRef.canGoBack()
       ? () => navigationRef.goBack()
       : undefined;
 
@@ -195,9 +197,9 @@ function AppNavigation() {
               : null,
             showCaregiverChrome
               ? {
-                  paddingBottom: CAREGIVER_BOTTOM_TAB_HEIGHT,
-                  paddingTop: caregiverTopInset,
-                }
+                paddingBottom: CAREGIVER_BOTTOM_TAB_HEIGHT,
+                paddingTop: caregiverTopInset,
+              }
               : null,
           ]}
         >
@@ -248,8 +250,8 @@ function AppNavigation() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="Calendar"
-              component={CalendarPage}
+              name="MedicationQrScan"
+              component={MedicationQrScanPage}
               options={{ headerShown: false }}
             />
             <Stack.Screen

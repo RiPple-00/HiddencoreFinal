@@ -35,3 +35,16 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# API keys / local config
+/src/main/resources/application.properties
+
+# env files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# 예시는 허용
+!.env.example
+!**/.env.example
