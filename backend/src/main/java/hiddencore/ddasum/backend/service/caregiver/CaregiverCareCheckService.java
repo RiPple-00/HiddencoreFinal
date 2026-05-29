@@ -1,21 +1,30 @@
 package hiddencore.ddasum.backend.service.caregiver;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import hiddencore.ddasum.backend.domain.Document;
 import hiddencore.ddasum.backend.domain.Facility;
 import hiddencore.ddasum.backend.domain.Patient;
 import hiddencore.ddasum.backend.repository.FacilityRepository;
 import hiddencore.ddasum.backend.repository.PatientRepository;
 import hiddencore.ddasum.backend.repository.caregiver.CaregiverCareCheckRepository;
+import hiddencore.ddasum.backend.web.dto.care.GuardianWeeklyCareReportResponse;
 import hiddencore.ddasum.backend.web.dto.caregiver.CaregiverCareCheckDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 간병인 일일 업무 체크리스트(CARE_CHECK) 도메인 서비스.
@@ -48,17 +57,18 @@ public class CaregiverCareCheckService {
     public CaregiverCareCheckDto.Response autoSave(CaregiverCareCheckDto.SaveRequest request) {
         validate(request);
 
+        Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
         LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : LocalDate.now();
-        Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + request.getPatientId()));
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
 
         Document document = careCheckRepository
-                .findLatestCareCheck(request.getPatientId(), date)
+            .findLatestCareCheck(patientId, date)
                 .orElseGet(() -> newCareCheckDocument(patient, date));
 
         applyContent(document, request.getContent(), date, patient, Document.DocumentStatus.DRAFT);
 
-        Document saved = careCheckRepository.save(document);
+        Document saved = careCheckRepository.save(Objects.requireNonNull(document, "document"));
         return toResponse(saved);
     }
 
@@ -70,18 +80,19 @@ public class CaregiverCareCheckService {
     @Transactional
     public CaregiverCareCheckDto.Response submit(CaregiverCareCheckDto.SaveRequest request) {
         validate(request);
+        Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
         LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : LocalDate.now();
-        Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + request.getPatientId()));
+        Patient patient = patientRepository.findById(patientId)
+            .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
 
         Document document = careCheckRepository
-                .findLatestCareCheck(request.getPatientId(), date)
+            .findLatestCareCheck(patientId, date)
                 .orElseGet(() -> newCareCheckDocument(patient, date));
 
         applyContent(document, request.getContent(), date, patient, Document.DocumentStatus.PENDING_APPROVAL);
         document.setRequestedAt(java.time.LocalDateTime.now());
 
-        Document saved = careCheckRepository.save(document);
+        Document saved = careCheckRepository.save(Objects.requireNonNull(document, "document"));
         return toResponse(saved);
     }
 
@@ -107,6 +118,143 @@ public class CaregiverCareCheckService {
         return careCheckRepository.findAllByPatient(patientId).stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public GuardianWeeklyCareReportResponse getWeeklyReport(Long patientId, LocalDate startDate, LocalDate endDate) {
+        Long safePatientId = Objects.requireNonNull(patientId, "patientId");
+
+        LocalDate today = LocalDate.now();
+        LocalDate end = endDate != null ? endDate : today;
+        LocalDate start = startDate != null ? startDate : end.minusDays(6);
+        if (start.isAfter(end)) {
+            LocalDate t = start;
+            start = end;
+            end = t;
+        }
+
+    Patient patient = patientRepository.findById(safePatientId)
+        .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + safePatientId));
+
+    List<Document> docs = careCheckRepository.findAllByPatientAndDateRange(safePatientId, start, end);
+        Map<LocalDate, Document> latestByDate = new HashMap<>();
+        for (Document d : docs) {
+            if (d.getRecordDate() == null) continue;
+            Document current = latestByDate.get(d.getRecordDate());
+            if (current == null || d.getUpdatedAt().isAfter(current.getUpdatedAt())) {
+                latestByDate.put(d.getRecordDate(), d);
+            }
+        }
+
+        int overallTotal = 0;
+        int overallAbnormal = 0;
+
+        int mealTotal = 0;
+        int mealAbnormal = 0;
+        int hygieneTotal = 0;
+        int hygieneAbnormal = 0;
+        int conditionTotal = 0;
+        int conditionAbnormal = 0;
+        int eliminationTotal = 0;
+        int eliminationAbnormal = 0;
+
+        int lowHydrationDays = 0;
+        int appetiteDeclineDays = 0;
+        int fallCount = 0;
+        int breathingAbnormalDays = 0;
+        int painAbnormalDays = 0;
+        int mealMorningMissingCount = 0;
+        int mealLunchMissingCount = 0;
+        int mealDinnerMissingCount = 0;
+
+        List<GuardianWeeklyCareReportResponse.DailyRate> dailyRates = new ArrayList<>();
+        List<String> mealComments = new ArrayList<>();
+        List<String> hygieneComments = new ArrayList<>();
+        List<String> conditionComments = new ArrayList<>();
+        List<String> eliminationComments = new ArrayList<>();
+
+        LocalDate cursor = start;
+        while (!cursor.isAfter(end)) {
+            Document dayDoc = latestByDate.get(cursor);
+            CaregiverCareCheckDto.Content c = parseContent(dayDoc);
+
+            DayComputation dayComp = computeDay(c);
+
+            overallTotal += dayComp.overallTotal;
+            overallAbnormal += dayComp.overallAbnormal;
+            mealTotal += dayComp.mealTotal;
+            mealAbnormal += dayComp.mealAbnormal;
+            hygieneTotal += dayComp.hygieneTotal;
+            hygieneAbnormal += dayComp.hygieneAbnormal;
+            conditionTotal += dayComp.conditionTotal;
+            conditionAbnormal += dayComp.conditionAbnormal;
+            eliminationTotal += dayComp.eliminationTotal;
+            eliminationAbnormal += dayComp.eliminationAbnormal;
+
+            if (dayComp.lowHydration) lowHydrationDays += 1;
+            if (dayComp.appetiteDecline) appetiteDeclineDays += 1;
+            if (dayComp.fallAlert) fallCount += 1;
+            if (dayComp.breathingAbnormal) breathingAbnormalDays += 1;
+            if (dayComp.painAbnormal) painAbnormalDays += 1;
+            if (dayComp.mealMorningMissing) mealMorningMissingCount += 1;
+            if (dayComp.mealLunchMissing) mealLunchMissingCount += 1;
+            if (dayComp.mealDinnerMissing) mealDinnerMissingCount += 1;
+
+            dailyRates.add(GuardianWeeklyCareReportResponse.DailyRate.builder()
+                    .date(cursor)
+                    .day(dayLabel(cursor))
+                    .rate(rate(dayComp.overallTotal, dayComp.overallAbnormal))
+                    .build());
+
+            mealComments.add(dayComp.mealComment);
+            hygieneComments.add(dayComp.hygieneComment);
+            conditionComments.add(dayComp.conditionComment);
+            eliminationComments.add(dayComp.eliminationComment);
+            cursor = cursor.plusDays(1);
+        }
+
+        List<String> riskFlags = new ArrayList<>();
+        if (lowHydrationDays >= 3) riskFlags.add("LOW_HYDRATION");
+        if (fallCount > 0) riskFlags.add("FALL_ALERT");
+        if (appetiteDeclineDays >= 2) riskFlags.add("APPETITE_DECLINE");
+        if (breathingAbnormalDays > 0) riskFlags.add("BREATHING_ALERT");
+        if (painAbnormalDays >= 2) riskFlags.add("PAIN_PERSISTENCE");
+
+        int overallRate = rate(overallTotal, overallAbnormal);
+        String riskLevel = overallRate >= 90 ? "안정" : overallRate >= 75 ? "주의" : "위험";
+
+        List<String> aiComments = buildAiComments(riskFlags);
+        String summaryText = switch (riskLevel) {
+            case "위험" -> "이번 주 기록에서 즉시 관찰이 필요한 징후가 확인되었습니다. 보호자와 시설이 함께 모니터링을 강화해 주세요.";
+            case "주의" -> "이번 주 기록에서 추적 관찰이 필요한 변화가 확인되었습니다. 수분, 식사, 통증 관련 관리를 권장드립니다.";
+            default -> "이번 주 기록 기준으로 전반적인 상태는 안정적으로 유지되고 있습니다.";
+        };
+
+        List<GuardianWeeklyCareReportResponse.ChecklistRow> rows = List.of(
+                checklistRow("식사 도움", mealTotal, mealAbnormal, mealComments),
+                checklistRow("개인 위생 관리", hygieneTotal, hygieneAbnormal, hygieneComments),
+            checklistRow("상태 안정화", conditionTotal, conditionAbnormal, conditionComments),
+                checklistRow("배변 관리", eliminationTotal, eliminationAbnormal, eliminationComments)
+        );
+
+        return GuardianWeeklyCareReportResponse.builder()
+                .patientId(patientId)
+                .patientName(patient.getName())
+                .periodStart(start)
+                .periodEnd(end)
+                .overallRate(overallRate)
+                .riskLevel(riskLevel)
+                .summaryText(summaryText)
+                .riskFlags(riskFlags)
+                .aiComments(aiComments)
+                .mealMissingCount(GuardianWeeklyCareReportResponse.MealMissingCount.builder()
+                    .morning(mealMorningMissingCount)
+                    .lunch(mealLunchMissingCount)
+                    .dinner(mealDinnerMissingCount)
+                    .total(mealMorningMissingCount + mealLunchMissingCount + mealDinnerMissingCount)
+                    .build())
+                .dailyRates(dailyRates.stream().sorted(Comparator.comparing(GuardianWeeklyCareReportResponse.DailyRate::getDate)).toList())
+                .checklistRows(rows)
+                .build();
     }
 
     // ============================================================
@@ -296,5 +444,194 @@ public class CaregiverCareCheckService {
                 .createdAt(document.getCreatedAt())
                 .updatedAt(document.getUpdatedAt())
                 .build();
+    }
+
+    private CaregiverCareCheckDto.Content parseContent(Document dayDoc) {
+        if (dayDoc == null || dayDoc.getContent() == null || dayDoc.getContent().isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(dayDoc.getContent(), CaregiverCareCheckDto.Content.class);
+        } catch (JsonProcessingException ignored) {
+            return null;
+        }
+    }
+
+    private GuardianWeeklyCareReportResponse.ChecklistRow checklistRow(String label,
+                                                                        int total,
+                                                                        int abnormal,
+                                                                        List<String> dailyComments) {
+        int p = rate(total, abnormal);
+        String style = p >= 90 ? "success" : p >= 75 ? "warn" : "danger";
+        return GuardianWeeklyCareReportResponse.ChecklistRow.builder()
+                .label(label)
+                .percent(p)
+                .percentStyle(style)
+                .dailyComments(dailyComments)
+                .build();
+    }
+
+    private int rate(int total, int abnormal) {
+        if (total <= 0) return 0;
+        return Math.max(0, Math.min(100, (int) Math.round((double) (total - abnormal) * 100.0 / (double) total)));
+    }
+
+    private String dayLabel(LocalDate d) {
+        DayOfWeek w = d.getDayOfWeek();
+        return switch (w) {
+            case MONDAY -> "월";
+            case TUESDAY -> "화";
+            case WEDNESDAY -> "수";
+            case THURSDAY -> "목";
+            case FRIDAY -> "금";
+            case SATURDAY -> "토";
+            case SUNDAY -> "일";
+        };
+    }
+
+    private List<String> buildAiComments(List<String> riskFlags) {
+        if (riskFlags == null || riskFlags.isEmpty()) {
+            return List.of("이번 주 기록에서는 급격한 악화 징후가 확인되지 않았습니다. 현재 돌봄 루틴을 유지해 주세요.");
+        }
+
+        List<String> comments = new ArrayList<>();
+        if (riskFlags.contains("LOW_HYDRATION")) {
+            comments.add("수분 섭취 저하 패턴이 반복되어 식사 사이 수분 보충 루틴 점검이 필요합니다.");
+        }
+        if (riskFlags.contains("APPETITE_DECLINE")) {
+            comments.add("식사량 감소일이 확인되어 선호 식단 중심의 섭취 유도가 권장됩니다.");
+        }
+        if (riskFlags.contains("FALL_ALERT")) {
+            comments.add("낙상 관련 이상이 기록되어 이동 보조 및 환경 안전 확인을 강화해 주세요.");
+        }
+        if (riskFlags.contains("BREATHING_ALERT")) {
+            comments.add("호흡 이상이 관찰되어 컨디션 변화를 우선 모니터링해 주세요.");
+        }
+        if (riskFlags.contains("PAIN_PERSISTENCE")) {
+            comments.add("통증 호소가 반복되어 통증 변화 추이를 의료진과 공유하는 것이 좋습니다.");
+        }
+        return comments;
+    }
+
+    private DayComputation computeDay(CaregiverCareCheckDto.Content c) {
+        DayComputation d = new DayComputation();
+        if (c == null) {
+            d.mealMorningMissing = true;
+            d.mealLunchMissing = true;
+            d.mealDinnerMissing = true;
+            d.mealComment = "아침/점심/저녁 미기입";
+            d.hygieneComment = "-";
+            d.conditionComment = "-";
+            d.eliminationComment = "-";
+            return d;
+        }
+
+        CaregiverCareCheckDto.MealSection meal = c.getMeal();
+        CaregiverCareCheckDto.MealSlot morningSlot = meal != null ? meal.getMorning() : null;
+        CaregiverCareCheckDto.MealSlot lunchSlot = meal != null ? meal.getLunch() : null;
+        CaregiverCareCheckDto.MealSlot dinnerSlot = meal != null ? meal.getDinner() : null;
+
+        d.mealMorningMissing = !slotFullyChecked(morningSlot);
+        d.mealLunchMissing = !slotFullyChecked(lunchSlot);
+        d.mealDinnerMissing = !slotFullyChecked(dinnerSlot);
+
+        List<String> uncheckedSlots = new ArrayList<>();
+        if (d.mealMorningMissing) uncheckedSlots.add("아침");
+        if (d.mealLunchMissing) uncheckedSlots.add("점심");
+        if (d.mealDinnerMissing) uncheckedSlots.add("저녁");
+
+        List<CaregiverCareCheckDto.MealItem> mealItems = Arrays.asList(
+            morningSlot != null ? morningSlot.getIntake() : null,
+            morningSlot != null ? morningSlot.getHydration() : null,
+            morningSlot != null ? morningSlot.getIncident() : null,
+            lunchSlot != null ? lunchSlot.getIntake() : null,
+            lunchSlot != null ? lunchSlot.getHydration() : null,
+            lunchSlot != null ? lunchSlot.getIncident() : null,
+            dinnerSlot != null ? dinnerSlot.getIntake() : null,
+            dinnerSlot != null ? dinnerSlot.getHydration() : null,
+            dinnerSlot != null ? dinnerSlot.getIncident() : null
+        );
+        d.mealTotal = 9;
+        int uncheckedMealItems = (int) mealItems.stream().filter(item -> statusOf(item) == null).count();
+        d.mealAbnormal = (int) mealItems.stream().filter(this::isAbnormal).count() + uncheckedMealItems;
+
+        d.lowHydration = isAbnormal(morningSlot != null ? morningSlot.getHydration() : null)
+            || isAbnormal(lunchSlot != null ? lunchSlot.getHydration() : null)
+            || isAbnormal(dinnerSlot != null ? dinnerSlot.getHydration() : null);
+        d.appetiteDecline = isAbnormal(morningSlot != null ? morningSlot.getIntake() : null)
+            || isAbnormal(lunchSlot != null ? lunchSlot.getIntake() : null)
+            || isAbnormal(dinnerSlot != null ? dinnerSlot.getIntake() : null);
+
+        if (!uncheckedSlots.isEmpty()) {
+            d.mealComment = String.join("/", uncheckedSlots) + " 미기입";
+        } else {
+            d.mealComment = d.lowHydration ? "수분 섭취 저하" : d.appetiteDecline ? "식사량 감소" : "정상";
+        }
+
+        CaregiverCareCheckDto.HygieneSection hygiene = c.getHygiene();
+        List<CaregiverCareCheckDto.HygieneItem> hygieneItems = Arrays.asList(
+                hygiene != null ? hygiene.getBedding() : null,
+                hygiene != null ? hygiene.getPatientItems() : null,
+                hygiene != null ? hygiene.getBathing() : null
+        );
+        d.hygieneTotal = 3;
+        d.hygieneAbnormal = (int) hygieneItems.stream().filter(this::isAbnormal).count();
+        d.hygieneComment = d.hygieneAbnormal > 0 ? "위생 항목 점검 필요" : "정상";
+
+        CaregiverCareCheckDto.ConditionSection condition = c.getCondition();
+        d.breathingAbnormal = isAbnormal(condition != null ? condition.getBreathing() : null);
+        d.painAbnormal = isAbnormal(condition != null ? condition.getPain() : null);
+        d.fallAlert = isAbnormal(condition != null ? condition.getFall() : null);
+
+        d.conditionTotal = 3;
+        int conditionAbnormal = 0;
+        if (d.breathingAbnormal) conditionAbnormal += 1;
+        if (d.painAbnormal) conditionAbnormal += 1;
+        if (d.fallAlert) conditionAbnormal += 1;
+        d.conditionAbnormal = conditionAbnormal;
+        d.conditionComment = conditionAbnormal > 0 ? "컨디션 이상 징후 관찰" : "정상";
+
+        d.eliminationTotal = 2;
+        CaregiverCareCheckDto.EliminationSection elimination = c.getElimination();
+        boolean urinationAbnormal = hasAbnormalLog(elimination != null ? elimination.getUrination() : null);
+        boolean defecationAbnormal = hasAbnormalLog(elimination != null ? elimination.getDefecation() : null);
+        d.eliminationAbnormal = (urinationAbnormal ? 1 : 0) + (defecationAbnormal ? 1 : 0);
+        d.eliminationComment = defecationAbnormal ? "배변 이상 기록" : urinationAbnormal ? "배뇨 이상 기록" : "정상";
+
+        d.overallTotal = d.mealTotal + d.hygieneTotal + 3 + d.eliminationTotal;
+        d.overallAbnormal = d.mealAbnormal + d.hygieneAbnormal + conditionAbnormal + d.eliminationAbnormal;
+        return d;
+    }
+
+    private static class DayComputation {
+        int overallTotal;
+        int overallAbnormal;
+        int mealTotal;
+        int mealAbnormal;
+        int hygieneTotal;
+        int hygieneAbnormal;
+        int conditionTotal;
+        int conditionAbnormal;
+        int eliminationTotal;
+        int eliminationAbnormal;
+        boolean lowHydration;
+        boolean appetiteDecline;
+        boolean mealMorningMissing;
+        boolean mealLunchMissing;
+        boolean mealDinnerMissing;
+        boolean fallAlert;
+        boolean breathingAbnormal;
+        boolean painAbnormal;
+        String mealComment;
+        String hygieneComment;
+        String conditionComment;
+        String eliminationComment;
+    }
+
+    private boolean slotFullyChecked(CaregiverCareCheckDto.MealSlot slot) {
+        if (slot == null) return false;
+        return statusOf(slot.getIntake()) != null
+            && statusOf(slot.getHydration()) != null
+            && statusOf(slot.getIncident()) != null;
     }
 }
