@@ -9,9 +9,12 @@ import java.time.LocalDate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hiddencore.ddasum.backend.security.AuthenticatedUser;
@@ -110,5 +113,20 @@ public class MedicationController {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> getMedicationHistory(
+            @RequestParam Long patientId,
+            @RequestParam Long guardianId) {
+        return ResponseEntity.ok(
+                medicationService.getMedicationHistory(patientId, guardianId));
+    }
+
+    @GetMapping("/{medicationId}")
+    public ResponseEntity<?> getMedicationDetail(
+            @PathVariable Long medicationId) {
+        return ResponseEntity.ok(
+                medicationService.getMedicationDetail(medicationId));
     }
 }

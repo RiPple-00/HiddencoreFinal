@@ -21,6 +21,9 @@ import hiddencore.ddasum.backend.repository.UsersRepository;
 import hiddencore.ddasum.backend.web.dto.guardian.MedicationDto;
 import lombok.RequiredArgsConstructor;
 
+import hiddencore.ddasum.backend.domain.MedicationDetail;
+import hiddencore.ddasum.backend.repository.MedicationDetailRepository;
+
 @Service
 @RequiredArgsConstructor
 public class MedicationService {
@@ -38,6 +41,7 @@ public class MedicationService {
     private final MfdsEasyDrugApiClient mfdsEasyDrugApiClient;
     private final MfdsDrugPermitApiClient mfdsDrugPermitApiClient;
     private final MfdsDurApiClient mfdsDurApiClient;
+    private final MedicationDetailRepository medicationDetailRepository;
 
     @Transactional
     public MedicationDto.Response saveMedicationFromQr(MedicationDto.ScanRequest request) {
@@ -236,6 +240,8 @@ public class MedicationService {
 
         Medication savedMedication = medicationRepository.save(medication);
 
+        saveEdbMedicationDetails(savedMedication, medicineInfos);
+
         return MedicationDto.Response.builder()
                 .medicationId(savedMedication.getMedicationId())
                 .patientId(request.getPatientId())
@@ -329,6 +335,224 @@ public class MedicationService {
         }
 
         return manufacturerName.toString();
+
     }
 
+    private void saveEdbMedicationDetails(
+            Medication savedMedication,
+            List<Map<String, Object>> medicineInfos) {
+        for (Map<String, Object> row : medicineInfos) {
+            try {
+                MedicationDetail detail = MedicationDetail.builder()
+                        .medication(savedMedication)
+
+                        .itemSeq(toStr(row.get("itemSeq")))
+                        .medicineName(toStr(row.get("medicineName")))
+                        .itemName(toStr(row.get("itemName")))
+                        .manufacturerName(toStr(row.get("manufacturerName")))
+                        .unit(toStr(row.get("unit")))
+                        .payType(toStr(row.get("payType")))
+                        .route(toStr(row.get("route")))
+                        .classNo(toStr(row.get("classNo")))
+                        .mainIngredientCode(toStr(row.get("mainIngredientCode")))
+                        .applyStartDate(toStr(row.get("applyStartDate")))
+                        .applyEndDate(toStr(row.get("applyEndDate")))
+                        .maxPrice(toStr(row.get("maxPrice")))
+                        .specialGeneralType(toStr(row.get("specialGeneralType")))
+                        .substitutionType(toStr(row.get("substitutionType")))
+
+                        .drugInfoFound(toBool(row.get("drugInfoFound")))
+                        .drugInfoMessage(toStr(row.get("drugInfoMessage")))
+                        .drugInfoSearchName(toStr(row.get("drugInfoSearchName")))
+
+                        .permitInfoFound(toBool(row.get("permitInfoFound")))
+                        .permitSearchName(toStr(row.get("permitSearchName")))
+                        .permitItemSeq(toStr(row.get("permitItemSeq")))
+                        .permitItemName(toStr(row.get("permitItemName")))
+                        .permitEntpName(toStr(row.get("permitEntpName")))
+                        .permitEffect(toStr(row.get("permitEffect")))
+                        .permitUseMethod(toStr(row.get("permitUseMethod")))
+                        .permitCaution(toStr(row.get("permitCaution")))
+
+                        .durInfoFound(toBool(row.get("durInfoFound")))
+                        .durSearchName(toStr(row.get("durSearchName")))
+                        .durSearchItemSeq(toStr(row.get("durSearchItemSeq")))
+                        .durProductFound(toBool(row.get("durProductFound")))
+                        .durWarningCount(toInt(row.get("durWarningCount")))
+                        .durWarningsJson(toJson(dedupeDurWarnings(row.get("durWarnings"))))
+                        .durProductInfoJson(toJson(row.get("durProductInfo")))
+                        .durInfoMessage(toStr(row.get("durInfoMessage")))
+                        .build();
+
+                medicationDetailRepository.save(detail);
+
+            } catch (Exception e) {
+                System.out.println(
+                        "약 상세 저장 실패 itemSeq=" + row.get("itemSeq")
+                                + ", message=" + e.getMessage());
+            }
+        }
+    }
+
+    private String toStr(Object value) {
+        return value == null ? null : String.valueOf(value);
+    }
+
+    private Boolean toBool(Object value) {
+        if (value == null)
+            return false;
+        if (value instanceof Boolean b)
+            return b;
+
+        return Boolean.parseBoolean(String.valueOf(value));
+    }
+
+    private Integer toInt(Object value) {
+        if (value == null)
+            return 0;
+
+        if (value instanceof Number n) {
+            return n.intValue();
+        }
+
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+private Object dedupeDurWarnings(Object value) {
+    if (!(value instanceof List<?> list)) {
+        return value;
+    }
+
+    List<Map<String, Object>> result = new ArrayList<>();
+    List<String> seen = new ArrayList<>();
+
+    for (Object item : list) {
+        if (!(item instanceof Map<?, ?> rawMap)) {
+            continue;
+        }
+
+        Map<String, Object> warning = new LinkedHashMap<>();
+
+        for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+            warning.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+
+        String key = String.join("|",
+                toStr(warning.get("durCategory")),
+                toStr(warning.get("durIngredientName")),
+                toStr(warning.get("durContent")),
+                toStr(warning.get("durNotificationDate"))
+        );
+
+        if (!seen.contains(key)) {
+            seen.add(key);
+            result.add(warning);
+        }
+    }
+
+    return result;
+}
+
+    private String toJson(Object value) {
+        if (value == null)
+            return null;
+
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getMedicationHistory(Long patientId, Long guardianId) {
+        List<Medication> medications = medicationRepository
+                .findByPatientId_PatientIdAndGuardianId_UserIdOrderByPrescriptionDateDescMedicationIdDesc(
+                        patientId,
+                        guardianId);
+
+        return medications.stream().map(medication -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+
+            row.put("medicationId", medication.getMedicationId());
+            row.put("patientId", medication.getPatientId().getPatientId());
+            row.put("guardianId", medication.getGuardianId() == null ? null : medication.getGuardianId().getUserId());
+            row.put("prescriptionDate", medication.getPrescriptionDate());
+            row.put("medicineSummary", medication.getMedicineSummary());
+            row.put("createdAt", medication.getCreatedAt());
+
+            return row;
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMedicationDetail(Long medicationId) {
+        Medication medication = medicationRepository.findById(medicationId)
+                .orElseThrow(() -> new IllegalArgumentException("처방 기록을 찾을 수 없습니다. id=" + medicationId));
+
+        List<MedicationDetail> details = medicationDetailRepository
+                .findByMedication_MedicationIdOrderByMedicationDetailIdAsc(medicationId);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("medicationId", medication.getMedicationId());
+        result.put("patientId", medication.getPatientId().getPatientId());
+        result.put("guardianId", medication.getGuardianId() == null ? null : medication.getGuardianId().getUserId());
+        result.put("prescriptionDate", medication.getPrescriptionDate());
+        result.put("medicineSummary", medication.getMedicineSummary());
+        result.put("details", details.stream().map(this::detailToMap).toList());
+
+        return result;
+    }
+
+    private Map<String, Object> detailToMap(MedicationDetail detail) {
+        Map<String, Object> row = new LinkedHashMap<>();
+
+        row.put("medicationDetailId", detail.getMedicationDetailId());
+        row.put("itemSeq", detail.getItemSeq());
+        row.put("medicineName", detail.getMedicineName());
+        row.put("itemName", detail.getItemName());
+        row.put("manufacturerName", detail.getManufacturerName());
+        row.put("unit", detail.getUnit());
+        row.put("payType", detail.getPayType());
+        row.put("route", detail.getRoute());
+        row.put("classNo", detail.getClassNo());
+        row.put("mainIngredientCode", detail.getMainIngredientCode());
+        row.put("specialGeneralType", detail.getSpecialGeneralType());
+        row.put("substitutionType", detail.getSubstitutionType());
+
+        row.put("permitInfoFound", detail.getPermitInfoFound());
+        row.put("permitItemSeq", detail.getPermitItemSeq());
+        row.put("permitItemName", detail.getPermitItemName());
+        row.put("permitEntpName", detail.getPermitEntpName());
+        row.put("permitEffect", detail.getPermitEffect());
+        row.put("permitUseMethod", detail.getPermitUseMethod());
+        row.put("permitCaution", detail.getPermitCaution());
+
+        row.put("durInfoFound", detail.getDurInfoFound());
+        row.put("durProductFound", detail.getDurProductFound());
+        row.put("durWarningCount", detail.getDurWarningCount());
+        row.put("durInfoMessage", detail.getDurInfoMessage());
+        row.put("durWarnings", fromJson(detail.getDurWarningsJson()));
+        row.put("durProductInfo", fromJson(detail.getDurProductInfoJson()));
+
+        return row;
+    }
+
+    private Object fromJson(String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, Object.class);
+        } catch (Exception e) {
+            return json;
+        }
+    }
 }

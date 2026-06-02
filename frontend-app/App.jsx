@@ -35,6 +35,8 @@ import PaymentHistory from "./src/components/billing/PaymentHistory";
 import InvoicePaymentList from "./src/components/billing/InvoicePaymentList";
 
 import MedicationQrScanPage from "./src/pages/guardian/MedicationQrScanPage";
+import MedicationHistoryPage from "./src/pages/guardian/MedicationHistoryPage";
+import MedicationHistoryDetailPage from "./src/pages/guardian/MedicationHistoryDetailPage";
 
 
 import { useFonts } from "expo-font";
@@ -92,6 +94,9 @@ const GUARDIAN_SCREENS = new Set([
   "Gallery",
   "ActivePhotoGallery",
   "GalleryMore",
+  "MedicationQrScan",
+  "MedicationHistory",
+  "MedicationHistoryDetail",
 ]);
 
 const BOTTOM_TAB_HEIGHT = 72;
@@ -255,6 +260,16 @@ function AppNavigation() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
+              name="MedicationHistory"
+              component={MedicationHistoryPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="MedicationHistoryDetail"
+              component={MedicationHistoryDetailPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
               name="Payment"
               component={PaymentPage}
               options={{ headerShown: false }}
@@ -321,6 +336,7 @@ function AppNavigation() {
               options={{ headerShown: false }}
             />
           </Stack.Navigator>
+
         </View>
 
         {showGuardianChrome && (

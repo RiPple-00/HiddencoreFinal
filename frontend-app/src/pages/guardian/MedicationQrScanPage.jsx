@@ -3,7 +3,6 @@ import {
     ActivityIndicator,
     Alert,
     Button,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -11,6 +10,45 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import GuardianBottomTab from "../../components/guardian/basic/GuardianBottomTab";
 import api from "../../api";
+import styles from "../../styles/medicationQrScan";
+
+function uniqueDurWarnings(warnings) {
+    if (!Array.isArray(warnings)) return [];
+
+    const seen = new Set();
+
+    return warnings.filter((warning) => {
+        const key = [
+            warning.durCategory,
+            warning.durIngredientName,
+            warning.durContent,
+            warning.durNotificationDate,
+        ].join("|");
+
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+        return true;
+    });
+}
+
+function parseMedicineData(medicineData) {
+    if (!medicineData) return [];
+
+    if (Array.isArray(medicineData)) {
+        return medicineData;
+    }
+
+    try {
+        const parsed = JSON.parse(medicineData);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        console.log("medicineData 파싱 실패:", error);
+        return [];
+    }
+}
 
 export default function MedicationQrScanPage({ navigation }) {
     const [permission, requestPermission] = useCameraPermissions();
@@ -75,13 +113,10 @@ export default function MedicationQrScanPage({ navigation }) {
         return (
             <View style={styles.center}>
                 <Text>처방전 QR 스캔을 위해 카메라 권한이 필요합니다.</Text>
-                <Button title="카메라 권한 허용" onPress={() => {
-                    scanLockRef.current = false;
-                    setScanned(false);
-                    setSaving(false);
-                    setQrText("");
-                    setSavedMedication(null);
-                }} />
+                <Button
+                    title="카메라 권한 허용"
+                    onPress={requestPermission}
+                />
             </View>
         );
     }
@@ -137,13 +172,77 @@ export default function MedicationQrScanPage({ navigation }) {
                         <ActivityIndicator />
                         <Text style={styles.loadingText}>처방전 정보를 저장하는 중...</Text>
                     </View>
+                ) : savedMedication ? (
+                    <ScrollView style={styles.medicineScroll}>
+                        <Text style={styles.resultText}>
+                            처방일자: {savedMedication.prescriptionDate}
+                        </Text>
+
+                        <Text style={styles.resultText}>
+                            {savedMedication.medicineSummary}
+                        </Text>
+
+                        {parseMedicineData(savedMedication.medicineData).map((drug, index) => (
+                            <View key={`${drug.itemSeq}-${index}`} style={styles.drugCard}>
+                                <Text style={styles.drugName}>
+                                    {index + 1}. {drug.medicineName || drug.itemName || "약 이름 없음"}
+                                </Text>
+
+                                <Text style={styles.drugText}>
+                                    제조사: {drug.manufacturerName || drug.permitEntpName || "-"}
+                                </Text>
+
+                                <Text style={styles.drugText}>
+                                    구분: {drug.specialGeneralType || "-"} / {drug.payType || "-"}
+                                </Text>
+
+                                <Text style={styles.drugText}>
+                                    투여경로: {drug.route || "-"}
+                                </Text>
+
+                                <Text style={styles.drugText}>
+                                    약품코드: {drug.itemSeq || "-"}
+                                </Text>
+
+                                <View style={styles.infoBox}>
+                                    <Text style={styles.infoTitle}>DUR 주의사항</Text>
+
+                                    {drug.durInfoFound && uniqueDurWarnings(drug.durWarnings).length > 0 ? (
+                                        uniqueDurWarnings(drug.durWarnings).map((warning, warningIndex) => (
+                                            <View key={warningIndex} style={styles.warningBox}>
+                                                <Text style={styles.warningCategory}>
+                                                    {warning.durCategory || "주의사항"}
+                                                </Text>
+
+                                                <Text style={styles.drugText}>
+                                                    성분: {warning.durIngredientName || "-"}
+                                                </Text>
+
+                                                {warning.durContent ? (
+                                                    <Text style={styles.warningContent}>
+                                                        {warning.durContent}
+                                                    </Text>
+                                                ) : (
+                                                    <Text style={styles.drugText}>
+                                                        상세 주의 내용 없음
+                                                    </Text>
+                                                )}
+
+                                                <Text style={styles.drugText}>
+                                                    고시일자: {warning.durNotificationDate || "-"}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.safeText}>DUR 주의사항 없음</Text>
+                                    )}
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
                 ) : (
                     <Text style={styles.resultText} numberOfLines={4}>
-                        {savedMedication
-                            ? `${savedMedication.prescriptionDate}\n${savedMedication.medicineSummary}`
-                            : qrText
-                                ? qrText
-                                : "카메라를 처방전 QR 코드에 가까이 가져가세요."}
+                        {qrText || "카메라를 처방전 QR 코드에 가까이 가져가세요."}
                     </Text>
                 )}
 
@@ -151,6 +250,7 @@ export default function MedicationQrScanPage({ navigation }) {
                     <TouchableOpacity
                         style={styles.retryButton}
                         onPress={() => {
+                            scanLockRef.current = false;
                             setScanned(false);
                             setSaving(false);
                             setQrText("");
@@ -160,6 +260,13 @@ export default function MedicationQrScanPage({ navigation }) {
                         <Text style={styles.retryText}>다시 스캔</Text>
                     </TouchableOpacity>
                 )}
+
+                <TouchableOpacity
+                    style={styles.historyButton}
+                    onPress={() => navigation.navigate("MedicationHistory")}
+                >
+                    <Text style={styles.historyText}>지난 처방기록 보기</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.bottomTabWrap}>
@@ -171,196 +278,3 @@ export default function MedicationQrScanPage({ navigation }) {
         </View>
     );
 }
-
-const BOX_SIZE = 240;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#000",
-    },
-
-    camera: {
-        flex: 1,
-    },
-
-    center: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-
-    topBar: {
-        position: "absolute",
-        top: 45,
-        left: 0,
-        right: 0,
-        height: 50,
-        paddingHorizontal: 18,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        zIndex: 20,
-        elevation: 20,
-    },
-
-    backButton: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
-        backgroundColor: "rgba(0,0,0,0.45)",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-
-    backText: {
-        color: "#fff",
-        fontSize: 36,
-        lineHeight: 38,
-        fontWeight: "300",
-    },
-
-    headerTitle: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "700",
-    },
-
-    rightBlank: {
-        width: 42,
-    },
-
-    scanGuideContainer: {
-        position: "absolute",
-        top: "28%",
-        left: 0,
-        right: 0,
-        alignItems: "center",
-        zIndex: 10,
-        elevation: 10,
-    },
-
-    scanBox: {
-        width: BOX_SIZE,
-        height: BOX_SIZE,
-        borderWidth: 2,
-        borderColor: "rgba(255, 216, 77, 0.55)",
-        borderRadius: 18,
-        backgroundColor: "rgba(0,0,0,0.08)",
-        position: "relative",
-    },
-
-    corner: {
-        position: "absolute",
-        width: 46,
-        height: 46,
-        borderColor: "#FFD84D",
-        zIndex: 20,
-        elevation: 20,
-    },
-
-    topLeft: {
-        top: 0,
-        left: 0,
-        borderTopWidth: 5,
-        borderLeftWidth: 5,
-        borderTopLeftRadius: 12,
-    },
-
-    topRight: {
-        top: 0,
-        right: 0,
-        borderTopWidth: 5,
-        borderRightWidth: 5,
-        borderTopRightRadius: 12,
-    },
-
-    bottomLeft: {
-        bottom: 0,
-        left: 0,
-        borderBottomWidth: 5,
-        borderLeftWidth: 5,
-        borderBottomLeftRadius: 12,
-    },
-
-    bottomRight: {
-        bottom: 0,
-        right: 0,
-        borderBottomWidth: 5,
-        borderRightWidth: 5,
-        borderBottomRightRadius: 12,
-    },
-
-    guideText: {
-        marginTop: 22,
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "600",
-        backgroundColor: "rgba(0,0,0,0.45)",
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-    },
-
-    bottomBox: {
-        position: "absolute",
-        left: 20,
-        right: 20,
-        bottom: 105,
-        backgroundColor: "rgba(0,0,0,0.7)",
-        padding: 16,
-        borderRadius: 16,
-        zIndex: 20,
-        elevation: 20,
-    },
-
-    resultTitle: {
-        color: "white",
-        fontSize: 17,
-        fontWeight: "700",
-        marginBottom: 10,
-    },
-
-    resultText: {
-        color: "white",
-        fontSize: 13,
-        lineHeight: 19,
-        marginBottom: 12,
-    },
-
-    loadingRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        marginTop: 8,
-        marginBottom: 12,
-    },
-
-    loadingText: {
-        color: "white",
-        fontSize: 13,
-    },
-
-    retryButton: {
-        marginTop: 12,
-        backgroundColor: "#FFD84D",
-        paddingVertical: 10,
-        borderRadius: 12,
-        alignItems: "center",
-    },
-
-    retryText: {
-        color: "#3A2A00",
-        fontSize: 14,
-        fontWeight: "800",
-    },
-
-    bottomTabWrap: {
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 30,
-        elevation: 30,
-    },
-});

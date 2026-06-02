@@ -20,6 +20,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "MEDICATION")
@@ -56,12 +61,17 @@ public class Medication {
 
     // 약 목록 + 복용 정보 + API 조회 결과를 JSON 문자열로 저장
     @Lob
-    @Column(name = "medicine_data", columnDefinition = "LONGTEXT", nullable = false)
+    @Column(name = "medicine_data", columnDefinition = "LONGTEXT")
     private String medicineData;
 
     // 화면에 간단히 보여줄 요약용
     @Column(name = "medicine_summary", length = 500)
     private String medicineSummary;
+
+    // 처방전 안의 약 상세 목록
+    @OneToMany(mappedBy = "medication", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MedicationDetail> details = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
