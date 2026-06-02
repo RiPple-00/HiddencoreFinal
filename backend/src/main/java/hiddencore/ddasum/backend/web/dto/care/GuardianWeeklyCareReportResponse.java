@@ -29,6 +29,7 @@ public class GuardianWeeklyCareReportResponse {
     private List<String> riskFlags;
     private List<String> aiComments;
     private MealMissingCount mealMissingCount;
+    private ProgramSection programSection;
 
     private List<DailyRate> dailyRates;
     private List<ChecklistRow> checklistRows;
@@ -64,5 +65,16 @@ public class GuardianWeeklyCareReportResponse {
         private Integer lunch;
         private Integer dinner;
         private Integer total;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProgramSection {
+        private String activityTitle;
+        private String activityDescription;
+        private List<String> effects;
+        private List<String> recommendations;
     }
 }

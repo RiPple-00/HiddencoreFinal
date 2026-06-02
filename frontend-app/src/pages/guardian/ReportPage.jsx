@@ -12,7 +12,7 @@ import {
   fetchGuardianLinkedPatients,
   fetchGuardianWeeklyReport,
 } from "../../api/careChecklistApi";
-
+ 
 const FALLBACK_DAILY_RATES = [
   { day: "월", rate: 0 },
   { day: "화", rate: 0 },
@@ -83,46 +83,59 @@ function dayLabelFromDate(value) {
   return DAY_LABELS[d.getDay()];
 }
 
+function startOfWeekMonday(dateValue) {
+  const d = new Date(dateValue);
+  const day = d.getDay();
+  const deltaToMonday = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + deltaToMonday);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
 export default function ReportPage({ navigation }) {
   const [expandedRows, setExpandedRows] = useState({});
   const [sectionOpen, setSectionOpen] = useState({
     checklist: false,
-    doctor: false,
     program: false,
+    prescription: false,
   });
   const [patientId, setPatientId] = useState(null);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const latestReportRequestIdRef = useRef(0);
-  const [selectedEndDate, setSelectedEndDate] = useState(() => new Date(todayStr()));
+  const [weekOffset, setWeekOffset] = useState(0);
   const toggleRow = (index) =>
     setExpandedRows((prev) => ({ ...prev, [index]: !prev[index] }));
   const toggleSection = (key) =>
     setSectionOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const todayDate = useMemo(() => new Date(todayStr()), []);
+  const anchorWeekStart = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return startOfWeekMonday(today);
+  }, []);
 
   const selectedStartDate = useMemo(
-    () => addDays(selectedEndDate, -6),
-    [selectedEndDate]
+    () => addDays(anchorWeekStart, weekOffset * 7),
+    [anchorWeekStart, weekOffset]
+  );
+
+  const selectedEndDate = useMemo(
+    () => addDays(selectedStartDate, 6),
+    [selectedStartDate]
   );
 
   const weekStartStr = useMemo(() => dateToStr(selectedStartDate), [selectedStartDate]);
   const weekEndStr = useMemo(() => dateToStr(selectedEndDate), [selectedEndDate]);
 
   const canGoNextWeek = useMemo(() => {
-    const nextEnd = addDays(selectedEndDate, 7);
-    return nextEnd <= todayDate;
-  }, [selectedEndDate, todayDate]);
+    return weekOffset < 0;
+  }, [weekOffset]);
 
-  const goPrevWeek = () => setSelectedEndDate((prev) => addDays(prev, -7));
+  const goPrevWeek = () => setWeekOffset((prev) => prev - 1);
   const goNextWeek = () => {
     if (!canGoNextWeek) return;
-    setSelectedEndDate((prev) => {
-      const next = addDays(prev, 7);
-      return next > todayDate ? todayDate : next;
-    });
+    setWeekOffset((prev) => Math.min(prev + 1, 0));
   };
 
   useEffect(() => {
@@ -237,6 +250,19 @@ export default function ReportPage({ navigation }) {
   const reportStart = prettyDate(report?.periodStart);
   const reportEnd = prettyDate(report?.periodEnd);
   const aiComments = report?.aiComments?.length ? report.aiComments : ["데이터가 충분하지 않아 기본 안내를 표시합니다."];
+  const programSection = report?.programSection ?? {
+    activityTitle: "실내 가드닝 활동",
+    activityDescription: "작은 식물을 심고 물을 주며 소근육 자극 및 심리적 안정감을 도와주었습니다.",
+    effects: [
+      "소근육 조절 능력 및 손가락 민첩성 향상 관찰",
+      "식물과의 교감을 통해 심리적 평온함 유지 및 사회적 유대감 형성",
+    ],
+    recommendations: [
+      "소화 기능 저하로 식욕이 감소된 상태입니다. 누워서 하는 가벼운 스트레칭 위주 활동을 권장합니다.",
+      "간단한 색칠화 또는 쓰기 활동을 추가하면 인지 자극과 집중력 유지에 효과적입니다.",
+      "가벼운 복부 마사지와 수분 보충 활동을 프로그램에 포함하면 도움이 됩니다.",
+    ],
+  };
 
   return (
     <SafeAreaView
@@ -495,7 +521,13 @@ export default function ReportPage({ navigation }) {
                               <Text className="w-5 text-[13px] font-bold text-guardian-text-secondary">
                                 {day}
                               </Text>
-                              <Text className={`text-[13px] flex-1 ${item.dailyComments[di] === "-" ? "text-guardian-button-primary opacity-40" : "text-guardian-text-neutral"}`}>
+                              <Text
+                                className={`text-[13px] flex-1 ${item.dailyComments[di] === "-"
+                                  ? "text-guardian-button-primary opacity-40"
+                                  : item.label === "상태 안정화" && String(item.dailyComments[di]).includes("컨디션 이상 징후")
+                                    ? "text-error-primary font-bold"
+                                    : "text-guardian-text-neutral"}`}
+                              >
                                 {item.dailyComments[di]}
                               </Text>
                             </View>
@@ -510,57 +542,6 @@ export default function ReportPage({ navigation }) {
           )}
         </View>
 
-        {/* 의료진 소견 */}
-        <View className="bg-background-neutral rounded-[20px] p-[18px] mb-[18px]">
-          <TouchableOpacity
-            className="flex-row justify-between items-center"
-            activeOpacity={0.7}
-            onPress={() => toggleSection("doctor")}
-          >
-            <Text className="text-lg font-bold text-guardian-text-primary">2. 의료진 소견 요약</Text>
-            <Ionicons
-              name={sectionOpen.doctor ? "chevron-up" : "chevron-down"}
-              size={18}
-              color="#503115"
-            />
-          </TouchableOpacity>
-
-          {sectionOpen.doctor && (
-            <>
-              <View className="flex-row items-center mt-4 mb-[18px]">
-                <View className="w-[60px] h-[60px] rounded-full bg-guardian-button-secondary mr-[14px]" />
-                <View className="flex-1">
-                  <Text className="font-bold text-guardian-text-primary mb-1">김완치 주치의</Text>
-                  <Text className="text-[15px] font-bold text-guardian-text-neutral leading-[22px]">
-                    "식단 조정 및 수분 섭취 집중 관리 필요"
-                  </Text>
-                </View>
-              </View>
-
-              {[
-                {
-                  label: "건강 상태",
-                  value: null,
-                  badge: true,
-                },
-                { label: "주요 소견", value: "소화 기능 저하로 인한 식욕 부진" },
-                { label: "복용 약물", value: "위장 보호제 1종 추가 처방" },
-              ].map(({ label, value, badge }) => (
-                <View key={label} className="flex-row justify-between mb-[14px] items-center">
-                  <Text className="text-guardian-text-neutral font-bold">{label}</Text>
-                  {badge ? (
-                    <View className="bg-guardian-button-secondary rounded-full px-[10px] py-[5px]">
-                      <Text className="text-guardian-text-primary font-bold text-xs">주의 관찰</Text>
-                    </View>
-                  ) : (
-                    <Text className="flex-1 text-right text-guardian-text-primary ml-5">{value}</Text>
-                  )}
-                </View>
-              ))}
-            </>
-          )}
-        </View>
-
         {/* 프로그램 활동 */}
         <View className="bg-background-neutral rounded-[20px] p-[18px] mb-[18px]">
           <TouchableOpacity
@@ -569,7 +550,7 @@ export default function ReportPage({ navigation }) {
             onPress={() => toggleSection("program")}
           >
             <Text className="text-lg font-bold text-guardian-text-primary">
-              3. 프로그램 활동 및 증진 효과
+              2. 프로그램 활동 및 증진 효과
             </Text>
             <Ionicons
               name={sectionOpen.program ? "chevron-up" : "chevron-down"}
@@ -581,19 +562,16 @@ export default function ReportPage({ navigation }) {
           {sectionOpen.program && (
             <>
               <View className="bg-guardian-bg-secondary rounded-2xl p-4 mt-4">
-                <Text className="font-bold text-guardian-text-primary mb-2">실내 가드닝 활동</Text>
+                <Text className="font-bold text-guardian-text-primary mb-2">{programSection.activityTitle}</Text>
                 <Text className="text-guardian-text-neutral leading-5">
-                  작은 식물을 심고 물을 주며 소근육 자극 및 심리적 안정감을 도와주었습니다.
+                  {programSection.activityDescription}
                 </Text>
               </View>
 
-              {[
-                { title: "신체 기능 개선", desc: "소근육 조절 능력 및 손가락 민첩성 향상 관찰" },
-                { title: "정서적 안정",   desc: "식물과의 교감을 통해 심리적 평온함 유지 및 사회적 유대감 형성" },
-              ].map(({ title, desc }) => (
-                <View key={title} className="bg-guardian-bg-secondary rounded-[14px] p-[14px] mt-[14px]">
-                  <Text className="font-bold text-guardian-text-primary mb-[6px]">{title}</Text>
-                  <Text className="text-guardian-text-neutral leading-5">{desc}</Text>
+              {programSection.effects.map((effect, idx) => (
+                <View key={`${effect}-${idx}`} className="bg-guardian-bg-secondary rounded-[14px] p-[14px] mt-[14px]">
+                  <Text className="font-bold text-guardian-text-primary mb-[6px]">효과 {idx + 1}</Text>
+                  <Text className="text-guardian-text-neutral leading-5">{effect}</Text>
                 </View>
               ))}
 
@@ -604,21 +582,43 @@ export default function ReportPage({ navigation }) {
                 <Text className="text-success-primary font-bold text-[14px] mb-3">
                    AI 다음 주 프로그램 추천
                 </Text>
-                {[
-                  { bullet: "", label: "신체 기능 강화", desc: "소화 기능 저하로 식욕이 감소된 상태입니다. 눈서르게 누워서 하는 스트레칭이나 업다운동작 위주의 활동으로 신체 스트레스를 줄이면 식욕 회복에 도움이 될 수 있습니다." },
-                  { bullet: "", label: "인지 자극",     desc: "간단한 색칠화 또는 백일장 쓰기 활동을 추가하면 인지 자극과 집중력 유지에 효과적입니다." },
-                  { bullet: "", label: "소화 지원",     desc: "변비 증세가 반복되고 있어 가벼운 복부 마사지, 수분 보충 활동 등을 프로그램에 포함하면 좋겠습니다." },
-                ].map(({ bullet, label, desc }, i, arr) => (
-                  <View key={label} className={`flex-row gap-[10px] ${i < arr.length - 1 ? "mb-3" : ""}`}>
-                    <Text className="text-[18px] mt-[1px]">{bullet}</Text>
+                {programSection.recommendations.map((rec, i, arr) => (
+                  <View key={`${rec}-${i}`} className={`flex-row gap-[10px] ${i < arr.length - 1 ? "mb-3" : ""}`}>
+                    <Text className="text-[18px] mt-[1px]">•</Text>
                     <View className="flex-1">
-                      <Text className="font-bold text-guardian-text-primary text-[13px] mb-[3px]">{label}</Text>
-                      <Text className="text-[13px] text-guardian-text-neutral leading-5">{desc}</Text>
+                      <Text className="font-bold text-guardian-text-primary text-[13px] mb-[3px]">추천 {i + 1}</Text>
+                      <Text className="text-[13px] text-guardian-text-neutral leading-5">{rec}</Text>
                     </View>
                   </View>
                 ))}
               </View>
             </>
+          )}
+        </View>
+
+        {/* 처방전 요약 */}
+        <View className="bg-background-neutral rounded-[20px] p-[18px] mb-[18px]">
+          <TouchableOpacity
+            className="flex-row justify-between items-center"
+            activeOpacity={0.7}
+            onPress={() => toggleSection("prescription")}
+          >
+            <Text className="text-lg font-bold text-guardian-text-primary">
+              3. 처방전 요약
+            </Text>
+            <Ionicons
+              name={sectionOpen.prescription ? "chevron-up" : "chevron-down"}
+              size={18}
+              color="#503115"
+            />
+          </TouchableOpacity>
+
+          {sectionOpen.prescription && (
+            <View className="bg-guardian-bg-secondary rounded-[14px] p-[14px] mt-4">
+              <Text className="text-guardian-text-neutral leading-5">
+                등록된 처방전 요약 데이터가 없습니다.
+              </Text>
+            </View>
           )}
         </View>
 
