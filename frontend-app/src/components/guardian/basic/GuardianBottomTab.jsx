@@ -14,32 +14,32 @@ export default function GuardianBottomTab({
     {
       label: "홈",
       route: "GuardianMain",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
+      activeIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
+      inactiveIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
     },
     {
       label: "스캔",
       route: "MedicationQrScan",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
+      activeIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/home-active.svg"),
+      inactiveIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/home.svg"),
     },
     {
       label: "수납",
       route: "Payment",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/card-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/card.svg"),
+      activeIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/card-active.svg"),
+      inactiveIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/card.svg"),
     },
     {
       label: "실시간",
       route: "LiveCheck",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/report-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/report.svg"),
+      activeIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/report-active.svg"),
+      inactiveIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/report.svg"),
     },
     {
       label: "챗봇",
       route: "Chatbot",
-      activeIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/chatbot-active.svg"),
-      inactiveIcon: require("C:/Gabia2026/FinalProject/HiddencoreFinal/frontend-app/assets/guardian/chatbot.svg"),
+      activeIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/chatbot-active.svg"),
+      inactiveIcon: require("C:/finalproject/HiddencoreFinal/frontend-app/assets/guardian/chatbot.svg"),
     },
   ];
 
