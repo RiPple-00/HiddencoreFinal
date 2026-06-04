@@ -51,7 +51,8 @@ function dateToStr(d) {
 function addDays(base, delta) {
   const d = new Date(base);
   d.setDate(d.getDate() + delta);
-  return d;
+  return d; 
+  
 }
 
 function prettyDate(v) {
@@ -250,6 +251,7 @@ export default function ReportPage({ navigation }) {
   const reportStart = prettyDate(report?.periodStart);
   const reportEnd = prettyDate(report?.periodEnd);
   const aiComments = report?.aiComments?.length ? report.aiComments : ["데이터가 충분하지 않아 기본 안내를 표시합니다."];
+  const checklistInsight = report?.checklistInsight ?? "이번 주 체크리스트 관찰 기반으로 요약을 제공합니다.";
   const programSection = report?.programSection ?? {
     activityTitle: "실내 가드닝 활동",
     activityDescription: "작은 식물을 심고 물을 주며 소근육 자극 및 심리적 안정감을 도와주었습니다.",
@@ -257,11 +259,13 @@ export default function ReportPage({ navigation }) {
       "소근육 조절 능력 및 손가락 민첩성 향상 관찰",
       "식물과의 교감을 통해 심리적 평온함 유지 및 사회적 유대감 형성",
     ],
-    recommendations: [
-      "소화 기능 저하로 식욕이 감소된 상태입니다. 누워서 하는 가벼운 스트레칭 위주 활동을 권장합니다.",
-      "간단한 색칠화 또는 쓰기 활동을 추가하면 인지 자극과 집중력 유지에 효과적입니다.",
-      "가벼운 복부 마사지와 수분 보충 활동을 프로그램에 포함하면 도움이 됩니다.",
-    ],
+    recommendations: report?.nextWeekTips?.length
+      ? report.nextWeekTips
+      : [
+        "소화 기능 저하로 식욕이 감소된 상태입니다. 누워서 하는 가벼운 스트레칭 위주 활동을 권장합니다.",
+        "간단한 색칠화 또는 쓰기 활동을 추가하면 인지 자극과 집중력 유지에 효과적입니다.",
+        "가벼운 복부 마사지와 수분 보충 활동을 프로그램에 포함하면 도움이 됩니다.",
+      ],
   };
 
   return (
@@ -356,6 +360,11 @@ export default function ReportPage({ navigation }) {
           <Text className="text-[14px] leading-[22px] text-guardian-text-neutral mb-[18px]">
             {report?.summaryText ?? "이번 주 동안 수집된 체크리스트 기반 보고서입니다."}
           </Text>
+
+          <View className="bg-guardian-bg-secondary rounded-[14px] p-[12px] mb-[14px]">
+            <Text className="text-[13px] text-guardian-text-primary font-bold mb-[4px]">체크리스트 인사이트</Text>
+            <Text className="text-[13px] leading-5 text-guardian-text-neutral">{checklistInsight}</Text>
+          </View>
 
           <View className="flex-row flex-wrap justify-between">
             {[
@@ -568,7 +577,7 @@ export default function ReportPage({ navigation }) {
                 </Text>
               </View>
 
-              {programSection.effects.map((effect, idx) => (
+              {(programSection.effects ?? []).map((effect, idx) => (
                 <View key={`${effect}-${idx}`} className="bg-guardian-bg-secondary rounded-[14px] p-[14px] mt-[14px]">
                   <Text className="font-bold text-guardian-text-primary mb-[6px]">효과 {idx + 1}</Text>
                   <Text className="text-guardian-text-neutral leading-5">{effect}</Text>
@@ -582,7 +591,7 @@ export default function ReportPage({ navigation }) {
                 <Text className="text-success-primary font-bold text-[14px] mb-3">
                    AI 다음 주 프로그램 추천
                 </Text>
-                {programSection.recommendations.map((rec, i, arr) => (
+                {(programSection.recommendations ?? []).map((rec, i, arr) => (
                   <View key={`${rec}-${i}`} className={`flex-row gap-[10px] ${i < arr.length - 1 ? "mb-3" : ""}`}>
                     <Text className="text-[18px] mt-[1px]">•</Text>
                     <View className="flex-1">

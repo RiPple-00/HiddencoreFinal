@@ -25,6 +25,8 @@ public class GuardianWeeklyReportLlmService {
             출력은 반드시 JSON 하나만 반환한다.
             JSON 외 설명, 코드블록, 마크다운은 금지한다.
             진단/처방을 단정하지 않고 관찰 중심으로 작성한다.
+            문체는 공손한 존댓말을 사용하고, 짧고 분명하게 작성한다.
+            불필요한 수식어, 과장 표현, 반복 문장은 피한다.
             """;
 
     private final ObjectMapper objectMapper;
@@ -55,11 +57,6 @@ public class GuardianWeeklyReportLlmService {
         if (!enabled) {
             return null;
         }
-        if (apiKey == null || apiKey.isBlank()) {
-            log.warn("LLM weekly report is enabled but API key is empty. Using fallback narrative.");
-            return null;
-        }
-
         try {
             RestClient restClient = RestClient.builder().build();
             String endpoint = baseUrl.endsWith("/") ? baseUrl + "chat/completions" : baseUrl + "/chat/completions";
@@ -77,10 +74,15 @@ public class GuardianWeeklyReportLlmService {
                     .put("role", "user")
                     .put("content", buildUserPrompt(input));
 
-            JsonNode response = restClient.post()
-                    .uri(endpoint)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                RestClient.RequestBodySpec requestSpec = restClient.post()
+                        .uri(endpoint)
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json");
+
+                if (apiKey != null && !apiKey.isBlank()) {
+                requestSpec = requestSpec.header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+                }
+
+                JsonNode response = requestSpec
                     .body(payload)
                     .retrieve()
                     .body(JsonNode.class);
@@ -97,13 +99,14 @@ public class GuardianWeeklyReportLlmService {
             String jsonOnly = stripCodeFence(raw);
             JsonNode root = objectMapper.readTree(jsonOnly);
 
-            String summaryText = normalize(root.path("summaryText").asText(""), 220);
-            String checklistInsight = normalize(root.path("checklistInsight").asText(""), 180);
-            List<String> aiComments = parseStringArray(root.path("aiComments"), 4, 140);
-            List<String> nextWeekTips = parseStringArray(root.path("nextWeekTips"), 3, 160);
+            String summaryText = normalize(root.path("summaryText").asText(""), 160);
+            String checklistInsight = normalize(root.path("checklistInsight").asText(""), 120);
+            List<String> aiComments = parseStringArray(root.path("aiComments"), 4, 110);
+            List<String> nextWeekTips = parseStringArray(root.path("nextWeekTips"), 3, 120);
             ProgramSectionData programSection = parseProgramSection(root.path("programSection"));
 
-            if (summaryText.isBlank() && checklistInsight.isBlank() && aiComments.isEmpty() && nextWeekTips.isEmpty() && programSection == null) {
+            if (summaryText.isBlank() && checklistInsight.isBlank() && aiComments.isEmpty()
+                    && nextWeekTips.isEmpty() && programSection == null) {
                 return null;
             }
 
@@ -120,6 +123,7 @@ public class GuardianWeeklyReportLlmService {
     private String buildUserPrompt(WeeklyNarrativeInput input) {
         return """
                 아래 주간 정보를 바탕으로 보호자용 요약을 생성해라.
+                                문체는 친절한 존댓말로 작성하고, 문장은 간결하게 유지해라.
                 반드시 다음 JSON 스키마만 반환:
                 {
                   "summaryText": "문자열",
@@ -142,6 +146,8 @@ public class GuardianWeeklyReportLlmService {
                                 - programSection.effects: 1~2개
                                 - programSection.recommendations: 2~3개
                 - 공포/단정 표현 금지
+                                - 각 항목은 1문장 위주로 작성
+                                - 비슷한 문장을 반복하지 말 것
 
                 입력:
                 period: %s ~ %s
@@ -188,10 +194,11 @@ public class GuardianWeeklyReportLlmService {
         if (node == null || !node.isObject()) {
             return null;
         }
-        String activityTitle = normalize(node.path("activityTitle").asText(""), 60);
-        String activityDescription = normalize(node.path("activityDescription").asText(""), 220);
-        List<String> effects = parseStringArray(node.path("effects"), 2, 120);
-        List<String> recommendations = parseStringArray(node.path("recommendations"), 3, 160);
+
+        String activityTitle = normalize(node.path("activityTitle").asText(""), 48);
+        String activityDescription = normalize(node.path("activityDescription").asText(""), 160);
+        List<String> effects = parseStringArray(node.path("effects"), 2, 90);
+        List<String> recommendations = parseStringArray(node.path("recommendations"), 3, 120);
 
         if (activityTitle.isBlank() && activityDescription.isBlank() && effects.isEmpty() && recommendations.isEmpty()) {
             return null;
@@ -267,6 +274,10 @@ public class GuardianWeeklyReportLlmService {
     public record ProgramSectionData(String activityTitle, String activityDescription, List<String> effects, List<String> recommendations) {
     }
 
-    public record GeneratedNarrative(String summaryText, String checklistInsight, List<String> aiComments, List<String> nextWeekTips, ProgramSectionData programSection) {
+    public record GeneratedNarrative(String summaryText,
+                                     String checklistInsight,
+                                     List<String> aiComments,
+                                     List<String> nextWeekTips,
+                                     ProgramSectionData programSection) {
     }
 }

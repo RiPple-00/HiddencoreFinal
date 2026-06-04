@@ -59,10 +59,10 @@ app:
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   llm:
     weekly-report:
-      enabled: ${APP_LLM_WEEKLY_REPORT_ENABLED:false}
-      base-url: ${APP_LLM_WEEKLY_REPORT_BASE_URL:https://api.openai.com/v1}
-      api-key: ${APP_LLM_WEEKLY_REPORT_API_KEY:}
-      model: ${APP_LLM_WEEKLY_REPORT_MODEL:gpt-4o-mini}
+      enabled: ${APP_LLM_WEEKLY_REPORT_ENABLED:true}
+      base-url: ${APP_LLM_WEEKLY_REPORT_BASE_URL:http://localhost:11434/v1}
+      api-key: ${APP_LLM_WEEKLY_REPORT_API_KEY:${OPENAI_API_KEY:}}
+      model: ${APP_LLM_WEEKLY_REPORT_MODEL:llama3.1:8b}
       temperature: ${APP_LLM_WEEKLY_REPORT_TEMPERATURE:0.2}
       max-tokens: ${APP_LLM_WEEKLY_REPORT_MAX_TOKENS:500}
   mail:

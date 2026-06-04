@@ -233,6 +233,8 @@ public class CaregiverCareCheckService {
             fallCount,
             mealIncidentDays
         );
+        List<String> nextWeekTips = buildNextWeekTips(riskFlags);
+        String checklistInsight = buildChecklistInsight(overallRate, riskFlags);
         String summaryText = switch (riskLevel) {
             case "위험" -> "이번 주 기록에서 즉시 관찰이 필요한 징후가 확인되었습니다. 보호자와 시설이 함께 모니터링을 강화해 주세요.";
             case "주의" -> "이번 주 기록에서 추적 관찰이 필요한 변화가 확인되었습니다. 수분, 식사, 통증 관련 관리를 권장드립니다.";
@@ -249,29 +251,35 @@ public class CaregiverCareCheckService {
         GuardianWeeklyCareReportResponse.ProgramSection programSection = buildProgramSectionFallback(riskLevel, riskFlags);
 
         GuardianWeeklyReportLlmService.GeneratedNarrative generatedNarrative =
-            weeklyReportLlmService.generateWeeklyNarrative(
-                new GuardianWeeklyReportLlmService.WeeklyNarrativeInput(
-                    String.valueOf(start),
-                    String.valueOf(end),
-                    overallRate,
-                    riskLevel,
-                    riskFlags,
-                    mealMorningMissingCount,
-                    mealLunchMissingCount,
-                    mealDinnerMissingCount,
-                    rate(mealTotal, mealAbnormal),
-                    rate(hygieneTotal, hygieneAbnormal),
-                    rate(conditionTotal, conditionAbnormal),
-                    rate(eliminationTotal, eliminationAbnormal)
-                )
-            );
+                weeklyReportLlmService.generateWeeklyNarrative(
+                        new GuardianWeeklyReportLlmService.WeeklyNarrativeInput(
+                                String.valueOf(start),
+                                String.valueOf(end),
+                                overallRate,
+                                riskLevel,
+                                riskFlags,
+                                mealMorningMissingCount,
+                                mealLunchMissingCount,
+                                mealDinnerMissingCount,
+                                rate(mealTotal, mealAbnormal),
+                                rate(hygieneTotal, hygieneAbnormal),
+                                rate(conditionTotal, conditionAbnormal),
+                                rate(eliminationTotal, eliminationAbnormal)
+                        )
+                );
 
         if (generatedNarrative != null) {
             if (hasText(generatedNarrative.summaryText())) {
                 summaryText = generatedNarrative.summaryText();
             }
+            if (hasText(generatedNarrative.checklistInsight())) {
+                checklistInsight = generatedNarrative.checklistInsight();
+            }
             if (generatedNarrative.aiComments() != null && !generatedNarrative.aiComments().isEmpty()) {
                 aiComments = generatedNarrative.aiComments();
+            }
+            if (generatedNarrative.nextWeekTips() != null && !generatedNarrative.nextWeekTips().isEmpty()) {
+                nextWeekTips = generatedNarrative.nextWeekTips();
             }
             if (generatedNarrative.programSection() != null) {
                 programSection = GuardianWeeklyCareReportResponse.ProgramSection.builder()
@@ -283,6 +291,16 @@ public class CaregiverCareCheckService {
             }
         }
 
+        if (programSection == null) {
+            programSection = buildProgramSectionFallback(riskLevel, riskFlags);
+        } else {
+            if (!hasText(programSection.getActivityTitle()) || !hasText(programSection.getActivityDescription())) {
+                programSection = buildProgramSectionFallback(riskLevel, riskFlags);
+            } else if (programSection.getRecommendations() == null || programSection.getRecommendations().isEmpty()) {
+                programSection.setRecommendations(nextWeekTips);
+            }
+        }
+
         return GuardianWeeklyCareReportResponse.builder()
                 .patientId(patientId)
                 .patientName(patient.getName())
@@ -291,8 +309,10 @@ public class CaregiverCareCheckService {
                 .overallRate(overallRate)
                 .riskLevel(riskLevel)
                 .summaryText(summaryText)
+                .checklistInsight(checklistInsight)
                 .riskFlags(riskFlags)
                 .aiComments(aiComments)
+                .nextWeekTips(nextWeekTips)
                 .programSection(programSection)
                 .mealMissingCount(GuardianWeeklyCareReportResponse.MealMissingCount.builder()
                     .morning(mealMorningMissingCount)
@@ -595,6 +615,18 @@ public class CaregiverCareCheckService {
         return String.format("%s %s, %s 및 %s 확인되었습니다.", prefix, signals.get(0), signals.get(1), withSubjectParticle(signals.get(2)));
     }
 
+    private String withSubjectParticle(String word) {
+        if (word == null || word.isBlank()) {
+            return "";
+        }
+        char lastChar = word.charAt(word.length() - 1);
+        if (lastChar < 0xAC00 || lastChar > 0xD7A3) {
+            return word + "가";
+        }
+        int jongseong = (lastChar - 0xAC00) % 28;
+        return word + (jongseong == 0 ? "가" : "이");
+    }
+
     private List<String> buildNextWeekTips(List<String> riskFlags) {
         List<String> tips = new ArrayList<>();
         if (riskFlags.contains("LOW_HYDRATION")) {
@@ -617,58 +649,60 @@ public class CaregiverCareCheckService {
             tips.add("활동 전후 컨디션 변화를 짧게 기록해 다음 주 비교에 활용해 주세요.");
         }
         if (tips.size() > 3) {
-            return tips.subList(0, 3);
+            return new ArrayList<>(tips.subList(0, 3));
         }
         return tips;
+    }
+
+    private String buildChecklistInsight(int overallRate, List<String> riskFlags) {
+        if (overallRate >= 90 && (riskFlags == null || riskFlags.isEmpty())) {
+            return "이번 주 체크리스트는 전반적으로 안정적으로 이행되었습니다.";
+        }
+        if (riskFlags != null && riskFlags.contains("FALL_ALERT")) {
+            return "낙상 관련 관찰 항목의 변동이 있어 이동 보조 루틴을 우선 점검할 필요가 있습니다.";
+        }
+        if (riskFlags != null && riskFlags.contains("LOW_HYDRATION")) {
+            return "수분 섭취 관련 항목의 변동이 있어 식사 간 수분 보충 관리가 필요합니다.";
+        }
+        return "일부 항목에서 변동이 확인되어 다음 주에는 주요 리스크 항목 중심의 관찰이 권장됩니다.";
     }
 
     private GuardianWeeklyCareReportResponse.ProgramSection buildProgramSectionFallback(String riskLevel, List<String> riskFlags) {
         String title;
         String description;
         List<String> effects = new ArrayList<>();
-        List<String> recommendations = new ArrayList<>();
 
-        if ("위험".equals(riskLevel)) {
-            title = "저강도 컨디션 안정 활동";
-            description = "호흡과 통증 부담을 낮추는 저강도 활동을 중심으로 구성했습니다.";
-            effects.add("활동 중 피로 누적을 줄이고 안정적인 참여를 돕습니다.");
-            effects.add("컨디션 변화를 빠르게 파악해 돌봄 대응을 용이하게 합니다.");
-        } else if ("주의".equals(riskLevel)) {
-            title = "회복 중심 균형 활동";
-            description = "신체 부담을 조절하면서 기능 유지와 회복을 함께 목표로 구성했습니다.";
-            effects.add("일상 기능 유지와 집중력 저하 방지에 도움이 됩니다.");
-            effects.add("활동 참여 리듬을 안정화해 주간 편차를 줄일 수 있습니다.");
-        } else {
-            title = "유지·증진 복합 활동";
-            description = "현재 안정 상태를 유지하면서 신체·인지 기능 증진을 목표로 구성했습니다.";
-            effects.add("소근육 및 인지 자극을 균형 있게 제공할 수 있습니다.");
-            effects.add("정서 안정과 사회적 상호작용 유지에 도움이 됩니다.");
+        switch (riskLevel) {
+            case "위험" -> {
+                title = "저강도 컨디션 안정 활동";
+                description = "호흡과 통증 부담을 낮추는 저강도 활동을 중심으로 구성했습니다.";
+                effects.add("활동 중 피로 누적을 줄이고 안정적인 참여를 돕습니다.");
+                effects.add("컨디션 변화를 빠르게 파악해 돌봄 대응을 용이하게 합니다.");
+            }
+            case "주의" -> {
+                title = "회복 중심 균형 활동";
+                description = "신체 부담을 조절하면서 기능 유지와 회복을 함께 목표로 구성했습니다.";
+                effects.add("일상 기능 유지와 집중력 저하 방지에 도움이 됩니다.");
+                effects.add("활동 참여 리듬을 안정화해 주간 편차를 줄일 수 있습니다.");
+            }
+            default -> {
+                title = "유지·증진 복합 활동";
+                description = "현재 안정 상태를 유지하면서 신체·인지 기능 증진을 목표로 구성했습니다.";
+                effects.add("소근육 및 인지 자극을 균형 있게 제공할 수 있습니다.");
+                effects.add("정서 안정과 사회적 상호작용 유지에 도움이 됩니다.");
+            }
         }
-
-        recommendations.addAll(buildNextWeekTips(riskFlags));
 
         return GuardianWeeklyCareReportResponse.ProgramSection.builder()
                 .activityTitle(title)
                 .activityDescription(description)
                 .effects(effects)
-                .recommendations(recommendations)
+                .recommendations(buildNextWeekTips(riskFlags))
                 .build();
     }
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
-    }
-
-    private String withSubjectParticle(String word) {
-        if (word == null || word.isBlank()) {
-            return "";
-        }
-        char lastChar = word.charAt(word.length() - 1);
-        if (lastChar < 0xAC00 || lastChar > 0xD7A3) {
-            return word + "가";
-        }
-        int jongseong = (lastChar - 0xAC00) % 28;
-        return word + (jongseong == 0 ? "가" : "이");
     }
 
     private DayComputation computeDay(CaregiverCareCheckDto.Content c) {

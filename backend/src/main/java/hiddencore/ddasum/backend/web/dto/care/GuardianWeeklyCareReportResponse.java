@@ -26,8 +26,10 @@ public class GuardianWeeklyCareReportResponse {
     private String riskLevel;
 
     private String summaryText;
+    private String checklistInsight;
     private List<String> riskFlags;
     private List<String> aiComments;
+    private List<String> nextWeekTips;
     private MealMissingCount mealMissingCount;
     private ProgramSection programSection;
 
