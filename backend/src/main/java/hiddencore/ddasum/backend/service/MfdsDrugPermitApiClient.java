@@ -25,7 +25,9 @@ public class MfdsDrugPermitApiClient {
     @Value("${mfds.permit.service-key}")
     private String serviceKey;
 
-    private static final String PERMIT_URL = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07";
+    private static final String PERMIT_LIST_URL = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07";
+
+    private static final String PERMIT_DETAIL_URL = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06";
 
     public Map<String, Object> getPermitInfo(String medicineName, String manufacturerName) {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -39,7 +41,7 @@ public class MfdsDrugPermitApiClient {
                 return result;
             }
 
-            String url = PERMIT_URL
+            String url = PERMIT_LIST_URL
                     + "?serviceKey=" + serviceKey
                     + "&type=json"
                     + "&pageNo=1"
@@ -194,63 +196,153 @@ public class MfdsDrugPermitApiClient {
                 .replaceAll("\\n{3,}", "\n\n")
                 .trim();
     }
-    public Map<String, Object> getPermitInfoByEdiCode(String ediCode) {
-    Map<String, Object> result = new LinkedHashMap<>();
-    result.put("permitInfoFound", false);
 
-    try {
-        if (ediCode == null || ediCode.isBlank()) {
-            result.put("permitInfoMessage", "EDI 코드가 비어 있어 허가정보를 조회하지 못했습니다.");
-            return result;
+    private String maskServiceKey(String url) {
+        if (url == null) {
+            return "";
         }
 
-        String url = PERMIT_URL
-                + "?serviceKey=" + serviceKey
-                + "&type=json"
-                + "&pageNo=1"
-                + "&numOfRows=5"
-                + "&edi_code=" + URLEncoder.encode(ediCode, StandardCharsets.UTF_8);
-
-        System.out.println("허가정보 EDI 요청 URL = " + url);
-
-        String response = restTemplate.getForObject(url, String.class);
-
-        System.out.println("허가정보 EDI 응답 = " + response);
-
-        JsonNode root = objectMapper.readTree(response);
-        JsonNode items = extractItems(root);
-        JsonNode item = selectBestItem(items, "", "");
-
-        if (item == null) {
-            result.put("permitInfoMessage", "식약처 허가정보 API에서 EDI 코드로 상세 정보를 찾지 못했습니다.");
-            result.put("permitSearchEdiCode", ediCode);
-            return result;
-        }
-
-        result.put("permitInfoFound", true);
-        result.put("permitSearchEdiCode", ediCode);
-
-        result.put("permitItemSeq", text(item, "ITEM_SEQ"));
-        result.put("permitItemName", text(item, "ITEM_NAME"));
-        result.put("permitEntpName", text(item, "ENTP_NAME"));
-        result.put("permitEdiCode", text(item, "EDI_CODE"));
-        result.put("permitChart", cleanText(text(item, "CHART")));
-        result.put("permitStorageMethod", cleanText(text(item, "STORAGE_METHOD")));
-        result.put("permitValidTerm", cleanText(text(item, "VALID_TERM")));
-        result.put("permitEtcOtcCode", text(item, "ETC_OTC_CODE"));
-        result.put("permitMaterialName", cleanText(text(item, "MATERIAL_NAME")));
-
-        result.put("permitEffect", cleanText(text(item, "EE_DOC_DATA")));
-        result.put("permitUseMethod", cleanText(text(item, "UD_DOC_DATA")));
-        result.put("permitCaution", cleanText(text(item, "NB_DOC_DATA")));
-
-        return result;
-
-    } catch (Exception e) {
-        result.put("permitInfoFound", false);
-        result.put("permitInfoMessage", "식약처 허가정보 EDI 코드 조회 중 오류가 발생했습니다.");
-        result.put("permitInfoError", e.getMessage());
-        return result;
+        return url.replaceAll("serviceKey=([^&]+)", "serviceKey=***");
     }
-}
+
+    private String cleanDocText(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .replaceAll("<ARTICLE[^>]*title=\"([^\"]*)\"[^>]*/>", "\n$1\n")
+                .replaceAll("<ARTICLE[^>]*title=\"([^\"]*)\"[^>]*>", "\n$1\n")
+                .replace("<![CDATA[", "")
+                .replace("]]>", "")
+                .replaceAll("(?i)<br\\s*/?>", "\n")
+                .replaceAll("<[^>]*>", "\n")
+                .replace("&nbsp;", " ")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replaceAll("[ \\t\\x0B\\f\\r]+", " ")
+                .replaceAll("\\n\\s*\\n+", "\n\n")
+                .trim();
+    }
+
+    public Map<String, Object> getPermitInfoByEdiCode(String ediCode) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("permitInfoFound", false);
+
+        try {
+            if (ediCode == null || ediCode.isBlank()) {
+                result.put("permitInfoMessage", "EDI 코드가 비어 있어 허가정보를 조회하지 못했습니다.");
+                return result;
+            }
+
+            String url = PERMIT_LIST_URL
+                    + "?serviceKey=" + serviceKey
+                    + "&type=json"
+                    + "&pageNo=1"
+                    + "&numOfRows=5"
+                    + "&edi_code=" + URLEncoder.encode(ediCode, StandardCharsets.UTF_8);
+
+            System.out.println("허가정보 EDI 요청 URL = " + url);
+
+            String response = restTemplate.getForObject(url, String.class);
+
+            System.out.println("허가정보 EDI 응답 = " + response);
+
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode items = extractItems(root);
+            JsonNode item = selectBestItem(items, "", "");
+
+            if (item == null) {
+                result.put("permitInfoMessage", "식약처 허가정보 API에서 EDI 코드로 상세 정보를 찾지 못했습니다.");
+                result.put("permitSearchEdiCode", ediCode);
+                return result;
+            }
+
+            result.put("permitInfoFound", true);
+            result.put("permitSearchEdiCode", ediCode);
+
+            result.put("permitItemSeq", text(item, "ITEM_SEQ"));
+            result.put("permitItemName", text(item, "ITEM_NAME"));
+            result.put("permitEntpName", text(item, "ENTP_NAME"));
+            result.put("permitEdiCode", text(item, "EDI_CODE"));
+            result.put("permitChart", cleanText(text(item, "CHART")));
+            result.put("permitStorageMethod", cleanText(text(item, "STORAGE_METHOD")));
+            result.put("permitValidTerm", cleanText(text(item, "VALID_TERM")));
+            result.put("permitEtcOtcCode", text(item, "ETC_OTC_CODE"));
+            result.put("permitMaterialName", cleanText(text(item, "MATERIAL_NAME")));
+
+            result.put("permitEffect", cleanText(text(item, "EE_DOC_DATA")));
+            result.put("permitUseMethod", cleanText(text(item, "UD_DOC_DATA")));
+            result.put("permitCaution", cleanText(text(item, "NB_DOC_DATA")));
+
+            return result;
+
+        } catch (Exception e) {
+            result.put("permitInfoFound", false);
+            result.put("permitInfoMessage", "식약처 허가정보 EDI 코드 조회 중 오류가 발생했습니다.");
+            result.put("permitInfoError", e.getMessage());
+            return result;
+        }
+    }
+
+    public Map<String, Object> getPermitDetailByItemSeq(String itemSeq) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("permitDetailFound", false);
+
+        try {
+            if (itemSeq == null || itemSeq.isBlank()) {
+                result.put("permitDetailMessage", "품목기준코드가 비어 있어 허가 상세정보를 조회하지 못했습니다.");
+                return result;
+            }
+
+            String url = PERMIT_DETAIL_URL
+                    + "?serviceKey=" + serviceKey
+                    + "&type=json"
+                    + "&pageNo=1"
+                    + "&numOfRows=1"
+                    + "&item_seq=" + URLEncoder.encode(itemSeq, StandardCharsets.UTF_8);
+
+            System.out.println("허가 상세정보 요청 URL = " + maskServiceKey(url));
+
+            String response = restTemplate.getForObject(url, String.class);
+
+            System.out.println("허가 상세정보 응답 = " + response);
+
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode items = extractItems(root);
+            JsonNode item = selectBestItem(items, "", "");
+
+            if (item == null) {
+                result.put("permitDetailMessage", "식약처 허가 상세정보 API에서 정보를 찾지 못했습니다.");
+                result.put("permitDetailSearchItemSeq", itemSeq);
+                return result;
+            }
+
+            result.put("permitDetailFound", true);
+            result.put("permitDetailSearchItemSeq", itemSeq);
+
+            result.put("permitItemSeq", text(item, "ITEM_SEQ"));
+            result.put("permitItemName", text(item, "ITEM_NAME"));
+            result.put("permitEntpName", text(item, "ENTP_NAME"));
+            result.put("permitEdiCode", text(item, "EDI_CODE"));
+
+            result.put("permitChart", cleanText(text(item, "CHART")));
+            result.put("permitStorageMethod", cleanText(text(item, "STORAGE_METHOD")));
+            result.put("permitValidTerm", cleanText(text(item, "VALID_TERM")));
+            result.put("permitMaterialName", cleanText(text(item, "MATERIAL_NAME")));
+
+            result.put("permitEffect", cleanDocText(text(item, "EE_DOC_DATA")));
+            result.put("permitUseMethod", cleanDocText(text(item, "UD_DOC_DATA")));
+            result.put("permitCaution", cleanDocText(text(item, "NB_DOC_DATA")));
+
+            return result;
+
+        } catch (Exception e) {
+            result.put("permitDetailFound", false);
+            result.put("permitDetailMessage", "식약처 허가 상세정보 조회 중 오류가 발생했습니다.");
+            result.put("permitDetailError", e.getMessage());
+            return result;
+        }
+    }
 }

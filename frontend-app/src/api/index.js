@@ -5,6 +5,8 @@ import { NativeModules, Platform } from "react-native";
 
 export const ACCESS_TOKEN_KEY = "accessToken";
 
+const API_PORT = "8080";
+
 export async function persistAccessToken(token) {
   if (token) await AsyncStorage.setItem(ACCESS_TOKEN_KEY, token);
   else await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -29,47 +31,40 @@ function parseHostFromScriptURL() {
 }
 
 export function resolveApiBaseUrl() {
-  const fromEnv = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
-  if (fromEnv) {
-    return fromEnv.replace(/\/$/, "");
-  }
+  const port = API_PORT;
 
-  const port = process.env.EXPO_PUBLIC_API_PORT?.trim() || "8080";
-
+  // 실제 기기 Expo Go 실행 시 Metro 주소에서 PC IP 추출
   const hostFromScript = parseHostFromScriptURL();
   if (hostFromScript) {
     return `http://${hostFromScript}:${port}`;
   }
 
+  // Expo Go debuggerHost에서 PC IP 추출
   const dh =
     Constants.expoGoConfig?.debuggerHost ||
     Constants.manifest?.debuggerHost ||
     Constants.manifest2?.extra?.expoGo?.debuggerHost;
+
   if (typeof dh === "string" && dh.includes(":")) {
     return `http://${dh.split(":")[0]}:${port}`;
   }
 
+  // Android 에뮬레이터
   if (Platform.OS === "android") {
     return `http://10.0.2.2:${port}`;
   }
+
+  // 웹 실행
   if (
     Platform.OS === "web" &&
     typeof window !== "undefined" &&
     window.location?.hostname
   ) {
     const h = window.location.hostname;
-    if (h === "localhost" || h === "127.0.0.1") {
-      const pagePort =
-        window.location.port ||
-        (window.location.protocol === "https:" ? "443" : "80");
-      if (String(pagePort) === String(port) && !process.env.EXPO_PUBLIC_API_BASE_URL?.trim()) {
-        const fallback =
-          process.env.EXPO_PUBLIC_API_FALLBACK_PORT?.trim() || "8080";
-        return `http://${h}:${fallback}`;
-      }
-      return `http://${h}:${port}`;
-    }
+    return `http://${h}:${port}`;
   }
+
+  // iOS 시뮬레이터 / 기타
   return `http://127.0.0.1:${port}`;
 }
 

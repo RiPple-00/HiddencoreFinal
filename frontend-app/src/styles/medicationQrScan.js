@@ -207,6 +207,166 @@ const styles = StyleSheet.create({
         zIndex: 30,
         elevation: 30,
     },
+        resultContainer: {
+        flex: 1,
+        backgroundColor: "#F8F8F8",
+    },
+
+    resultHeader: {
+        height: 58,
+        paddingHorizontal: 18,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#FFFFFF",
+        borderBottomWidth: 1,
+        borderBottomColor: "#EEEEEE",
+    },
+
+    resultBackButton: {
+        width: 42,
+        height: 42,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+
+    resultBackText: {
+        fontSize: 34,
+        color: "#333333",
+        lineHeight: 36,
+    },
+
+    resultHeaderTitle: {
+        fontSize: 18,
+        fontWeight: "800",
+        color: "#222222",
+    },
+
+    resultScroll: {
+        flex: 1,
+    },
+
+    resultScrollContent: {
+        padding: 18,
+        paddingBottom: 36,
+    },
+
+    summaryCard: {
+        backgroundColor: "#FFF4C7",
+        borderRadius: 18,
+        padding: 16,
+        marginBottom: 14,
+    },
+
+    summaryLabel: {
+        fontSize: 14,
+        fontWeight: "700",
+        color: "#7A5A00",
+        marginBottom: 6,
+    },
+
+    summaryValue: {
+        fontSize: 15,
+        color: "#222222",
+        lineHeight: 22,
+    },
+
+    resultDrugCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 18,
+        padding: 16,
+        marginBottom: 14,
+        borderWidth: 1,
+        borderColor: "#EEEEEE",
+    },
+
+    resultDrugName: {
+        fontSize: 16,
+        fontWeight: "800",
+        color: "#222222",
+        marginBottom: 12,
+        lineHeight: 23,
+    },
+
+    resultDrugText: {
+        fontSize: 14,
+        color: "#444444",
+        lineHeight: 21,
+        marginBottom: 3,
+    },
+
+    durBox: {
+        marginTop: 12,
+        backgroundColor: "#F6F6F6",
+        borderRadius: 14,
+        padding: 12,
+    },
+
+    durTitle: {
+        fontSize: 15,
+        fontWeight: "800",
+        color: "#222222",
+        marginBottom: 8,
+    },
+
+    durWarningBox: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        padding: 10,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: "#FFE1E1",
+    },
+
+    durWarningCategory: {
+        fontSize: 14,
+        fontWeight: "800",
+        color: "#D9534F",
+        marginBottom: 4,
+    },
+
+    durWarningContent: {
+        fontSize: 13,
+        color: "#444444",
+        lineHeight: 20,
+        marginTop: 4,
+    },
+
+    durSafeText: {
+        fontSize: 14,
+        fontWeight: "700",
+        color: "#2E8B57",
+    },
+
+    resultRetryButton: {
+        marginTop: 8,
+        backgroundColor: "#FFD84D",
+        paddingVertical: 15,
+        borderRadius: 14,
+        alignItems: "center",
+    },
+
+    resultRetryText: {
+        color: "#3A2A00",
+        fontSize: 15,
+        fontWeight: "800",
+    },
+
+    resultHistoryButton: {
+        marginTop: 10,
+        backgroundColor: "#FFFFFF",
+        paddingVertical: 15,
+        borderRadius: 14,
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#DDDDDD",
+    },
+
+    resultHistoryText: {
+        color: "#333333",
+        fontSize: 15,
+        fontWeight: "800",
+    },
 });
 
 export default styles;

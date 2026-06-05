@@ -90,6 +90,40 @@ public class MedicationDetail {
     @Column(name = "drug_info_search_name", length = 255)
     private String drugInfoSearchName;
 
+    @Column(name = "easy_drug_item_name", length = 500)
+    private String easyDrugItemName;
+
+    @Lob
+    @Column(name = "easy_effect", columnDefinition = "LONGTEXT")
+    private String effect;
+
+    @Lob
+    @Column(name = "easy_use_method", columnDefinition = "LONGTEXT")
+    private String useMethod;
+
+    @Lob
+    @Column(name = "easy_warning", columnDefinition = "LONGTEXT")
+    private String warning;
+
+    @Lob
+    @Column(name = "easy_caution", columnDefinition = "LONGTEXT")
+    private String caution;
+
+    @Lob
+    @Column(name = "easy_interaction", columnDefinition = "LONGTEXT")
+    private String interaction;
+
+    @Lob
+    @Column(name = "easy_side_effect", columnDefinition = "LONGTEXT")
+    private String sideEffect;
+
+    @Lob
+    @Column(name = "easy_storage_method", columnDefinition = "LONGTEXT")
+    private String storageMethod;
+
+    @Column(name = "easy_item_image", length = 1000)
+    private String itemImage;
+
     @Column(name = "permit_info_found")
     private Boolean permitInfoFound;
 

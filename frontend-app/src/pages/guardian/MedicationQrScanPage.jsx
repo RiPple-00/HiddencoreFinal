@@ -6,9 +6,9 @@ import {
     Text,
     TouchableOpacity,
     View,
+    ScrollView,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import GuardianBottomTab from "../../components/guardian/basic/GuardianBottomTab";
 import api from "../../api";
 import styles from "../../styles/medicationQrScan";
 
@@ -120,7 +120,135 @@ export default function MedicationQrScanPage({ navigation }) {
             </View>
         );
     }
+    if (savedMedication) {
+        const medicineList = parseMedicineData(savedMedication.medicineData);
 
+        return (
+            <View style={styles.resultContainer}>
+                <View style={styles.resultHeader}>
+                    <TouchableOpacity
+                        style={styles.resultBackButton}
+                        onPress={() => {
+                            scanLockRef.current = false;
+                            setScanned(false);
+                            setSaving(false);
+                            setQrText("");
+                            setSavedMedication(null);
+                        }}
+                    >
+                        <Text style={styles.resultBackText}>‹</Text>
+                    </TouchableOpacity>
+
+                    <Text style={styles.resultHeaderTitle}>처방전 저장 완료</Text>
+
+                    <View style={styles.rightBlank} />
+                </View>
+
+                <ScrollView
+                    style={styles.resultScroll}
+                    contentContainerStyle={styles.resultScrollContent}
+                >
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryLabel}>처방일자</Text>
+                        <Text style={styles.summaryValue}>
+                            {savedMedication.prescriptionDate}
+                        </Text>
+                    </View>
+
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryLabel}>처방 요약</Text>
+                        <Text style={styles.summaryValue}>
+                            {savedMedication.medicineSummary}
+                        </Text>
+                    </View>
+
+                    {medicineList.map((drug, index) => {
+                        const durWarnings = uniqueDurWarnings(drug.durWarnings);
+
+                        return (
+                            <View
+                                key={`${drug.itemSeq}-${index}`}
+                                style={styles.resultDrugCard}
+                            >
+                                <Text style={styles.resultDrugName}>
+                                    {index + 1}. {drug.medicineName || drug.itemName || "약 이름 없음"}
+                                </Text>
+
+                                <Text style={styles.resultDrugText}>
+                                    제조사: {drug.manufacturerName || drug.permitEntpName || "-"}
+                                </Text>
+
+                                <Text style={styles.resultDrugText}>
+                                    구분: {drug.specialGeneralType || "-"} / {drug.payType || "-"}
+                                </Text>
+
+                                <Text style={styles.resultDrugText}>
+                                    투여경로: {drug.route || "-"}
+                                </Text>
+
+                                <Text style={styles.resultDrugText}>
+                                    약품코드: {drug.itemSeq || "-"}
+                                </Text>
+
+                                <View style={styles.durBox}>
+                                    <Text style={styles.durTitle}>DUR 주의사항</Text>
+
+                                    {drug.durInfoFound && durWarnings.length > 0 ? (
+                                        durWarnings.map((warning, warningIndex) => (
+                                            <View
+                                                key={warningIndex}
+                                                style={styles.durWarningBox}
+                                            >
+                                                <Text style={styles.durWarningCategory}>
+                                                    {warning.durCategory || "주의사항"}
+                                                </Text>
+
+                                                <Text style={styles.resultDrugText}>
+                                                    성분: {warning.durIngredientName || "-"}
+                                                </Text>
+
+                                                <Text style={styles.durWarningContent}>
+                                                    {warning.durContent || "상세 주의 내용 없음"}
+                                                </Text>
+
+                                                <Text style={styles.resultDrugText}>
+                                                    고시일자: {warning.durNotificationDate || "-"}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.durSafeText}>
+                                            DUR 주의사항 없음
+                                        </Text>
+                                    )}
+                                </View>
+                            </View>
+                        );
+                    })}
+
+                    <TouchableOpacity
+                        style={styles.resultRetryButton}
+                        onPress={() => {
+                            scanLockRef.current = false;
+                            setScanned(false);
+                            setSaving(false);
+                            setQrText("");
+                            setSavedMedication(null);
+                        }}
+                    >
+                        <Text style={styles.resultRetryText}>다시 스캔</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.resultHistoryButton}
+                        onPress={() => navigation.navigate("MedicationHistory")}
+                    >
+                        <Text style={styles.resultHistoryText}>지난 처방기록 보기</Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
             <CameraView
@@ -153,9 +281,7 @@ export default function MedicationQrScanPage({ navigation }) {
                     <View style={[styles.corner, styles.bottomRight]} />
                 </View>
 
-                <Text style={styles.guideText}>
-                    처방전 QR 코드를 네모 안에 맞춰주세요
-                </Text>
+
             </View>
 
             <View style={styles.bottomBox}>
@@ -269,12 +395,6 @@ export default function MedicationQrScanPage({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.bottomTabWrap}>
-                <GuardianBottomTab
-                    navigation={navigation}
-                    currentTab="MedicationQrScan"
-                />
-            </View>
         </View>
     );
 }

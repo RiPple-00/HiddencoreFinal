@@ -40,7 +40,7 @@ public class MfdsEasyDrugApiClient {
             }
 
             String url = EASY_DRUG_URL
-                    + "?serviceKey=" + serviceKey
+                    + "?ServiceKey=" + serviceKey
                     + "&type=json"
                     + "&pageNo=1"
                     + "&numOfRows=1"
@@ -76,6 +76,59 @@ public class MfdsEasyDrugApiClient {
         } catch (Exception e) {
             result.put("drugInfoFound", false);
             result.put("drugInfoMessage", "식약처 상세 정보 조회 중 오류가 발생했습니다.");
+            result.put("drugInfoError", e.getMessage());
+            return result;
+        }
+    }
+
+    public Map<String, Object> getEasyDrugInfoByItemSeq(String itemSeq) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("drugInfoFound", false);
+
+        try {
+            if (itemSeq == null || itemSeq.isBlank()) {
+                result.put("drugInfoMessage", "품목기준코드가 비어 있어 e약은요 정보를 조회하지 못했습니다.");
+                return result;
+            }
+
+            String url = EASY_DRUG_URL
+                    + "?ServiceKey=" + serviceKey
+                    + "&type=json"
+                    + "&pageNo=1"
+                    + "&numOfRows=1"
+                    + "&itemSeq=" + URLEncoder.encode(itemSeq, StandardCharsets.UTF_8);
+
+            String response = restTemplate.getForObject(url, String.class);
+
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode items = root.path("body").path("items");
+            JsonNode item = getFirstItem(items);
+
+            if (item == null || item.isMissingNode() || item.isNull()) {
+                result.put("drugInfoMessage", "식약처 e약은요 API에서 품목기준코드로 상세 정보를 찾지 못했습니다.");
+                result.put("drugInfoSearchItemSeq", itemSeq);
+                return result;
+            }
+
+            result.put("drugInfoFound", true);
+            result.put("drugInfoSearchItemSeq", itemSeq);
+
+            result.put("easyDrugItemName", text(item, "itemName"));
+            result.put("effect", cleanText(text(item, "efcyQesitm")));
+            result.put("useMethod", cleanText(text(item, "useMethodQesitm")));
+            result.put("warning", cleanText(text(item, "atpnWarnQesitm")));
+            result.put("caution", cleanText(text(item, "atpnQesitm")));
+            result.put("interaction", cleanText(text(item, "intrcQesitm")));
+            result.put("sideEffect", cleanText(text(item, "seQesitm")));
+            result.put("storageMethod", cleanText(text(item, "depositMethodQesitm")));
+            result.put("itemImage", text(item, "itemImage"));
+
+            return result;
+
+        } catch (Exception e) {
+            result.put("drugInfoFound", false);
+            result.put("drugInfoMessage", "식약처 e약은요 품목기준코드 조회 중 오류가 발생했습니다.");
             result.put("drugInfoError", e.getMessage());
             return result;
         }

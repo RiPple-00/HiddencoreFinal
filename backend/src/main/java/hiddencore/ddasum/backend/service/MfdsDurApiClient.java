@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -79,8 +81,10 @@ public class MfdsDurApiClient {
         List<String> apiErrors = new ArrayList<>();
         int successCount = 0;
 
+        JsonNode productItems = null;
+
         try {
-            JsonNode productItems = requestItems(PRODUCT_ENDPOINT, cleanName, permitItemSeq);
+            productItems = requestItems(PRODUCT_ENDPOINT, cleanName, permitItemSeq);
             JsonNode productItem = firstItem(productItems);
 
             if (productItem != null) {
@@ -94,9 +98,28 @@ public class MfdsDurApiClient {
             apiErrors.add("DUR품목정보: " + e.getMessage());
         }
 
-        for (Map.Entry<String, String> entry : WARNING_ENDPOINTS.entrySet()) {
-            String category = entry.getKey();
-            String endpoint = entry.getValue();
+        Set<String> targetCategories = extractDurCategories(productItems);
+        result.put("durTargetCategories", new ArrayList<>(targetCategories));
+
+        if (targetCategories.isEmpty()) {
+            result.put("durWarnings", warnings);
+            result.put("durWarningCount", 0);
+
+            if (!apiErrors.isEmpty()) {
+                result.put("durApiErrors", apiErrors);
+            }
+
+            result.put("durInfoFound", false);
+            result.put("durInfoMessage", "DUR 주의사항 없음");
+            return result;
+        }
+
+        for (String category : targetCategories) {
+            String endpoint = WARNING_ENDPOINTS.get(category);
+
+            if (endpoint == null) {
+                continue;
+            }
 
             try {
                 JsonNode items = requestItems(endpoint, cleanName, permitItemSeq);
@@ -120,21 +143,55 @@ public class MfdsDurApiClient {
             return result;
         }
 
-        if (Boolean.TRUE.equals(result.get("durProductFound"))) {
-            result.put("durInfoFound", true);
-            result.put("durInfoMessage", "DUR 품목정보는 조회됐지만, 해당 약품의 주의사항 카테고리 결과는 없습니다.");
-            return result;
-        }
-
         if (successCount > 0) {
             result.put("durInfoFound", false);
-            result.put("durInfoMessage", "DUR API 조회는 성공했지만 해당 약품의 결과가 없습니다.");
+            result.put("durInfoMessage", "DUR API 조회는 성공했지만 해당 약품의 주의사항 결과는 없습니다.");
             return result;
         }
 
         result.put("durInfoFound", false);
         result.put("durInfoMessage", "DUR API 조회 중 오류가 발생했습니다.");
         return result;
+    }
+
+    private Set<String> extractDurCategories(JsonNode items) {
+        Set<String> categories = new LinkedHashSet<>();
+
+        if (items == null || items.isMissingNode() || items.isNull()) {
+            return categories;
+        }
+
+        if (items.isArray()) {
+            for (JsonNode item : items) {
+                addDurCategory(categories, item);
+            }
+            return categories;
+        }
+
+        if (items.isObject()) {
+            addDurCategory(categories, items);
+        }
+
+        return categories;
+    }
+
+    private void addDurCategory(Set<String> categories, JsonNode item) {
+        String typeName = text(
+                item,
+                "TYPE_NAME",
+                "TYPE_NAME  ",
+                "typeName",
+                "durTypeName");
+
+        if (typeName == null || typeName.isBlank()) {
+            return;
+        }
+
+        String cleanedTypeName = typeName.trim();
+
+        if (WARNING_ENDPOINTS.containsKey(cleanedTypeName)) {
+            categories.add(cleanedTypeName);
+        }
     }
 
     private JsonNode requestItems(String endpoint, String cleanName, String permitItemSeq) throws Exception {

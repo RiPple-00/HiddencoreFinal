@@ -13,16 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hiddencore.ddasum.backend.domain.Medication;
+import hiddencore.ddasum.backend.domain.MedicationDetail;
 import hiddencore.ddasum.backend.domain.Patient;
 import hiddencore.ddasum.backend.domain.Users;
+import hiddencore.ddasum.backend.repository.MedicationDetailRepository;
 import hiddencore.ddasum.backend.repository.MedicationRepository;
 import hiddencore.ddasum.backend.repository.PatientRepository;
 import hiddencore.ddasum.backend.repository.UsersRepository;
 import hiddencore.ddasum.backend.web.dto.guardian.MedicationDto;
 import lombok.RequiredArgsConstructor;
-
-import hiddencore.ddasum.backend.domain.MedicationDetail;
-import hiddencore.ddasum.backend.repository.MedicationDetailRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -197,6 +196,10 @@ public class MedicationService {
             Map<String, Object> easyDrugInfo = mfdsEasyDrugApiClient.getEasyDrugInfo(medicineNameForSearch);
             row.putAll(easyDrugInfo);
 
+            /*
+             * e약은요 이름 조회 실패 + 아직 허가정보가 없으면
+             * 식약처 허가정보에서 permitItemSeq를 먼저 확보
+             */
             if (!Boolean.TRUE.equals(easyDrugInfo.get("drugInfoFound"))
                     && !Boolean.TRUE.equals(row.get("permitInfoFound"))) {
                 Map<String, Object> permitInfo = mfdsDrugPermitApiClient.getPermitInfo(
@@ -212,9 +215,42 @@ public class MedicationService {
                 permitItemSeq = permitItemSeqValue.toString();
             }
 
-            Map<String, Object> durInfo = mfdsDurApiClient.getDurInfo(medicineNameForSearch, permitItemSeq);
+            /*
+             * e약은요 이름 조회 실패 시,
+             * 공식 요청변수 itemSeq로 한 번 더 조회
+             */
+            if (!Boolean.TRUE.equals(easyDrugInfo.get("drugInfoFound"))
+                    && permitItemSeq != null
+                    && !permitItemSeq.isBlank()) {
+                Map<String, Object> easyDrugInfoByItemSeq = mfdsEasyDrugApiClient
+                        .getEasyDrugInfoByItemSeq(permitItemSeq);
 
-            row.putAll(durInfo);
+                row.putAll(easyDrugInfoByItemSeq);
+            }
+
+            /*
+             * e약은요 조회가 최종 실패하면,
+             * 식약처 허가 상세정보 API로 효능/용법/주의사항 조회
+             */
+            if (!Boolean.TRUE.equals(row.get("drugInfoFound"))
+                    && permitItemSeq != null
+                    && !permitItemSeq.isBlank()) {
+                Map<String, Object> permitDetailInfo = mfdsDrugPermitApiClient.getPermitDetailByItemSeq(permitItemSeq);
+
+                row.putAll(permitDetailInfo);
+            }  
+
+            if (permitItemSeq != null && !permitItemSeq.isBlank()) {
+                Map<String, Object> durInfo = mfdsDurApiClient.getDurInfo(medicineNameForSearch, permitItemSeq);
+                row.putAll(durInfo);
+            } else {
+                row.put("durInfoFound", false);
+                row.put("durProductFound", false);
+                row.put("durWarningCount", 0);
+                row.put("durWarnings", new ArrayList<>());
+                row.put("durProductInfo", null);
+                row.put("durInfoMessage", "품목기준코드가 없어 DUR 정확 조회를 생략했습니다.");
+            }
 
             medicineInfos.add(row);
         }
@@ -365,6 +401,16 @@ public class MedicationService {
                         .drugInfoMessage(toStr(row.get("drugInfoMessage")))
                         .drugInfoSearchName(toStr(row.get("drugInfoSearchName")))
 
+                        .easyDrugItemName(toStr(row.get("easyDrugItemName")))
+                        .effect(toStr(row.get("effect")))
+                        .useMethod(toStr(row.get("useMethod")))
+                        .warning(toStr(row.get("warning")))
+                        .caution(toStr(row.get("caution")))
+                        .interaction(toStr(row.get("interaction")))
+                        .sideEffect(toStr(row.get("sideEffect")))
+                        .storageMethod(toStr(row.get("storageMethod")))
+                        .itemImage(toStr(row.get("itemImage")))
+
                         .permitInfoFound(toBool(row.get("permitInfoFound")))
                         .permitSearchName(toStr(row.get("permitSearchName")))
                         .permitItemSeq(toStr(row.get("permitItemSeq")))
@@ -382,6 +428,7 @@ public class MedicationService {
                         .durWarningsJson(toJson(dedupeDurWarnings(row.get("durWarnings"))))
                         .durProductInfoJson(toJson(row.get("durProductInfo")))
                         .durInfoMessage(toStr(row.get("durInfoMessage")))
+
                         .build();
 
                 medicationDetailRepository.save(detail);
@@ -423,40 +470,39 @@ public class MedicationService {
     }
 
     @SuppressWarnings("unchecked")
-private Object dedupeDurWarnings(Object value) {
-    if (!(value instanceof List<?> list)) {
-        return value;
+    private Object dedupeDurWarnings(Object value) {
+        if (!(value instanceof List<?> list)) {
+            return value;
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        List<String> seen = new ArrayList<>();
+
+        for (Object item : list) {
+            if (!(item instanceof Map<?, ?> rawMap)) {
+                continue;
+            }
+
+            Map<String, Object> warning = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                warning.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+
+            String key = String.join("|",
+                    toStr(warning.get("durCategory")),
+                    toStr(warning.get("durIngredientName")),
+                    toStr(warning.get("durContent")),
+                    toStr(warning.get("durNotificationDate")));
+
+            if (!seen.contains(key)) {
+                seen.add(key);
+                result.add(warning);
+            }
+        }
+
+        return result;
     }
-
-    List<Map<String, Object>> result = new ArrayList<>();
-    List<String> seen = new ArrayList<>();
-
-    for (Object item : list) {
-        if (!(item instanceof Map<?, ?> rawMap)) {
-            continue;
-        }
-
-        Map<String, Object> warning = new LinkedHashMap<>();
-
-        for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
-            warning.put(String.valueOf(entry.getKey()), entry.getValue());
-        }
-
-        String key = String.join("|",
-                toStr(warning.get("durCategory")),
-                toStr(warning.get("durIngredientName")),
-                toStr(warning.get("durContent")),
-                toStr(warning.get("durNotificationDate"))
-        );
-
-        if (!seen.contains(key)) {
-            seen.add(key);
-            result.add(warning);
-        }
-    }
-
-    return result;
-}
 
     private String toJson(Object value) {
         if (value == null)
@@ -525,6 +571,20 @@ private Object dedupeDurWarnings(Object value) {
         row.put("mainIngredientCode", detail.getMainIngredientCode());
         row.put("specialGeneralType", detail.getSpecialGeneralType());
         row.put("substitutionType", detail.getSubstitutionType());
+
+        row.put("drugInfoFound", detail.getDrugInfoFound());
+        row.put("drugInfoMessage", detail.getDrugInfoMessage());
+        row.put("drugInfoSearchName", detail.getDrugInfoSearchName());
+
+        row.put("easyDrugItemName", detail.getEasyDrugItemName());
+        row.put("effect", detail.getEffect());
+        row.put("useMethod", detail.getUseMethod());
+        row.put("warning", detail.getWarning());
+        row.put("caution", detail.getCaution());
+        row.put("interaction", detail.getInteraction());
+        row.put("sideEffect", detail.getSideEffect());
+        row.put("storageMethod", detail.getStorageMethod());
+        row.put("itemImage", detail.getItemImage());
 
         row.put("permitInfoFound", detail.getPermitInfoFound());
         row.put("permitItemSeq", detail.getPermitItemSeq());
