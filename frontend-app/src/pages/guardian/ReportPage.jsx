@@ -92,6 +92,36 @@ function startOfWeekMonday(dateValue) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
+function keepPleaseTogether(text) {
+  return String(text ?? "").replace(/주세요/g, "주\u2060세\u2060요");
+}
+
+function formatEffectTwoLines(text, maxLineLen = 24) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return "";
+  if (raw.length <= maxLineLen) return raw;
+
+  const words = raw.split(/\s+/);
+  const lines = ["", ""];
+  let lineIndex = 0;
+
+  for (const word of words) {
+    const candidate = lines[lineIndex] ? `${lines[lineIndex]} ${word}` : word;
+    if (candidate.length <= maxLineLen || lineIndex === 1) {
+      lines[lineIndex] = candidate;
+      continue;
+    }
+    lineIndex = 1;
+    lines[lineIndex] = word;
+  }
+
+  if (lines[1].length > maxLineLen) {
+    lines[1] = `${lines[1].slice(0, Math.max(0, maxLineLen - 1)).trimEnd()}…`;
+  }
+
+  return lines[1] ? `${lines[0]}\n${lines[1]}` : lines[0];
+}
+
 export default function ReportPage({ navigation }) {
   const [expandedRows, setExpandedRows] = useState({});
   const [sectionOpen, setSectionOpen] = useState({
@@ -572,7 +602,8 @@ export default function ReportPage({ navigation }) {
             <>
               <View className="bg-guardian-bg-secondary rounded-2xl p-4 mt-4">
                 <Text className="font-bold text-guardian-text-primary mb-2">{programSection.activityTitle}</Text>
-                <Text className="text-guardian-text-neutral leading-5">
+                <Text className="text-guardian-text-neutral l
+                eading-5">
                   {programSection.activityDescription}
                 </Text>
               </View>
@@ -580,7 +611,9 @@ export default function ReportPage({ navigation }) {
               {(programSection.effects ?? []).map((effect, idx) => (
                 <View key={`${effect}-${idx}`} className="bg-guardian-bg-secondary rounded-[14px] p-[14px] mt-[14px]">
                   <Text className="font-bold text-guardian-text-primary mb-[6px]">효과 {idx + 1}</Text>
-                  <Text className="text-guardian-text-neutral leading-5">{effect}</Text>
+                  <Text className="text-guardian-text-neutral leading-5" numberOfLines={2} ellipsizeMode="tail">
+                    {formatEffectTwoLines(effect)}
+                  </Text>
                 </View>
               ))}
 
@@ -596,7 +629,7 @@ export default function ReportPage({ navigation }) {
                     <Text className="text-[18px] mt-[1px]">•</Text>
                     <View className="flex-1">
                       <Text className="font-bold text-guardian-text-primary text-[13px] mb-[3px]">추천 {i + 1}</Text>
-                      <Text className="text-[13px] text-guardian-text-neutral leading-5">{rec}</Text>
+                      <Text className="text-[13px] text-guardian-text-neutral leading-5">{keepPleaseTogether(rec)}</Text>
                     </View>
                   </View>
                 ))}

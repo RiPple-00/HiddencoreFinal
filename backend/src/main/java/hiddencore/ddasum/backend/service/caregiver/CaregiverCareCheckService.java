@@ -2,6 +2,7 @@ package hiddencore.ddasum.backend.service.caregiver;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -40,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CaregiverCareCheckService {
 
+    private static final ZoneId APP_ZONE = ZoneId.of("Asia/Seoul");
+
     private final CaregiverCareCheckRepository careCheckRepository;
     private final PatientRepository patientRepository;
     private final FacilityRepository facilityRepository;
@@ -59,7 +62,7 @@ public class CaregiverCareCheckService {
         validate(request);
 
         Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
-        LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : LocalDate.now();
+        LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : today();
         Patient patient = patientRepository.findById(patientId)
             .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
 
@@ -82,7 +85,7 @@ public class CaregiverCareCheckService {
     public CaregiverCareCheckDto.Response submit(CaregiverCareCheckDto.SaveRequest request) {
         validate(request);
         Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
-        LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : LocalDate.now();
+        LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : today();
         Patient patient = patientRepository.findById(patientId)
             .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
 
@@ -104,7 +107,7 @@ public class CaregiverCareCheckService {
     /** 단건 조회 - 환자, 날짜 기준. 없으면 null content 응답. */
     public CaregiverCareCheckDto.Response getOne(Long patientId, LocalDate recordDate) {
         Objects.requireNonNull(patientId, "patientId");
-        LocalDate date = recordDate != null ? recordDate : LocalDate.now();
+        LocalDate date = recordDate != null ? recordDate : today();
 
         return careCheckRepository.findLatestCareCheck(patientId, date)
                 .map(this::toResponse)
@@ -124,7 +127,7 @@ public class CaregiverCareCheckService {
     public GuardianWeeklyCareReportResponse getWeeklyReport(Long patientId, LocalDate startDate, LocalDate endDate) {
         Long safePatientId = Objects.requireNonNull(patientId, "patientId");
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = today();
         LocalDate end = endDate != null ? endDate : today;
         LocalDate start = startDate != null ? startDate : end.minusDays(6);
         if (start.isAfter(end)) {
@@ -323,6 +326,10 @@ public class CaregiverCareCheckService {
                 .dailyRates(dailyRates.stream().sorted(Comparator.comparing(GuardianWeeklyCareReportResponse.DailyRate::getDate)).toList())
                 .checklistRows(rows)
                 .build();
+    }
+
+    private LocalDate today() {
+        return LocalDate.now(APP_ZONE);
     }
 
     // ============================================================
