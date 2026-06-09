@@ -99,4 +99,19 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         @Modifying(clearAutomatically = true)
         @Query("UPDATE Post p SET p.views = COALESCE(p.views, 0) + 1 WHERE p.postId = :postId")
         void incrementViewsByPostId(@Param("postId") Long postId);
+
+        // 서버 재시작 시 아직 발행되지 않은 예약 게시글 전체 조회
+        @Query("SELECT p FROM Post p WHERE p.status = 'RESERVE' AND p.reservationAt IS NOT NULL AND p.reservationAt > :now")
+        List<Post> findPendingReservedPosts(@Param("now") java.time.LocalDateTime now);
+
+        // 보관함: 임시 저장(INACTIVE) + 예약(RESERVE) 게시글
+        @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
+                        "WHERE a.userId = :userId AND p.status IN ('INACTIVE', 'RESERVE')")
+        List<Post> findStoredByUser(@Param("userId") Long userId, Pageable pageable);
+
+        @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
+                        "WHERE a.userId = :userId AND p.status IN ('INACTIVE', 'RESERVE') AND p.type = :type")
+        List<Post> findStoredByUserAndType(@Param("userId") Long userId,
+                        @Param("type") PostType type,
+                        Pageable pageable);
 }

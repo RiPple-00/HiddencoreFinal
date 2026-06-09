@@ -38,6 +38,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final ScheduleService scheduleService;
     private final ScheduleRepository scheduleRepository;
+    private final PostPublishScheduler postPublishScheduler;
 
     /* 게시판 조회 */
 
@@ -134,7 +135,14 @@ public class PostService {
             scheduleService.createFacilitySchedule(scheduleRequest, userId, scheduleType);
         }
 
-        return PostDto.PostResponse.from(postRepository.save(post));
+        Post saved = postRepository.save(post);
+
+        // 예약 게시글이면 지정 시각에 자동 발행 등록
+        if (saved.getStatus() == PostStatus.RESERVE && saved.getReservationAt() != null) {
+            postPublishScheduler.schedule(saved.getPostId(), saved.getReservationAt());
+        }
+
+        return PostDto.PostResponse.from(saved);
     }
 
     // 게시글 수정: 작성자 본인만 가능
@@ -198,6 +206,7 @@ public class PostService {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
 
+        postPublishScheduler.cancel(postId);
         postRepository.delete(post);
     }
 
@@ -208,6 +217,16 @@ public class PostService {
         List<Post> posts = (type == null)
                 ? postRepository.findActiveByUser(userId, pageable)
                 : postRepository.findActiveByUserAndType(userId, type, pageable);
+
+        Long facilityId = posts == null || posts.isEmpty() ? null : posts.get(0).getFacilityId().getFacilityId();
+        return toPostListResponses(facilityId, posts);
+    }
+
+    // 보관함 조회: 임시 저장(INACTIVE) + 예약(RESERVE) 모두
+    public List<PostDto.PostListResponse> getUserStoredPosts(Long userId, PostType type, Pageable pageable) {
+        List<Post> posts = (type == null)
+                ? postRepository.findStoredByUser(userId, pageable)
+                : postRepository.findStoredByUserAndType(userId, type, pageable);
 
         Long facilityId = posts == null || posts.isEmpty() ? null : posts.get(0).getFacilityId().getFacilityId();
         return toPostListResponses(facilityId, posts);

@@ -33,6 +33,11 @@ const postApi = {
       params: { page, size, ...(type != null ? { type } : {}) },
     }),
 
+  getMyStored: (facilityId, type = null, page = 0, size = 500) =>
+    api.get(`/facilities/${facilityId}/posts/stored`, {
+      params: { page, size, ...(type != null ? { type } : {}) },
+    }),
+
   uploadFile: (facilityId, file) => {
     const formData = new FormData();
     formData.append('file', file);

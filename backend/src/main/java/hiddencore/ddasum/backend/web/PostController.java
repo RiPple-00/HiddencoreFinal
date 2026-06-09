@@ -147,4 +147,16 @@ public class PostController {
         Long userId = authenticatedUser.userId();
         return ResponseEntity.ok(postService.getUserDrafts(userId, type, pageable));
     }
+
+    // 보관함 조회: 임시 저장(INACTIVE) + 예약(RESERVE)
+    // GET /facilities/{facilityId}/posts/stored
+    @GetMapping("/stored")
+    public ResponseEntity<List<PostDto.PostListResponse>> getUserStoredPosts(
+            @PathVariable Long facilityId,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestParam(required = false) PostType type,
+            @PageableDefault(size = 500) Pageable pageable) {
+        Long userId = authenticatedUser.userId();
+        return ResponseEntity.ok(postService.getUserStoredPosts(userId, type, pageable));
+    }
 }
