@@ -213,4 +213,22 @@ public class PostDto {
         private LocalDateTime reservationAt;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostNeighborItem {
+        private Long id;
+        private String title;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostNeighborsResponse {
+        private PostNeighborItem prev; // 이전 글 (더 오래된 글)
+        private PostNeighborItem next; // 다음 글 (더 최신 글)
+    }
+
 }

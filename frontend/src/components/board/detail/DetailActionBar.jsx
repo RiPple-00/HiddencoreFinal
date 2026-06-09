@@ -44,7 +44,7 @@ const DetailActionBar = ({ post, user, facilityId, onDelete }) => {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => navigate(`/facilities/${facilityId}/board`)}
+          onClick={() => navigate(-1)}
         >
           ← {t('board.detail.action.backToList', '목록으로 돌아가기')}
         </Button>

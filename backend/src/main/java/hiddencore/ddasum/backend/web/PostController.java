@@ -70,6 +70,16 @@ public class PostController {
         return ResponseEntity.ok(postService.getPost(facilityId, postId));
     }
 
+    // 이전/다음 글 조회
+    // GET /facilities/{facilityId}/posts/{postId}/neighbors
+    @GetMapping("/{postId}/neighbors")
+    public ResponseEntity<PostDto.PostNeighborsResponse> getNeighborPosts(
+            @PathVariable Long facilityId,
+            @PathVariable Long postId) {
+
+        return ResponseEntity.ok(postService.getNeighborPosts(facilityId, postId));
+    }
+
     // 검색
     // GET /facilities/{facilityId}/posts/search?type=BOARD&searchType=title&keyword=공지
     @GetMapping("/search")

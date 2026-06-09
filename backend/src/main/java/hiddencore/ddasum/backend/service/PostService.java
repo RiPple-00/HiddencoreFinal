@@ -242,6 +242,23 @@ public class PostService {
         return toPostListResponses(facilityId, posts);
     }
 
+    // 이전/다음 글 조회
+    public PostDto.PostNeighborsResponse getNeighborPosts(Long facilityId, Long postId) {
+        org.springframework.data.domain.Pageable one = org.springframework.data.domain.PageRequest.of(0, 1);
+
+        PostDto.PostNeighborItem prev = postRepository.findPrevPost(facilityId, postId, one)
+                .stream().findFirst()
+                .map(p -> PostDto.PostNeighborItem.builder().id(p.getPostId()).title(p.getTitle()).build())
+                .orElse(null);
+
+        PostDto.PostNeighborItem next = postRepository.findNextPost(facilityId, postId, one)
+                .stream().findFirst()
+                .map(p -> PostDto.PostNeighborItem.builder().id(p.getPostId()).title(p.getTitle()).build())
+                .orElse(null);
+
+        return PostDto.PostNeighborsResponse.builder().prev(prev).next(next).build();
+    }
+
     @Transactional
     public void syncCurrentEnrolled(Post post, int currentEnrolled) {
         if (post == null) {

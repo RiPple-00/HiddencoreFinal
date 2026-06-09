@@ -9,6 +9,9 @@ const postApi = {
   getPost: (facilityId, postId) =>
     api.get(`/facilities/${facilityId}/posts/${postId}`),
 
+  getNeighborPosts: (facilityId, postId) =>
+    api.get(`/facilities/${facilityId}/posts/${postId}/neighbors`),
+
   searchPosts: (facilityId, type, searchType, keyword, page = 0, size = 20) =>
     api.get(`/facilities/${facilityId}/posts/search`, {
       params: { type, searchType, keyword, page, size },

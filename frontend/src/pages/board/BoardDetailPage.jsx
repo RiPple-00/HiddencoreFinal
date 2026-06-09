@@ -10,6 +10,7 @@ import AttachmentList from '../../components/board/detail/AttachmentList';
 import { useAuth } from '../../contexts/AutoContext.jsx';
 import Header from '../../components/common/Header';
 import { useI18n } from '../../hooks/useI18n.jsx';
+import { useTranslatedText } from '../../hooks/useTranslate';
 
 /**
  * post.type과 BOARD_TABS_MAP을 역참조해서 브레드크럼 라벨 반환
@@ -36,18 +37,26 @@ const BoardDetailPage = () => {
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [neighbors, setNeighbors] = useState({ prev: null, next: null });
 
   // AI 요약 토글 상태
   const [aiOpen, setAiOpen] = useState(false);
+
+  // 제목·내용 번역 (언어 변경 시 warmup 캐시 히트 → 즉시 표시)
+  const translatedTitle   = useTranslatedText(post?.title   ?? '');
+  const translatedContent = useTranslatedText(post?.content ?? '');
 
   useEffect(() => {
     const fetch = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await postApi.getPost(facilityId, postId);
-        // CHECK!!! 백엔드 응답 구조 확인 필요 - res.data가 PostResponse 객체인지
-        setPost(res.data);
+        const [postRes, neighborRes] = await Promise.all([
+          postApi.getPost(facilityId, postId),
+          postApi.getNeighborPosts(facilityId, postId),
+        ]);
+        setPost(postRes.data);
+        setNeighbors(neighborRes.data ?? { prev: null, next: null });
       } catch {
         setError(t('board.detail.cannotLoadPost', '게시글을 불러오지 못했습니다.'));
       } finally {
@@ -140,7 +149,7 @@ const BoardDetailPage = () => {
             </span>
           )}
           <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
-            {post.title}
+            {translatedTitle}
           </h1>
         </div>
 
@@ -180,11 +189,35 @@ const BoardDetailPage = () => {
         {/* 본문 */}
         <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-wrap mb-8">
           {/* CHECK!!! content가 HTML이면 dangerouslySetInnerHTML 사용 필요 - 현재는 plain text 가정 */}
-          {post.content}
+          {translatedContent}
         </div>
 
         {/* 첨부파일 */}
         <AttachmentList attachmentUrls={post.attachmentUrls} />
+
+        {/* 이전 글 / 다음 글 */}
+        <div className="mt-10 border-t border-gray-200 divide-y divide-gray-100">
+          {neighbors.next && (
+            <button
+              type="button"
+              onClick={() => navigate(`/facilities/${facilityId}/board/${neighbors.next.id}`)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className="shrink-0 text-xs font-semibold text-gray-400 w-14">다음 글</span>
+              <span className="text-gray-700 truncate">{neighbors.next.title}</span>
+            </button>
+          )}
+          {neighbors.prev && (
+            <button
+              type="button"
+              onClick={() => navigate(`/facilities/${facilityId}/board/${neighbors.prev.id}`)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className="shrink-0 text-xs font-semibold text-gray-400 w-14">이전 글</span>
+              <span className="text-gray-700 truncate">{neighbors.prev.title}</span>
+            </button>
+          )}
+        </div>
 
       </div>
     </div>

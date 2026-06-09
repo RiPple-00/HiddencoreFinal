@@ -104,6 +104,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         @Query("SELECT p FROM Post p WHERE p.status = 'RESERVE' AND p.reservationAt IS NOT NULL AND p.reservationAt > :now")
         List<Post> findPendingReservedPosts(@Param("now") java.time.LocalDateTime now);
 
+        // 이전 글: 현재보다 postId가 작은 ACTIVE 게시글 중 가장 최근 것
+        @Query("SELECT p FROM Post p WHERE p.facilityId.facilityId = :facilityId AND p.status = 'ACTIVE' AND p.postId < :postId ORDER BY p.postId DESC")
+        List<Post> findPrevPost(@Param("facilityId") Long facilityId, @Param("postId") Long postId, Pageable pageable);
+
+        // 다음 글: 현재보다 postId가 큰 ACTIVE 게시글 중 가장 오래된 것
+        @Query("SELECT p FROM Post p WHERE p.facilityId.facilityId = :facilityId AND p.status = 'ACTIVE' AND p.postId > :postId ORDER BY p.postId ASC")
+        List<Post> findNextPost(@Param("facilityId") Long facilityId, @Param("postId") Long postId, Pageable pageable);
+
         // 보관함: 임시 저장(INACTIVE) + 예약(RESERVE) 게시글
         @Query("SELECT p FROM Post p JOIN FETCH p.facilityId f JOIN FETCH p.authorUserId a " +
                         "WHERE a.userId = :userId AND p.status IN ('INACTIVE', 'RESERVE')")
