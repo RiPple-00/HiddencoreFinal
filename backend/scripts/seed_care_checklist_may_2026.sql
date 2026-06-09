@@ -2,7 +2,7 @@
 -- MySQL 8 기준
 --
 -- 사용 방법:
--- 2) 동일 환자/기간 기존 CARE_CHECK 데이터는 삭제 후 재생성합니다.
+-- 2) 동일 입소자/기간 기존 CARE_CHECK 데이터는 삭제 후 재생성합니다.
 
 SET @target_start := DATE('2026-05-01');
 SET @target_end := DATE('2026-05-31');
@@ -24,7 +24,7 @@ SET @target_facility_id := (
     WHERE p.patient_id = @target_patient_id
 );
 
--- 대상 환자가 없으면 에러 발생시켜 중단
+-- 대상 입소자가 없으면 에러 발생시켜 중단
 SET @guard := IF(@target_patient_id IS NULL, (SELECT 1 / 0), 1);
 
 START TRANSACTION;

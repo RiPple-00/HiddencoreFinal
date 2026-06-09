@@ -1,6 +1,6 @@
 import { getAccessToken, decodeJwtPayload } from "../api/index";
 
-/** 데모 시설(시설코드 12345678) — JWT·연결 환자 없을 때 최후 fallback */
+/** 데모 시설(시설코드 12345678) — JWT·연결 입소자 없을 때 최후 fallback */
 const DEMO_FACILITY_ID = 2;
 
 let cachedFacilityId = null;

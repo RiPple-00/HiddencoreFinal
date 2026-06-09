@@ -1,9 +1,9 @@
-# 라벨링 가이드 (2단계: 환자 식별 GT)
+# 라벨링 가이드 (2단계: 입소자 식별 GT)
 
 ## 목적
 
 자동 파이프라인(YOLO person → InsightFace)이 **얼마나 맞는지** 측정하기 위해,  
-사람(person) 단위로 **정답 환자 ID**를 수동으로 기록합니다.
+사람(person) 단위로 **정답 입소자 ID**를 수동으로 기록합니다.
 
 > Action(행동) 라벨은 **4단계**에서 `data/labels/action/` 등으로 확장 예정입니다.
 
@@ -14,8 +14,8 @@
 | 파이프라인 `identity_status` | 설계안 의미 |
 |------------------------------|-------------|
 | `NO_FACE` | person 안 얼굴 없음 → **unknown**, A·B 스킵 |
-| `UNKNOWN` | 얼굴 있으나 환자 1~6 매칭 실패 |
-| `MATCHED` | 환자 식별 성공 (`patient_id` 있음) |
+| `UNKNOWN` | 얼굴 있으나 입소자 1~6 매칭 실패 |
+| `MATCHED` | 입소자 식별 성공 (`patient_id` 있음) |
 
 라벨 파일의 `patient_id_gt`는 **사람이 본 정답**입니다.
 
@@ -97,7 +97,7 @@ YOLO person 0명인 경우:
 1. **person_index**는 분석 결과와 동일하게 유지 (재분석 후 바뀌면 `init_ground_truth.py --force`로 갱신).
 2. **여러 명**이면 person마다 각각 `patient_id_gt` 입력.
 3. 애매하면 `unknown` — 억지로 patient_N 붙이지 않기.
-4. 환자 등록 사진(`data/patients/`)과 실제 인물이 다르면 GT는 **실제 인물 기준**으로 적기.
+4. 입소자 등록 사진(`data/patients/`)과 실제 인물이 다르면 GT는 **실제 인물 기준**으로 적기.
 
 ---
 

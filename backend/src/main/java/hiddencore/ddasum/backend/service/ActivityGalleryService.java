@@ -85,7 +85,7 @@ public class ActivityGalleryService {
         String imagePath = stored.absolutePath().toString();
         LocalDateTime takenAt = LocalDateTime.now();
 
-        // 모든 업로드에 얼굴 인식 AI 실행 (전체 환자 대상, 시연 시 patient_6 필터)
+        // 모든 업로드에 얼굴 인식 AI 실행 (전체 입소자 대상, 시연 시 patient_6 필터)
         FaceVerifyResult faceVerify =
                 localPythonFaceVerifier
                         .verify(imagePath, GalleryDemoProperties.AI_PATIENT_KEY)
@@ -192,7 +192,7 @@ public class ActivityGalleryService {
     @Transactional(readOnly = true)
     public ActivityGalleryListResponse listForGuardian(Long guardianUserId, Long patientId) {
         if (!careChecklistService.isGuardianOfPatient(guardianUserId, patientId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 환자만 조회할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 입소자만 조회할 수 있습니다.");
         }
 
         List<Document> galleryDocuments = resolveAllGalleryDocuments(patientId);
@@ -331,7 +331,7 @@ public class ActivityGalleryService {
 
         Patient patient = document.getPatientId();
         if (patient == null || patient.getFacilityId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "환자 정보가 없는 게시물입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "입소자 정보가 없는 게시물입니다.");
         }
         if (!patient.getFacilityId().getFacilityId().equals(caregiver.facilityId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 시설의 게시물만 수정할 수 있습니다.");
@@ -348,12 +348,12 @@ public class ActivityGalleryService {
                                 () ->
                                         new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "시연 환자(patient_6 → 기만경)를 찾을 수 없습니다. patient_id="
+                                                "시연 입소자(patient_6 → 기만경)를 찾을 수 없습니다. patient_id="
                                                         + demoId));
 
         if (!patient.getFacilityId().getFacilityId().equals(facilityId)) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "시연 환자가 요양사 시설과 일치하지 않습니다.");
+                    HttpStatus.BAD_REQUEST, "시연 입소자가 요양사 시설과 일치하지 않습니다.");
         }
         return patient;
     }

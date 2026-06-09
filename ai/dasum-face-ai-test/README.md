@@ -1,6 +1,6 @@
 # dasum-face-ai-test
 
-요양시설 프로그램 활동 사진 — **InsightFace embedding 기반 환자 유사도** POC
+요양시설 프로그램 활동 사진 — **InsightFace embedding 기반 입소자 유사도** POC
 
 ## 빠른 시작
 
@@ -14,7 +14,7 @@ python main.py --step all --overwrite
 | 단계 | 명령 | 산출물 |
 |------|------|--------|
 | 공통 전처리 | `--step preprocess` | `data/*_preprocessed/` |
-| 환자 DB | `--step build-patient-db` | `data/face_db/` |
+| 입소자 DB | `--step build-patient-db` | `data/face_db/` |
 | 활동 얼굴 검출 | `--step detect-faces` | `data/activity_faces/` |
 | 유사도 매칭 | `--step match` | `output/reports/*.csv`, `output/visualized/` |
 | 검수 export | `--step export-review` | uncertain/unknown/low_conf CSV |

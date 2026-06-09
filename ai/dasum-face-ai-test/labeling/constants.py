@@ -13,5 +13,5 @@ LABEL_DONE = "done"
 
 # 설계안 ↔ 파이프라인 상태 매핑 (docs/labeling_guide.md 참고)
 # NO_FACE  : person crop 안 얼굴 없음 → 설계상 unknown, A·B 스킵
-# UNKNOWN  : 얼굴 있으나 환자 매칭 실패
-# MATCHED  : 환자 식별 성공
+# UNKNOWN  : 얼굴 있으나 입소자 매칭 실패
+# MATCHED  : 입소자 식별 성공

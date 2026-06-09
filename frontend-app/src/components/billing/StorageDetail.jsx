@@ -178,7 +178,7 @@ export default function StorageDetail({ route, navigation }) {
         ) : (
           <View className="bg-background-neutral rounded-2xl p-4 mb-4">
 
-            {/* 환자 정보 */}
+            {/* 입소자 정보 */}
             <View className="flex-row items-center gap-3 mb-4">
               <View className="w-12 h-12 rounded-full bg-guardian-button-primary justify-center items-center">
                 <Text className="text-base font-bold text-guardian-text-primary">
@@ -187,7 +187,7 @@ export default function StorageDetail({ route, navigation }) {
               </View>
               <View className="flex-1">
                 <Text className="text-base font-bold text-guardian-text-primary">
-                  {patient?.name ?? "-"} 환자님
+                  {patient?.name ?? "-"} 입소자님
                 </Text>
                 <Text className="text-xs text-guardian-text-neutral mt-1">
                   {invoice?.period

@@ -1,6 +1,6 @@
 // 신청자 성함
 // 연락처
-// 환자와의 관계
+// 입소자와의 관계
 
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
@@ -31,7 +31,7 @@ const VisitApplicantForm = ({ onSubmit }) => {
       keyboardType: "phone-pad",
     },
     {
-      label:       "환자와의 관계",
+      label:       "입소자와의 관계",
       value:       relationship,
       onChange:    setRelationship,
       placeholder: "예) 자녀, 배우자",

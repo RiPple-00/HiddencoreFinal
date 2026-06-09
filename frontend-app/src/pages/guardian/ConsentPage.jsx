@@ -39,7 +39,7 @@ export default function ConsentPage({ navigation }) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.mainTitle}>환자 권리 및 수술 동의</Text>
+        <Text style={styles.mainTitle}>입소자 권리 및 수술 동의</Text>
         <Text style={styles.intro}>
           수술 전 꼭 확인해야 할 항목입니다.{"\n"}
           각 문항의 설명을 읽으시고, 강조된 용어를 눌러 상세 안내를 확인해 주세요.
@@ -54,7 +54,7 @@ export default function ConsentPage({ navigation }) {
           </View>
           <Text style={styles.question}>Q1. 마취 방식은 어떻게 결정되나요?</Text>
           <Text style={styles.answer}>
-            수술 부위·종류와 환자의 전신 상태를 종합해 마취과에서 판단합니다. 필요 시{" "}
+            수술 부위·종류와 입소자의 전신 상태를 종합해 마취과에서 판단합니다. 필요 시{" "}
             <Text
               style={styles.linkInline}
               onPress={() => setShowGeneralAnesthesiaNote((v) => !v)}
@@ -67,7 +67,7 @@ export default function ConsentPage({ navigation }) {
             <View style={styles.infoBoxAccent}>
               <Text style={styles.infoBoxText}>
                 전신 마취는 의식과 통증을 일시적으로 없애 전신을 안전하게 관리하는 마취
-                방식입니다. 환자 상태에 따라 마취 계획은 달라질 수 있습니다.
+                방식입니다. 입소자 상태에 따라 마취 계획은 달라질 수 있습니다.
               </Text>
             </View>
           ) : null}
@@ -168,7 +168,7 @@ export default function ConsentPage({ navigation }) {
             <Text style={styles.signSubmitText}>동의 및 서명하기</Text>
           </TouchableOpacity>
 
-          <Text style={styles.signFooter}>보호자: 김OO  •  환자: 이OO</Text>
+          <Text style={styles.signFooter}>보호자: 김OO  •  입소자: 이OO</Text>
         </View>
 
         {/* FAQ */}

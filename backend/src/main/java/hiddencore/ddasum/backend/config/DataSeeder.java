@@ -57,7 +57,7 @@ import hiddencore.ddasum.backend.security.StaffLoginIdCodec;
  *  [보호자]
  *  로그인ID : guardian001
  *  비밀번호 : 1234
- *  연결환자 : 기만경 (patient_id 260401008)
+ *  연결입소자 : 기만경 (patient_id 260401008)
  * ════════════════════════════════════════
  */
 
@@ -177,7 +177,7 @@ public class DataSeeder {
                                         }
                                 }
 
-                                // B동 1층: 일반실 3개 + 중환자실 2개
+                                // B동 1층: 일반실 3개 + 중입소자실 2개
                                 for (int roomNum = 1; roomNum <= 3; roomNum++) {
                                         for (int bed = 1; bed <= 4; bed++) {
                                                 locationRepository.save(Location.builder()
@@ -220,7 +220,7 @@ public class DataSeeder {
                                         }
                                 }
 
-                                // B동 3층: 일반실 3개 + 중환자실 1개 + 격리실 1개
+                                // B동 3층: 일반실 3개 + 중입소자실 1개 + 격리실 1개
                                 for (int roomNum = 1; roomNum <= 3; roomNum++) {
                                         for (int bed = 1; bed <= 4; bed++) {
                                                 locationRepository.save(Location.builder()
@@ -304,7 +304,7 @@ public class DataSeeder {
                                                                                         .facilityId(facility)
                                                                                         .locationId(freeBed)
                                                                                         .primaryCaregiver(caregiver)
-                                                                                        .name("데모 환자(보호자연결)")
+                                                                                        .name("데모 입소자(보호자연결)")
                                                                                         .gender(Patient.Gender.MALE)
                                                                                         .birthDate(
                                                                                                         LocalDate.of(
@@ -360,8 +360,8 @@ public class DataSeeder {
                                                                 .targetRoles("OFFICE,CAREGIVER").views(8)
                                                                 .build(),
                                                 Post.builder().facilityId(facility).authorUserId(office)
-                                                                .type(PostType.CLINICAL).title("당뇨 환자 식이 가이드라인 업데이트")
-                                                                .content("최신 당뇨 환자 식이 가이드라인이 업데이트되었습니다.")
+                                                                .type(PostType.CLINICAL).title("당뇨 입소자 식이 가이드라인 업데이트")
+                                                                .content("최신 당뇨 입소자 식이 가이드라인이 업데이트되었습니다.")
                                                                 .status(PostStatus.ACTIVE).isPinned(false)
                                                                 .targetRoles("OFFICE,CAREGIVER").views(23).build(),
                                                 Post.builder().facilityId(facility).authorUserId(office)

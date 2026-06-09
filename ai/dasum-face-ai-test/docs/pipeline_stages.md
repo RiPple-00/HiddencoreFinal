@@ -3,7 +3,7 @@
 | 단계 | 내용 | 산출물 |
 |------|------|--------|
 | 0 | 공통 전처리 (1회) | `gallery_preprocessed`, `patients_preprocessed` |
-| 1 | 환자 face DB | `face_db/embeddings`, `representatives` |
+| 1 | 입소자 face DB | `face_db/embeddings`, `representatives` |
 | 2 | 활동 사진 얼굴 검출 | `activity_faces/crops`, `aligned` |
 | 3 | 유사도 매칭 + 검수 CSV | `output/reports/*` |
 | 4 | GT 라벨링 + eval | `ground_truth`, `eval_identity_summary.csv` |

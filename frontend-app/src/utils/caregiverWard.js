@@ -11,7 +11,7 @@ export function inferFloorFromRoom(room) {
   return null;
 }
 
-/** 담당 환자 목록에서 요양사가 맡은 병실(동·층·호) 결정 */
+/** 담당 입소자 목록에서 요양사가 맡은 병실(동·층·호) 결정 */
 export function resolveCaregiverWard(patients, caregiverUserId) {
   let mine = (patients ?? []).filter(
     (p) =>
@@ -21,7 +21,7 @@ export function resolveCaregiverWard(patients, caregiverUserId) {
       p.room
   );
 
-  // DB에 담당 ID가 없을 때: 107호 환자를 담당 병실로 사용 (기만경 시연 데이터)
+  // DB에 담당 ID가 없을 때: 107호 입소자를 담당 병실로 사용 (기만경 시연 데이터)
   if (mine.length === 0) {
     const in107 = (patients ?? []).filter(
       (p) => normalizeRoom(p.room) === "107"

@@ -7,7 +7,7 @@ export const getNotices = () => api.get("/api/notices");
 // 식단
 export const getMeals = () => api.get("/api/meals");
 
-// 환자 정보
+// 입소자 정보
 export const getPatient = () => api.get("/api/patient");
 
 export { getGuardianProgramList as getPrograms } from "./programListApi";

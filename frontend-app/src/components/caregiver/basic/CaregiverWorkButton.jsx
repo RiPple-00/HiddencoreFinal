@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 import Text from "../../Text";
 
 /**
- * 업무 체크 / 환자 목록 / 사진 업로드 바로가기.
+ * 업무 체크 / 입소자 목록 / 사진 업로드 바로가기.
  */
 export default function CaregiverWorkButton({
   onPressWorkCheck,
@@ -12,7 +12,7 @@ export default function CaregiverWorkButton({
 }) {
   const buttons = [
     { icon: "📋", label: "업무 체크", onPress: onPressWorkCheck },
-    { icon: "📂", label: "환자 목록", onPress: onPressPatientList },
+    { icon: "📂", label: "입소자 목록", onPress: onPressPatientList },
     { icon: "🗓️", label: "사진 업로드", onPress: onPressPhoto },
   ];
 

@@ -86,7 +86,7 @@ public class ProgramApplicationService {
                 .findByGuardianUserId_UserIdOrderByIsPrimaryDesc(guardianUserId)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("보호자와 연결된 환자가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("보호자와 연결된 입소자가 없습니다."));
 
         Document document = Document.builder()
                 .patientId(guardianPatient.getPatientId())

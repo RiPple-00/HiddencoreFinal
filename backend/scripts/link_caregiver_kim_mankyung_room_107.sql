@@ -1,4 +1,4 @@
--- 요양사 「기만경」 ↔ 107호 환자 연결 (코드/도메인 변경 없이 DB만 수정)
+-- 요양사 「기만경」 ↔ 107호 입소자 연결 (코드/도메인 변경 없이 DB만 수정)
 --
 -- 실행 전 확인:
 --   SELECT user_id, name, role FROM USERS WHERE name = '기만경';
@@ -19,7 +19,7 @@ SET @caregiver_id := (
 SELECT @caregiver_id AS caregiver_user_id;
 
 -- ---------------------------------------------------------------------------
--- 1) 402호 + 기만경 담당 환자 → 빈 107호 병상으로 이동 (병상 1:1 매칭)
+-- 1) 402호 + 기만경 담당 입소자 → 빈 107호 병상으로 이동 (병상 1:1 매칭)
 -- ---------------------------------------------------------------------------
 DROP TEMPORARY TABLE IF EXISTS tmp_move_plan;
 CREATE TEMPORARY TABLE tmp_move_plan (
@@ -65,7 +65,7 @@ UPDATE PATIENT p
 INNER JOIN tmp_move_plan m ON p.patient_id = m.patient_id
 SET p.location_id = m.new_location_id;
 
--- 402호에 남은 기만경 담당 해제 (이동하지 못한 환자 포함)
+-- 402호에 남은 기만경 담당 해제 (이동하지 못한 입소자 포함)
 UPDATE PATIENT p
 INNER JOIN LOCATION l ON p.location_id = l.location_id
 SET p.primary_caregiver_user_id = NULL
@@ -74,7 +74,7 @@ WHERE p.primary_caregiver_user_id = @caregiver_id
   AND REPLACE(l.room, '호', '') = '402';
 
 -- ---------------------------------------------------------------------------
--- 2) 107호 입원 환자 전원 → 담당 요양사 기만경
+-- 2) 107호 입원 입소자 전원 → 담당 요양사 기만경
 -- ---------------------------------------------------------------------------
 UPDATE PATIENT p
 INNER JOIN LOCATION l ON p.location_id = l.location_id

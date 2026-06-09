@@ -13,13 +13,13 @@ import java.util.Optional;
  * 간병인 일일 업무 체크리스트({@link Document.DocumentType#CARE_CHECK}) 전용 리포지토리.
  *
  * <p>{@code Document} 테이블을 그대로 사용하지만 type=CARE_CHECK 만 다루므로 caregiver 패키지에 둔다.
- * 자동 저장은 (환자 + 날짜) 단일 문서를 upsert 방식으로 갱신하기 위해 단건 조회 메서드를 제공한다.
+ * 자동 저장은 (입소자 + 날짜) 단일 문서를 upsert 방식으로 갱신하기 위해 단건 조회 메서드를 제공한다.
  */
 public interface CaregiverCareCheckRepository extends JpaRepository<Document, Long> {
 
     /**
-     * 특정 환자, 특정 일자의 CARE_CHECK 문서 한 건을 가져온다.
-     * 동일 (환자, 일자) 조합이 이미 있으면 자동 저장 시 그 문서를 갱신해야 하므로
+     * 특정 입소자, 특정 일자의 CARE_CHECK 문서 한 건을 가져온다.
+     * 동일 (입소자, 일자) 조합이 이미 있으면 자동 저장 시 그 문서를 갱신해야 하므로
      * 가장 최근(updated_at desc) 한 건을 우선 반환한다.
      */
     @Query("""
@@ -38,7 +38,7 @@ public interface CaregiverCareCheckRepository extends JpaRepository<Document, Lo
         return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
     }
 
-    /** 특정 환자의 CARE_CHECK 이력 - 최신순. 추후 목록 화면에서 활용 */
+    /** 특정 입소자의 CARE_CHECK 이력 - 최신순. 추후 목록 화면에서 활용 */
     @Query("""
         SELECT d
         FROM Document d

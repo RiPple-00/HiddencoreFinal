@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import hiddencore.ddasum.backend.config.KimMankyungPatientSeeder;
 
 /**
- * 기만경 환자 한글 깨짐 복구 — JDBC UTF-8로 직접 갱신.
+ * 기만경 입소자 한글 깨짐 복구 — JDBC UTF-8로 직접 갱신.
  * 실행: {@code ./gradlew fixKimEncoding}
  */
 public final class FixKimMankyungEncoding {

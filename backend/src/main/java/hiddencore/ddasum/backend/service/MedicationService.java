@@ -49,7 +49,7 @@ public class MedicationService {
     public MedicationDto.Response saveMedicationFromQr(MedicationDto.ScanRequest request) {
 
         Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new IllegalArgumentException("환자를 찾을 수 없습니다. id=" + request.getPatientId()));
+                .orElseThrow(() -> new IllegalArgumentException("입소자를 찾을 수 없습니다. id=" + request.getPatientId()));
 
         Users guardian = null;
 

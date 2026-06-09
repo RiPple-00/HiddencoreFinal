@@ -17,7 +17,7 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "app.gallery")
 public class GalleryDemoProperties {
 
-    /** InsightFace DB 키 patient_6 → 시연 보호자 연동 환자(기만경) */
+    /** InsightFace DB 키 patient_6 → 시연 보호자 연동 입소자(기만경) */
     public static final String AI_PATIENT_KEY = "patient_6";
 
     private static final Map<String, String> AI_PATIENT_DISPLAY_NAMES =

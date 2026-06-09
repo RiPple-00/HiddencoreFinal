@@ -48,7 +48,7 @@ function buildPatientLineForUi(patientId, apiName, apiRoom) {
     known ||
     (typeof apiName === "string" && apiName.trim().length > 0
       ? apiName.trim()
-      : "환자");
+      : "입소자");
   const room =
     typeof apiRoom === "string" && apiRoom.trim().length > 0
       ? apiRoom.trim()
@@ -418,9 +418,9 @@ export default function VisitReservationPage({ onBack, onComplete }) {
               keyboardType="phone-pad"
             />
 
-            {/* 환자와의 관계 */}
+            {/* 입소자와의 관계 */}
             <Text className="text-[14px] font-bold text-guardian-text-primary mb-2 mt-1">
-              환자와의 관계
+              입소자와의 관계
             </Text>
             <TouchableOpacity
               className="flex-row items-center justify-between bg-guardian-bg-secondary rounded-xl px-[14px] py-[14px] mb-2"

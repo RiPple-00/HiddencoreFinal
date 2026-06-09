@@ -1,4 +1,4 @@
-/** 시연 보호자(guardian001) 기준 환자 — 기만경 patient_6 */
+/** 시연 보호자(guardian001) 기준 입소자 — 기만경 patient_6 */
 export const DEMO_GUARDIAN_PATIENT_ID =
   Number(process.env.EXPO_PUBLIC_GALLERY_PATIENT_ID) ||
   Number(process.env.EXPO_PUBLIC_PATIENT_ID) ||
@@ -14,8 +14,8 @@ export function isGarbledPatientName(name) {
 }
 
 /**
- * 환자 ID·API 이름으로 UI 표시명 결정.
- * 시연 환자(기만경)는 항상 한글 이름, 그 외는 API 값(깨지면 "환자").
+ * 입소자 ID·API 이름으로 UI 표시명 결정.
+ * 시연 입소자(기만경)는 항상 한글 이름, 그 외는 API 값(깨지면 "입소자").
  */
 export function resolveGuardianPatientDisplayName(patientId, apiName) {
   const id = Number(patientId);
@@ -26,14 +26,14 @@ export function resolveGuardianPatientDisplayName(patientId, apiName) {
   if (!isGarbledPatientName(raw)) {
     return raw;
   }
-  return "환자";
+  return "입소자";
 }
 
 /** @deprecated DEMO_GUARDIAN_PATIENT_ID 와 동일 */
 export const GALLERY_DEMO_PATIENT_ID = DEMO_GUARDIAN_PATIENT_ID;
 
 /**
- * 연결 환자 목록에서 보호자 기본 환자 선택.
+ * 연결 입소자 목록에서 보호자 기본 입소자 선택.
  * 갤러리·보고서·실시간·면회·프로그램 등 공통: 기만경(260401008) 우선.
  */
 export function resolveGuardianPrimaryPatientId(linkedPatients) {

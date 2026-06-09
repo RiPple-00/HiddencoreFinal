@@ -215,12 +215,12 @@ export default function PatientListPage() {
           {isAssignPromptOpen && (
             <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/45 px-4">
               <div className="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl">
-                <h3 className="text-2xl font-bold text-slate-900">환자 등록 완료</h3>
+                <h3 className="text-2xl font-bold text-slate-900">입소자 등록 완료</h3>
 
                 <p className="mt-4 text-base leading-7 text-slate-600">
                   환자가 등록되었습니다.
                   <br />
-                  환자 배치를 바로 진행하시겠습니까?
+                  입소자 배치를 바로 진행하시겠습니까?
                 </p>
 
                 <div className="mt-7 flex justify-end gap-3">

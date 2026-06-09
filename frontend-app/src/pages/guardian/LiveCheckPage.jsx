@@ -66,7 +66,7 @@ export default function LiveCheckPage() {
           });
         } catch (e) {
           if (!cancelled) {
-            setError(e?.response?.data?.message ?? "연결된 환자 정보를 불러오지 못했습니다. 다시 로그인해 주세요.");
+            setError(e?.response?.data?.message ?? "연결된 입소자 정보를 불러오지 못했습니다. 다시 로그인해 주세요.");
           }
         } finally {
           if (!cancelled) setLoadingPatients(false);
@@ -121,21 +121,21 @@ export default function LiveCheckPage() {
       {loadingPatients ? (
         <View style={pageStyles.center}>
           <ActivityIndicator size="large" color={G.textSecondary} />
-          <Text style={pageStyles.muted}>연결 환자 확인 중…</Text>
+          <Text style={pageStyles.muted}>연결 입소자 확인 중…</Text>
         </View>
       ) : null}
 
       {!loadingPatients && !patientId ? (
         <View style={pageStyles.center}>
           <Text style={pageStyles.errorText}>
-            {error ?? "이 계정에 연결된 환자가 없습니다. 시설에서 보호자 연동을 확인해 주세요."}
+            {error ?? "이 계정에 연결된 입소자가 없습니다. 시설에서 보호자 연동을 확인해 주세요."}
           </Text>
         </View>
       ) : null}
 
       {patientId ? (
         <ScrollView contentContainerStyle={pageStyles.scroll} showsVerticalScrollIndicator={false}>
-          {/* 환자 탭 (다중 연결 시) */}
+          {/* 입소자 탭 (다중 연결 시) */}
           {linked.length > 1 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={pageStyles.tabs}>
               {linked.map((p) => (
@@ -152,7 +152,7 @@ export default function LiveCheckPage() {
             </ScrollView>
           ) : null}
 
-          {/* ─── 환자 정보 카드 ─── */}
+          {/* ─── 입소자 정보 카드 ─── */}
           <View style={pageStyles.patientCard}>
             {/* 아바타 */}
             <View style={pageStyles.avatarWrap}>
@@ -218,7 +218,7 @@ export default function LiveCheckPage() {
 
           <CaregiverSectionCard icon="🧼" title="위생점검 (Hygiene)" theme="guardian">
             <CaregiverHygieneRow label="침구류 청결도" value={state.hygiene.bedding} onChange={noop} readOnly theme="guardian" />
-            <CaregiverHygieneRow label="환자 용품 청결" value={state.hygiene.patientItems} onChange={noop} readOnly theme="guardian" />
+            <CaregiverHygieneRow label="입소자 용품 청결" value={state.hygiene.patientItems} onChange={noop} readOnly theme="guardian" />
             <CaregiverHygieneRow label="목욕 여부" value={state.hygiene.bathing} onChange={noop} readOnly theme="guardian" isLast />
           </CaregiverSectionCard>
 
@@ -297,7 +297,7 @@ const pageStyles = StyleSheet.create({
   tabText: { fontSize: 14, color: GMuted, fontWeight: "600" },
   tabTextActive: { color: G.textPrimary },
 
-  /* ─── 환자 정보 카드 ─── */
+  /* ─── 입소자 정보 카드 ─── */
   patientCard: {
     backgroundColor: G.backgroundNeutral,
     borderRadius: 16,

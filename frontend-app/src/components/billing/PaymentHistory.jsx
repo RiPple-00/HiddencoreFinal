@@ -1,5 +1,5 @@
 /**
- * 결제 내역 화면 (리스트형 - 환자 정보 포함)
+ * 결제 내역 화면 (리스트형 - 입소자 정보 포함)
  * ─────────────────────────────────────────────
  * 진입: StoragePage → "최근 결제 내역 보기"
  *
@@ -71,7 +71,7 @@ export default function PaymentHistory({ navigation }) {
   const [loading,          setLoading]          = useState(true);
   const [error,            setError]            = useState(null);
 
-  // 환자 (mount 1회)
+  // 입소자 (mount 1회)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -82,7 +82,7 @@ export default function PaymentHistory({ navigation }) {
         setPatient(
           Array.isArray(data) ? normalizePatient(data[0] ?? {}, t) : normalizePatient(data, t)
         );
-      } catch {/* 환자 실패는 무시 */}
+      } catch {/* 입소자 실패는 무시 */}
     })();
     return () => { cancelled = true; };
   }, [t]);
@@ -143,7 +143,7 @@ export default function PaymentHistory({ navigation }) {
         <View className="w-10" />
       </View>
 
-      {/* 환자 요약 바 */}
+      {/* 입소자 요약 바 */}
       <View className="flex-row items-center px-4 py-3 bg-background-neutral gap-3 border-b border-guardian-button-secondary">
         <View className="w-10 h-10 rounded-full bg-guardian-button-primary justify-center items-center">
           <Text className="text-base font-bold text-guardian-text-primary">

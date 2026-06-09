@@ -152,7 +152,7 @@ export function isRequiredChecklistComplete(state) {
   return requiredItems.every((item) => hasStatus(item) && hasRequiredMemo(item));
 }
 
-/** 요양사 환자 목록 API 한 건 → CaregiverTaskCheck 라우트 파라미터 */
+/** 요양사 입소자 목록 API 한 건 → CaregiverTaskCheck 라우트 파라미터 */
 export function caregiverPatientToTaskCheckRouteParams(p) {
   if (!p || p.patientId == null) return null;
   const gEnum = p.gender;
@@ -168,7 +168,7 @@ export function caregiverPatientToTaskCheckRouteParams(p) {
   const metaItems = [ward || null, String(p.patientId)].filter(Boolean);
   return {
     patientId: p.patientId,
-    patientName: p.name ?? "환자",
+    patientName: p.name ?? "입소자",
     genderAge,
     metaItems: metaItems.length ? metaItems : [String(p.patientId)],
     recordDate: todayStr(),

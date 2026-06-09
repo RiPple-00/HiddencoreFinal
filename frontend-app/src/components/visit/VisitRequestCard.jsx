@@ -1,5 +1,5 @@
 // 날짜/시간
-// 환자명
+// 입소자명
 // 병실
 // 면회 유형
 // 상태 배지
@@ -45,7 +45,7 @@ const VisitRequestCard = ({ visit, navigation }) => {
           )}
         </View>
 
-        {/* 환자명 */}
+        {/* 입소자명 */}
         <Text className="text-base font-extrabold text-guardian-text-primary">
           {visit.patientName}
         </Text>

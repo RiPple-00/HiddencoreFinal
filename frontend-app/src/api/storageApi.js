@@ -88,7 +88,7 @@ function ok(data) {
 }
 
 const storageApi = {
-  // 1. 환자 조회
+  // 1. 입소자 조회
   getPatients: (params) => {
     return api.get(`/storage/patients`, { params }).catch(() => ok([MOCK.patient]));
   },

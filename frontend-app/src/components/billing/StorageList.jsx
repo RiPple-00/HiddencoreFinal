@@ -10,7 +10,7 @@
  *   - storageApi.getPatients({ id })
  *   - storageApi.getInvoices(params)  : 필터 변경 시마다
  *
- * 표시: 환자 바, 년/월 캘린더 피커, 상태 드롭다운, 청구서 카드 목록
+ * 표시: 입소자 바, 년/월 캘린더 피커, 상태 드롭다운, 청구서 카드 목록
  * 카드 클릭 → InvoicePaymentList
  */
 
@@ -70,7 +70,7 @@ export default function StorageList({ route, navigation }) {
     ? `${selectedYearMonth.year}년 ${selectedYearMonth.month}월`
     : t("billing.all_period", "전체 기간");
 
-  // 환자 정보 (mount 1회)
+  // 입소자 정보 (mount 1회)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -81,7 +81,7 @@ export default function StorageList({ route, navigation }) {
         setPatient(
           Array.isArray(data) ? normalizePatient(data[0] ?? {}, t) : normalizePatient(data, t)
         );
-      } catch {/* 환자 실패는 무시 */}
+      } catch {/* 입소자 실패는 무시 */}
     })();
     return () => { cancelled = true; };
   }, [t]);
@@ -174,7 +174,7 @@ export default function StorageList({ route, navigation }) {
         <View className="w-10" />
       </View>
 
-      {/* 환자 요약 바 */}
+      {/* 입소자 요약 바 */}
       <View className="flex-row items-center px-4 py-3 bg-background-neutral gap-3 border-b border-guardian-button-secondary">
         <View className="w-10 h-10 rounded-full bg-guardian-button-primary justify-center items-center">
           <Text className="text-base font-bold text-guardian-text-primary">

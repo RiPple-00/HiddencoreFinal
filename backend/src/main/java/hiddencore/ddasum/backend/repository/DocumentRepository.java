@@ -12,27 +12,29 @@ import hiddencore.ddasum.backend.domain.Document.DocumentType;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-    List<Document> findTop5ByPatientId_PatientIdAndTypeOrderByCreatedAtDesc(Long patientId, DocumentType type);
+        List<Document> findByTypeOrderByRequestedAtDesc(DocumentType type);
 
-    /** 동일 프로그램에 이미 진행 중인 신청이 있는지(반려 후 재신청은 허용) */
-    boolean existsByRequesterUserId_UserIdAndPostId_PostIdAndTypeAndStatusIn(
-            Long requesterUserId,
-            Long postId,
-            DocumentType type,
-            Collection<DocumentStatus> statuses);
+        List<Document> findTop5ByPatientId_PatientIdAndTypeOrderByCreatedAtDesc(Long patientId, DocumentType type);
 
-    List<Document> findByRequesterUserId_UserIdAndTypeOrderByRequestedAtDesc(
-            Long requesterUserId,
-            DocumentType type);
+        /** 동일 프로그램에 이미 진행 중인 신청이 있는지(반려 후 재신청은 허용) */
+        boolean existsByRequesterUserId_UserIdAndPostId_PostIdAndTypeAndStatusIn(
+                        Long requesterUserId,
+                        Long postId,
+                        DocumentType type,
+                        Collection<DocumentStatus> statuses);
 
-    Optional<Document> findByDocumentIdAndRequesterUserId_UserIdAndType(
-            Long documentId,
-            Long requesterUserId,
-            DocumentType type);
+        List<Document> findByRequesterUserId_UserIdAndTypeOrderByRequestedAtDesc(
+                        Long requesterUserId,
+                        DocumentType type);
 
-    List<Document> findByPatientId_PatientIdAndTypeOrderByCreatedAtDesc(
-            Long patientId, DocumentType type);
+        Optional<Document> findByDocumentIdAndRequesterUserId_UserIdAndType(
+                        Long documentId,
+                        Long requesterUserId,
+                        DocumentType type);
 
-    List<Document> findByPatientId_PatientIdAndTypeOrderByCreatedAtAsc(
-            Long patientId, DocumentType type);
+        List<Document> findByPatientId_PatientIdAndTypeOrderByCreatedAtDesc(
+                        Long patientId, DocumentType type);
+
+        List<Document> findByPatientId_PatientIdAndTypeOrderByCreatedAtAsc(
+                        Long patientId, DocumentType type);
 }

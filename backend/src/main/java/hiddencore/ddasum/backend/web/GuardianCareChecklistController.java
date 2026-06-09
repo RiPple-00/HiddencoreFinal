@@ -48,7 +48,7 @@ public class GuardianCareChecklistController {
         AuthenticatedUser u = securityContextHelper.requireAuthenticatedUser();
         requireGuardian(u);
         if (!careChecklistService.isGuardianOfPatient(u.userId(), patientId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 환자만 조회할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 입소자만 조회할 수 있습니다.");
         }
         Optional<CareChecklistLatestResponse> body = careChecklistService.findLatestChecklist(patientId);
         return body.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
@@ -72,7 +72,7 @@ public class GuardianCareChecklistController {
         AuthenticatedUser u = securityContextHelper.requireAuthenticatedUser();
         requireGuardian(u);
         if (!careChecklistService.isGuardianOfPatient(u.userId(), patientId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 환자만 조회할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 입소자만 조회할 수 있습니다.");
         }
         return caregiverCareCheckService.getOne(patientId, date);
     }
@@ -85,7 +85,7 @@ public class GuardianCareChecklistController {
         AuthenticatedUser u = securityContextHelper.requireAuthenticatedUser();
         requireGuardian(u);
         if (!careChecklistService.isGuardianOfPatient(u.userId(), patientId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 환자만 조회할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "연결된 입소자만 조회할 수 있습니다.");
         }
         return caregiverCareCheckService.getWeeklyReport(u.userId(), patientId, startDate, endDate);
     }

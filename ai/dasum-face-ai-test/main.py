@@ -33,7 +33,7 @@ def main() -> None:
     parser.add_argument(
         "--augment",
         action="store_true",
-        help="환자 DB 생성 시 mild augmentation 사용 (기본: 비활성)",
+        help="입소자 DB 생성 시 mild augmentation 사용 (기본: 비활성)",
     )
     parser.add_argument(
         "--use-raw",
@@ -52,7 +52,7 @@ def main() -> None:
             overwrite=args.overwrite,
             use_augmentation=args.augment if args.augment else None,
         )
-        print(f"[완료] 환자 DB: {list(reps.keys())}")
+        print(f"[완료] 입소자 DB: {list(reps.keys())}")
     elif args.step == "detect-faces":
         df = P.run_detect_faces(overwrite=args.overwrite)
         print(f"[완료] 얼굴 검출 {len(df)}행")
@@ -94,7 +94,7 @@ def _run_legacy_yolo(use_raw: bool = False) -> None:
     app = init_face_model()
     patient_embeddings = build_patient_embeddings(app)
     if not patient_embeddings:
-        print("[종료] 환자 임베딩 없음")
+        print("[종료] 입소자 임베딩 없음")
         sys.exit(1)
     result = analyze_gallery(detector, app, patient_embeddings)
     print(save_result(result))

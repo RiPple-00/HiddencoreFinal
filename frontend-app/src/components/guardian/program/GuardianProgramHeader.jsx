@@ -9,7 +9,7 @@ export default function GuardianProgramHeader() {
     <View style={styles.programSectionHeader}>
       <Text style={styles.programSectionTitle}>프로그램 신청</Text>
       <Text style={styles.programSectionSubtitle}>
-        보호자님이 환자 대신 프로그램을 신청할 수 있어요.
+        보호자님이 입소자 대신 프로그램을 신청할 수 있어요.
       </Text>
     </View>
   );

@@ -7,7 +7,7 @@ import api from "./index";
  *  - POST /auto-save : 자동 저장(임시저장 갱신)
  *  - POST /submit    : 제출(승인 대기 상태로 승격)
  *  - GET  ?patientId=&date=  : 단건 조회(없으면 빈 응답)
- *  - GET  /history?patientId : 환자별 이력
+ *  - GET  /history?patientId : 입소자별 이력
  */
 const caregiverApi = {
   /**
@@ -34,7 +34,7 @@ const caregiverApi = {
       },
     }),
 
-  /** 환자별 이력 목록 */
+  /** 입소자별 이력 목록 */
   getHistory: ({ patientId }) =>
     api.get("/api/caregiver/care-checks/history", {
       params: { patientId },

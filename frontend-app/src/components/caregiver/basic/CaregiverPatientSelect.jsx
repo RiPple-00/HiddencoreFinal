@@ -3,7 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Text from "../../Text";
 
 /**
- * 담당 환자 선택(토글 드롭다운).
+ * 담당 입소자 선택(토글 드롭다운).
  */
 export default function CaregiverPatientSelect({
   patients,

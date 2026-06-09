@@ -26,7 +26,7 @@ import CaregiverSectionCard    from "../../components/caregiver/CaregiverSection
 // 메인 페이지
 // =============================================================
 export default function CaregiverTaskCheckPage({ navigation, route }) {
-  // route 파라미터로 환자 정보를 받을 수 있게 하되, 없으면 디자인의 더미값을 사용한다.
+  // route 파라미터로 입소자 정보를 받을 수 있게 하되, 없으면 디자인의 더미값을 사용한다.
   const params      = route?.params ?? {};
   const patientId   = params.patientId   ?? 1;
   const patientName = params.patientName ?? "김따숨";
@@ -303,7 +303,7 @@ export default function CaregiverTaskCheckPage({ navigation, route }) {
                 showStatusError={Boolean(submitErrors?.hygieneMap?.bedding)}
               />
               <CaregiverHygieneRow
-                label="환자 용품 청결"
+                label="입소자 용품 청결"
                 value={state.hygiene.patientItems}
                 onChange={(v) => { clearRequiredSectionFeedback(); updateHygieneItem("patientItems", v); }}
                 showStatusError={Boolean(submitErrors?.hygieneMap?.patientItems)}

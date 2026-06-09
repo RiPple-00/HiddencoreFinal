@@ -30,7 +30,7 @@ import hiddencore.ddasum.backend.repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 원무·요양사·보호자 공통 시연 환자 — 기만경(260401008, A동 107호).
+ * 원무·요양사·보호자 공통 시연 입소자 — 기만경(260401008, A동 107호).
  * bootRun 시 없으면 생성·있으면 진단/병상/연동 정보를 맞춥니다.
  */
 @Slf4j
@@ -88,7 +88,7 @@ public class KimMankyungPatientSeeder {
                                                         .orElse(null));
 
                 if (patient == null) {
-                    log.warn("[KimMankyungPatientSeeder] 기만경 환자 생성 실패");
+                    log.warn("[KimMankyungPatientSeeder] 기만경 입소자 생성 실패");
                     return;
                 }
 

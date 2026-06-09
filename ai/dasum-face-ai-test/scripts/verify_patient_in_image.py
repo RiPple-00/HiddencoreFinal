@@ -1,4 +1,4 @@
-"""업로드 사진 얼굴 인식: 전체 환자 목록 + 시연 대상(patient_6=기만경) 포함 여부. stdout JSON 1줄."""
+"""업로드 사진 얼굴 인식: 전체 입소자 목록 + 시연 대상(patient_6=기만경) 포함 여부. stdout JSON 1줄."""
 from __future__ import annotations
 
 import json
@@ -55,7 +55,7 @@ def patient_sort_key(patient_key: str) -> int:
 
 
 def resolve_recognized_patient(result: SimilarityResult) -> str | None:
-    """단체 사진에서 얼굴 1개당 대표 환자 키 (patient_1~6)."""
+    """단체 사진에서 얼굴 1개당 대표 입소자 키 (patient_1~6)."""
     if result.predicted_patient in PATIENT_DISPLAY_NAMES and result.status in (
         S.IDENTITY_MATCHED,
         S.IDENTITY_UNCERTAIN,
@@ -93,18 +93,18 @@ def build_result_message(
 ) -> str:
     if not detected_names:
         return (
-            f"인식된 환자가 없습니다. {DEMO_GUARDIAN_PATIENT_NAME}이 보이는 사진을 올려 주세요."
+            f"인식된 입소자가 없습니다. {DEMO_GUARDIAN_PATIENT_NAME}이 보이는 사진을 올려 주세요."
         )
 
     listed = ", ".join(detected_names)
     if accepted:
         return (
-            f"인식된 환자: {listed}. "
+            f"인식된 입소자: {listed}. "
             f"{DEMO_GUARDIAN_PATIENT_NAME}이 포함되어 보호자 사진 기록에 등록합니다."
         )
 
     return (
-        f"인식된 환자: {listed}. "
+        f"인식된 입소자: {listed}. "
         f"{DEMO_GUARDIAN_PATIENT_NAME}이 없어 보호자 사진 기록에 등록되지 않습니다."
     )
 
@@ -136,7 +136,7 @@ def verify(image_path: str, target_patient: str = DEMO_GUARDIAN_PATIENT_KEY) -> 
         return {
             "accepted": False,
             "reason": "TARGET_NOT_IN_DB",
-            "message": f"환자 DB에 {target_patient} 정보가 없습니다.",
+            "message": f"입소자 DB에 {target_patient} 정보가 없습니다.",
             "target_patient": target_patient,
             "target_patient_name": PATIENT_DISPLAY_NAMES.get(target_patient, target_patient),
             "faces_detected": 0,

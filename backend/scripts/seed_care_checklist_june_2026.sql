@@ -16,7 +16,7 @@ WHERE patient_id = @target_patient_id
 
 -- GuardianReportDemoSeeder 와 동일 패턴의 7일치 데이터는
 -- Spring bootRun 시 Java 시더가 자동 생성합니다.
--- 수동 SQL이 필요하면 seed_care_checklist_may_2026.sql 를 참고해 기간·환자 ID만 바꿔 실행하세요.
+-- 수동 SQL이 필요하면 seed_care_checklist_may_2026.sql 를 참고해 기간·입소자 ID만 바꿔 실행하세요.
 
 SELECT COUNT(*) AS care_check_count
 FROM DOCUMENT

@@ -27,7 +27,7 @@ public class BedResponseDto {
     private LocalDate birthDate;
 
     /**
-     * @param patient 환자 정보. LOCATION.patient_id 또는 PATIENT.location_id 어느 쪽으로만 연결돼 있어도
+     * @param patient 입소자 정보. LOCATION.patient_id 또는 PATIENT.location_id 어느 쪽으로만 연결돼 있어도
      *            서비스에서 한쪽으로 보강해 넘긴다.
      */
     public static BedResponseDto from(Location location, Patient patient) {

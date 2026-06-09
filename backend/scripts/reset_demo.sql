@@ -14,7 +14,7 @@
 --
 -- 실행 후 필수
 --   cd backend && ./gradlew bootRun
---   (얼굴 AI 시연 환자 6명이 필요하면) mysql ... < scripts/seed_demo_ai_patients.sql
+--   (얼굴 AI 시연 입소자 6명이 필요하면) mysql ... < scripts/seed_demo_ai_patients.sql
 -- =============================================================================
 
 SET NAMES utf8mb4;

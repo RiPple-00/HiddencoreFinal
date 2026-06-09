@@ -79,7 +79,7 @@ export default function CaregiverPatientListPage({ navigation }) {
       console.error(e);
       setError(
         e?.response?.data?.message ??
-          "병상·환자 정보를 불러오지 못했습니다."
+          "병상·입소자 정보를 불러오지 못했습니다."
       );
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function CaregiverPatientListPage({ navigation }) {
   const openTaskCheck = (patient) => {
     const params = caregiverPatientToTaskCheckRouteParams(patient);
     if (!params) {
-      Alert.alert("안내", "환자 정보를 확인할 수 없습니다.");
+      Alert.alert("안내", "입소자 정보를 확인할 수 없습니다.");
       return;
     }
     navigation?.navigate?.("CaregiverTaskCheck", params);
@@ -128,7 +128,7 @@ export default function CaregiverPatientListPage({ navigation }) {
     if (!bed.occupied || !bed.patientId) return;
     const patient = patientById(myPatients, bed.patientId);
     if (!patient) {
-      Alert.alert("안내", "담당 환자가 아닙니다.");
+      Alert.alert("안내", "담당 입소자가 아닙니다.");
       return;
     }
     setSelectedPatientId(bed.patientId);
@@ -162,7 +162,7 @@ export default function CaregiverPatientListPage({ navigation }) {
                 <Text className="text-xl">🔎</Text>
                 <TextInput
                   className="flex-1 text-caregiver-text-primary text-base"
-                  placeholder="환자 성함 또는 침상 검색"
+                  placeholder="입소자 성함 또는 침상 검색"
                   placeholderTextColor="#9CA3AF"
                   value={search}
                   onChangeText={setSearch}

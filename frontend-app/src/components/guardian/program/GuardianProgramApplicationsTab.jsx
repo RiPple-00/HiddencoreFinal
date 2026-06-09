@@ -29,7 +29,7 @@ export default function GuardianProgramApplicationsTab({
           </Text>
 
           <Text style={styles.historyInfo}>
-            대상 환자: {application.patientName || "-"}
+            대상 입소자: {application.patientName || "-"}
           </Text>
 
           <View style={styles.historyBottomRow}>

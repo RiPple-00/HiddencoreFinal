@@ -26,7 +26,7 @@ public class CaregiverCareCheckDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SaveRequest {
-        /** 환자 ID (필수) */
+        /** 입소자 ID (필수) */
         private Long patientId;
 
         /** 기록 일자(yyyy-MM-dd). 미지정 시 서버 오늘 날짜로 처리. */
@@ -127,7 +127,7 @@ public class CaregiverCareCheckDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class HygieneSection {
         private HygieneItem bedding;       // 침구류 청결도
-        private HygieneItem patientItems;  // 환자 용품 청결
+        private HygieneItem patientItems;  // 입소자 용품 청결
         private HygieneItem bathing;       // 목욕 여부
     }
 

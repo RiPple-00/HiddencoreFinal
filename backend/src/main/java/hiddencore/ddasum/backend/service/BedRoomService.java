@@ -61,7 +61,7 @@ public class BedRoomService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new IllegalArgumentException("병상을 찾을 수 없습니다."));
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("환자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("입소자를 찾을 수 없습니다."));
 
         Location previousLocation = patient.getLocationId();
         if (previousLocation != null && !previousLocation.getLocationId().equals(locationId)) {

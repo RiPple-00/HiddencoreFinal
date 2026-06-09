@@ -33,7 +33,7 @@ REVIEW_NEAR_THRESHOLD_GAP = 0.05
 ## unknown / uncertain / no_face
 
 - **NO_FACE**: 활동 사진에서 얼굴 미검출
-- **UNKNOWN**: 얼굴은 있으나 환자 1~6 매칭 실패
+- **UNKNOWN**: 얼굴은 있으나 입소자 1~6 매칭 실패
 - **UNCERTAIN**: threshold는 넘지만 2위와 격차가 작음
 - **LOW_CONFIDENCE**: 유사도가 매우 낮음 → 검수 권장
 

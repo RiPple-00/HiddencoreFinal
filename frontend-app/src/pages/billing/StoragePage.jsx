@@ -24,7 +24,7 @@ import { TAG_COLORS, STATUS_COLORS } from "../../styles/colors";
 import Text from "@/components/Text";
 import useI18n from "@/hooks/useI18n";
 
-// TODO: 인증/세션에서 환자 ID 가져오도록 변경 필요
+// TODO: 인증/세션에서 입소자 ID 가져오도록 변경 필요
 const PATIENT_ID = 1;
 
 export default function StoragePage({ navigation }) {
@@ -93,10 +93,10 @@ export default function StoragePage({ navigation }) {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
 
-        {/* 환자 정보 + 예상 수납 카드 */}
+        {/* 입소자 정보 + 예상 수납 카드 */}
         <View className="mx-4 mt-4 bg-background-neutral rounded-2xl p-4 mb-4">
 
-          {/* 환자 행 */}
+          {/* 입소자 행 */}
           <View className="flex-row items-center gap-3 mb-4">
             <View className="w-12 h-12 rounded-full bg-guardian-button-primary justify-center items-center">
               <Text className="text-lg font-bold text-guardian-text-primary">

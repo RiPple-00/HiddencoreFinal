@@ -82,7 +82,7 @@ KNOWN: dict[str, tuple[str, str, str]] = {
         "재생성",
     ),
     "data/face_db/build_log.json": (
-        "환자 DB 빌드 시 사진별 성공/실패 로그",
+        "입소자 DB 빌드 시 사진별 성공/실패 로그",
         "등록 사진 품질 점검",
         "재생성",
     ),
@@ -119,7 +119,7 @@ KNOWN.update(
             ),
             "detector.py": (
                 "InsightFace buffalo_l 초기화·detect()·bbox/landmark",
-                "환자·활동 사진 얼굴 위치 검출",
+                "입소자·활동 사진 얼굴 위치 검출",
                 "보존",
             ),
             "embedder.py": (
@@ -144,7 +144,7 @@ KNOWN.update(
             ),
             "similarity.py": (
                 "cosine_similarity, rank_patients, decide_match (threshold/margin)",
-                "환자 식별 판정 규칙",
+                "입소자 식별 판정 규칙",
                 "보존",
             ),
             "visualize.py": (
@@ -169,7 +169,7 @@ KNOWN.update(
             ),
             "augment.py": (
                 "mild_augment, augment_patient_dir (--augment 옵션)",
-                "환자 DB 다양성 (기본 OFF)",
+                "입소자 DB 다양성 (기본 OFF)",
                 "보존",
             ),
             "io_utils.py": (
@@ -343,7 +343,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if fnmatch(p, "data/patients/patient_*/*"):
         return FileEntry(
             p, "데이터(원본)", ext, 0,
-            "등록 환자 원본 얼굴 사진",
+            "등록 입소자 원본 얼굴 사진",
             "face_db 유일 원천",
             "보존",
         )
@@ -351,7 +351,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if fnmatch(p, "data/patients_preprocessed/patient_*/*"):
         return FileEntry(
             p, "데이터(전처리)", ext, 0,
-            "환자 사진 전처리본",
+            "입소자 사진 전처리본",
             "build-patient-db 입력",
             "재생성",
         )
@@ -359,7 +359,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if fnmatch(p, "data/face_db/aligned_patients/patient_*/*"):
         return FileEntry(
             p, "중간산출물", ext, 0,
-            "환자 등록 사진 112×112 정렬 얼굴",
+            "입소자 등록 사진 112×112 정렬 얼굴",
             "DB 품질 확인·디버깅",
             "재생성",
         )
@@ -367,7 +367,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if fnmatch(p, "data/face_db/embeddings/patient_*.npy"):
         return FileEntry(
             p, "중간산출물", ".npy", 0,
-            "환자별 embedding 벡터 배열",
+            "입소자별 embedding 벡터 배열",
             "representatives 계산 전 단계",
             "재생성",
         )
@@ -375,7 +375,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if p == "data/face_db/representatives/patient_representatives.npy":
         return FileEntry(
             p, "중간산출물", ".npy", 0,
-            "환자 6명 대표 embedding (dict serialized)",
+            "입소자 6명 대표 embedding (dict serialized)",
             "match 단계 유사도 비교 기준",
             "재생성",
         )
@@ -487,7 +487,7 @@ def _match_pattern(rel: str) -> FileEntry | None:
     if fnmatch(p, "data/augmented/patients/patient_*/*"):
         return FileEntry(
             p, "데이터(증강)", ext, 0,
-            "--augment 옵션 시 생성된 환자 증강 이미지",
+            "--augment 옵션 시 생성된 입소자 증강 이미지",
             "face_db 다양성 (기본 미사용)",
             "재생성",
         )

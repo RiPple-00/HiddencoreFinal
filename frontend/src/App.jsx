@@ -19,6 +19,7 @@ import BedRoomPage from './pages/BedRoomPage';
 import PatientListPage from './pages/patient/PatientListPage';
 import AdminPatientDetailPage from './pages/admin/AdminPatientDetailPage';
 import WardPage from './pages/WardPage';
+import VisitManagementPage from './pages/VisitManagementPage';
 import { useAuth } from './contexts/AutoContext.jsx';
 
 
@@ -110,6 +111,7 @@ function App() {
           <Route path="/patients" element={<PatientListPage />} />
           <Route path="/patients/:patientId" element={<AdminPatientDetailPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/visit-management" element={<VisitManagementPage />} />
         </Routes>
   );
 }

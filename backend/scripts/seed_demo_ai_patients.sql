@@ -1,5 +1,5 @@
 -- =============================================================================
--- AI 얼굴 인식 시연용 환자 6명 + 기만경(보호자 갤러리) 시드 SQL
+-- AI 얼굴 인식 시연용 입소자 6명 + 기만경(보호자 갤러리) 시드 SQL
 -- =============================================================================
 -- 용도
 --   - patient_1~6 (얼굴 AI) ↔ MySQL PATIENT 매핑
@@ -76,7 +76,7 @@ WHERE `facility_id` = @demo_facility_id
 LIMIT 1;
 
 -- ---------------------------------------------------------------------------
--- 3) AI 시연 환자 6명 (UPSERT)
+-- 3) AI 시연 입소자 6명 (UPSERT)
 -- ---------------------------------------------------------------------------
 INSERT INTO `PATIENT` (
   `patient_id`, `facility_id`, `location_id`, `primary_caregiver_user_id`,
@@ -103,7 +103,7 @@ INSERT INTO `PATIENT` (
 (260401007, @demo_facility_id, NULL, NULL,
  '장원준', 'MALE', '1965-10-20', '서울', '2026-05-02', NULL,
  'AB_POSITIVE', NULL, 'STABLE', 'AI patient_5', @now, @now),
--- patient_6 기만경 (보호자 갤러리·원무 시연 환자)
+-- patient_6 기만경 (보호자 갤러리·원무 시연 입소자)
 (260401008, @demo_facility_id, @loc_107_bed1, NULL,
  '기만경', 'MALE', '1942-05-12', '서울특별시 종로구', '2026-04-10', NULL,
  'A_POSITIVE',
@@ -176,7 +176,7 @@ WHERE @guardian_id IS NOT NULL
       AND `patient_id` = 260401008
   );
 
--- 기만경만 주 보호자 (DataSeeder 데모 환자 등 기존 primary 해제)
+-- 기만경만 주 보호자 (DataSeeder 데모 입소자 등 기존 primary 해제)
 UPDATE `GUARDIAN_PATIENT`
 SET `is_primary` = 0
 WHERE `guardian_user_id` = @guardian_id

@@ -87,7 +87,7 @@ export default function CaregiverPhotoUploadPage({ navigation }) {
       setStatusText("등록이 완료되었습니다. 보호자 갤러리에서 확인할 수 있어요.");
 
       const detectedLine = res.data?.detectedPatientNames?.length
-        ? `\n인식된 환자: ${res.data.detectedPatientNames.join(", ")}`
+        ? `\n인식된 입소자: ${res.data.detectedPatientNames.join(", ")}`
         : "";
       const actionLine = res.data?.actionKo
         ? `\n인식 활동: ${res.data.actionKo}`
@@ -214,7 +214,7 @@ export default function CaregiverPhotoUploadPage({ navigation }) {
             <Text className="text-base font-bold text-caregiver-text-primary">등록 결과</Text>
             {result.detectedPatientNames?.length ? (
               <Text className="text-sm text-caregiver-text-neutral">
-                인식된 환자: {result.detectedPatientNames.join(", ")}
+                인식된 입소자: {result.detectedPatientNames.join(", ")}
               </Text>
             ) : null}
             {result.actionKo ? (

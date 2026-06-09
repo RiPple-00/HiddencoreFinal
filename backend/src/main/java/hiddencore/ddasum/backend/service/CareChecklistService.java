@@ -67,7 +67,7 @@ public class CareChecklistService {
                 .toList();
     }
 
-    /** 갤러리 시연 환자(기만경) → 주 보호자 → patient_id 내림차순 */
+    /** 갤러리 시연 입소자(기만경) → 주 보호자 → patient_id 내림차순 */
     private static Comparator<GuardianPatient> guardianPatientOrder(Long galleryDemoPatientId) {
         return Comparator
                 .comparing(
@@ -98,9 +98,9 @@ public class CareChecklistService {
         Patient patient =
                 patientRepository
                         .findById(patientId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "환자를 찾을 수 없습니다."));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "입소자를 찾을 수 없습니다."));
         if (!patient.getFacilityId().getFacilityId().equals(facilityId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 시설 환자가 아닙니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 시설 입소자가 아닙니다.");
         }
     }
 
@@ -121,7 +121,7 @@ public class CareChecklistService {
         Patient patient =
                 patientRepository
                         .findById(patientId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "환자를 찾을 수 없습니다."));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "입소자를 찾을 수 없습니다."));
 
         Users employee =
                 memberRepository

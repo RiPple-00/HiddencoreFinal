@@ -21,7 +21,7 @@ public class LocationController {
 
     private final LocationService locationService;
 
-    @Operation(summary = "층별 병실 환자 수 목록", description = "선택한 병동/층의 각 병실별 환자 수를 조회합니다.")
+    @Operation(summary = "층별 병실 입소자 수 목록", description = "선택한 병동/층의 각 병실별 입소자 수를 조회합니다.")
     @GetMapping("/rooms/summary")
     public ResponseEntity<List<LocationDto.RoomSummaryDto>> getRoomSummary(
             @Parameter(description = "건물(병동)", example = "A") @RequestParam String building,
@@ -29,7 +29,7 @@ public class LocationController {
         return ResponseEntity.ok(locationService.getRoomSummary(building, floor));
     }
 
-    @Operation(summary = "병실 환자 수 조회", description = "지정한 병실에 현재 입원 중인 환자 수를 조회합니다.")
+    @Operation(summary = "병실 입소자 수 조회", description = "지정한 병실에 현재 입원 중인 입소자 수를 조회합니다.")
     @GetMapping("/room/count")
     public ResponseEntity<LocationDto.RoomSummaryDto> getRoomPatientCount(
             @Parameter(description = "건물") @RequestParam String building,

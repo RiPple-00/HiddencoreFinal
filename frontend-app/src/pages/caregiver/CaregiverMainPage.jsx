@@ -33,7 +33,7 @@ export default function CaregiverMainPage({ navigation }) {
   const [notices, setNotices] = useState(null);
   const [loadingNotices, setLoadingNotices] = useState(true);
 
-  // 환자 목록 fetch
+  // 입소자 목록 fetch
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -45,9 +45,9 @@ export default function CaregiverMainPage({ navigation }) {
         setSelectedPatientId((prev) => prev ?? (list[0]?.patientId ?? null));
       } catch (e) {
         Alert.alert(
-          "환자 목록",
+          "입소자 목록",
           e?.response?.data?.message ??
-            "환자를 불러오지 못했습니다. 요양사로 로그인했는지 확인해 주세요."
+            "입소자를 불러오지 못했습니다. 요양사로 로그인했는지 확인해 주세요."
         );
       } finally {
         if (mounted) setLoadingPatients(false);
@@ -100,16 +100,16 @@ export default function CaregiverMainPage({ navigation }) {
     ? `${selectedPatient.name} (${selectedPatient.age ?? "?"}세) / ${selectedPatient.room ?? "-"}호`
     : loadingPatients
       ? "불러오는 중…"
-      : "등록된 환자 없음";
+      : "등록된 입소자 없음";
 
   const goWorkCheck = () => {
     if (selectedPatientId == null) {
-      Alert.alert("안내", "먼저 담당 환자를 선택해 주세요.");
+      Alert.alert("안내", "먼저 담당 입소자를 선택해 주세요.");
       return;
     }
     const params = caregiverPatientToTaskCheckRouteParams(selectedPatient);
     if (!params) {
-      Alert.alert("안내", "환자 정보를 확인할 수 없습니다.");
+      Alert.alert("안내", "입소자 정보를 확인할 수 없습니다.");
       return;
     }
     navigation.navigate("CaregiverTaskCheck", params);

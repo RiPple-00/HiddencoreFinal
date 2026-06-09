@@ -85,7 +85,7 @@ public class GuardianAccountService {
                 .build();
     }
 
-    /** 연결된 환자 시설(주 보호자 우선) → 게시판·프로그램 API용 */
+    /** 연결된 입소자 시설(주 보호자 우선) → 게시판·프로그램 API용 */
     private Long resolveGuardianFacilityId(Long guardianUserId) {
         List<GuardianPatient> links =
                 guardianPatientRepository.findByGuardianUserId_UserIdOrderByIsPrimaryDesc(guardianUserId);

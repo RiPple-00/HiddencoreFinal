@@ -38,7 +38,7 @@ import hiddencore.ddasum.backend.web.dto.caregiver.CaregiverCareCheckDto;
  * 간병인 일일 업무 체크리스트(CARE_CHECK) 도메인 서비스.
  *
  * <ul>
- *   <li>자동 저장(임시저장) - 동일 (환자, 날짜) 문서가 있으면 갱신, 없으면 생성한다.</li>
+ *   <li>자동 저장(임시저장) - 동일 (입소자, 날짜) 문서가 있으면 갱신, 없으면 생성한다.</li>
  *   <li>제출 - 자동 저장 본문을 그대로 PENDING_APPROVAL 로 승격한다.</li>
  *   <li>조회 - 저장된 JSON content 를 다시 객체로 풀어서 반환한다.</li>
  * </ul>
@@ -81,7 +81,7 @@ public class CaregiverCareCheckService {
   // 자동 저장(임시저장)
    
     /**
-     * 자동 저장. 동일 (환자, 날짜) 문서가 있으면 갱신, 없으면 새로 생성한다.
+     * 자동 저장. 동일 (입소자, 날짜) 문서가 있으면 갱신, 없으면 새로 생성한다.
      * 화면 입력이 멈추면 프론트에서 디바운스해 호출한다.
      */
     @Transactional
@@ -91,7 +91,7 @@ public class CaregiverCareCheckService {
         Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
         LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : today();
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
+            .orElseThrow(() -> new IllegalArgumentException("입소자가 없습니다. id=" + patientId));
 
         Document document = careCheckRepository
             .findLatestCareCheck(patientId, date)
@@ -114,7 +114,7 @@ public class CaregiverCareCheckService {
         Long patientId = Objects.requireNonNull(request.getPatientId(), "patientId");
         LocalDate date = request.getRecordDate() != null ? request.getRecordDate() : today();
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
+            .orElseThrow(() -> new IllegalArgumentException("입소자가 없습니다. id=" + patientId));
 
         Document document = careCheckRepository
             .findLatestCareCheck(patientId, date)
@@ -131,7 +131,7 @@ public class CaregiverCareCheckService {
     // 조회
     // ============================================================
 
-    /** 단건 조회 - 환자, 날짜 기준. 없으면 null content 응답. */
+    /** 단건 조회 - 입소자, 날짜 기준. 없으면 null content 응답. */
     public CaregiverCareCheckDto.Response getOne(Long patientId, LocalDate recordDate) {
         Objects.requireNonNull(patientId, "patientId");
         LocalDate date = recordDate != null ? recordDate : today();
@@ -144,7 +144,7 @@ public class CaregiverCareCheckService {
                         .build());
     }
 
-    /** 환자별 이력 목록 - 최신순 */
+    /** 입소자별 이력 목록 - 최신순 */
     public List<CaregiverCareCheckDto.Response> getHistory(Long patientId) {
         return careCheckRepository.findAllByPatient(patientId).stream()
                 .map(this::toResponse)
@@ -172,7 +172,7 @@ public class CaregiverCareCheckService {
         }
 
         Patient patient = patientRepository.findById(safePatientId)
-                .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + safePatientId));
+                .orElseThrow(() -> new IllegalArgumentException("입소자가 없습니다. id=" + safePatientId));
 
         List<Document> docs = careCheckRepository.findAllByPatientAndDateRange(safePatientId, start, end);
         Map<LocalDate, Document> latestByDate = new HashMap<>();
@@ -401,7 +401,7 @@ public class CaregiverCareCheckService {
         }
         String name = patient.getName();
         if (name == null || name.isBlank() || name.chars().allMatch(ch -> ch == '?' || ch == '\uFFFD')) {
-            return "환자";
+            return "입소자";
         }
         return name;
     }
@@ -588,7 +588,7 @@ public class CaregiverCareCheckService {
                                 "[%s] %s — %s",
                                 item.getCategory(),
                                 item.getProgramTitle(),
-                                hasText(item.getReason()) ? item.getReason() : "환자 상태에 적합한 프로그램입니다."));
+                                hasText(item.getReason()) ? item.getReason() : "입소자 상태에 적합한 프로그램입니다."));
             } else if (Boolean.FALSE.equals(item.getHasProgram())) {
                 texts.add(
                         String.format(
@@ -647,7 +647,7 @@ public class CaregiverCareCheckService {
                                                 GuardianWeeklyCareReportResponse.ProgramRecommendation.builder()
                                                         .category(matched.getCategory())
                                                         .reason(
-                                                                "알츠하이머형 치매 환자의 기억·인지 자극에 도움이 되는 모집 중 프로그램입니다.")
+                                                                "알츠하이머형 치매 입소자의 기억·인지 자극에 도움이 되는 모집 중 프로그램입니다.")
                                                         .hasProgram(true)
                                                         .postId(matched.getPostId())
                                                         .programTitle(matched.getTitle())
@@ -688,7 +688,7 @@ public class CaregiverCareCheckService {
                 recommendations.add(
                         GuardianWeeklyCareReportResponse.ProgramRecommendation.builder()
                                 .category(category)
-                                .reason("환자 상태 기준으로 도움이 될 수 있는 분야입니다.")
+                                .reason("입소자 상태 기준으로 도움이 될 수 있는 분야입니다.")
                                 .hasProgram(false)
                                 .noProgramMessage("현재 모집 중인 해당 분야 프로그램이 없습니다.")
                                 .build());
@@ -875,7 +875,7 @@ public class CaregiverCareCheckService {
     }
 
     private String buildTitle(Patient patient, LocalDate date) {
-        String name = patient.getName() != null ? patient.getName() : "환자";
+        String name = patient.getName() != null ? patient.getName() : "입소자";
         return String.format("%s 일일 업무 체크 - %s", name, date);
     }
 

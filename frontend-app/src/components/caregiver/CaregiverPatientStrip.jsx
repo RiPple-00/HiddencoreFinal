@@ -3,7 +3,7 @@ import { View } from "react-native";
 import Text from "../Text";
 
 /**
- * "김따숨 (M/82)" + "441212 · Ward 402 · 72283944" 형태의 환자 정보 스트립.
+ * "김따숨 (M/82)" + "441212 · Ward 402 · 72283944" 형태의 입소자 정보 스트립.
  *
  * props:
  *   name      : "김따숨"

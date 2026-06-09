@@ -189,14 +189,14 @@ export default function ReportPage({ navigation }) {
         const linked = res.data ?? [];
         const pid = resolveGuardianPrimaryPatientId(linked);
         if (!pid) {
-          setError("연결된 환자가 없습니다.");
+          setError("연결된 입소자가 없습니다.");
           setLoading(false);
           return;
         }
         setPatientId(pid);
       } catch {
         if (!cancelled) {
-          setError("환자 정보를 불러오지 못했습니다.");
+          setError("입소자 정보를 불러오지 못했습니다.");
           setLoading(false);
         }
       }
@@ -355,7 +355,7 @@ export default function ReportPage({ navigation }) {
 
         {!error ? (
           <>
-        {/* 환자 카드 */}
+        {/* 입소자 카드 */}
         <View className="bg-background-neutral rounded-[20px] p-[18px] mb-[18px]">
           <View className="flex-row items-center">
             <View className="w-[70px] h-[70px] rounded-full bg-guardian-button-secondary" />
@@ -419,7 +419,7 @@ export default function ReportPage({ navigation }) {
               { emoji: "🍽️", title: "식사", desc: `${checklistData[0]?.percent ?? "0%"} 달성` },
               { emoji: "🪥", title: "위생", desc: `${checklistData[1]?.percent ?? "0%"} 관리` },
               { emoji: "🚻", title: "배변", desc: `${checklistData[2]?.percent ?? "0%"} 관리` },
-              { emoji: "🟩", title: "환자 상태", desc: riskLevel },
+              { emoji: "🟩", title: "입소자 상태", desc: riskLevel },
             ].map(({ emoji, title, desc }) => (
               <View key={title} className="w-[48%] bg-guardian-bg-secondary rounded-2xl py-[18px] items-center mb-3">
                 <Text className="text-[22px]">{emoji}</Text>
@@ -660,7 +660,7 @@ export default function ReportPage({ navigation }) {
 
                 {categoryRecommendations.length === 0 ? (
                   <Text className="text-[13px] text-guardian-text-neutral leading-5">
-                    현재 환자 상태를 분석한 결과, 추가로 추천할 프로그램 분야가 없거나 모집 중인 해당 분야 프로그램이 없습니다.
+                    현재 입소자 상태를 분석한 결과, 추가로 추천할 프로그램 분야가 없거나 모집 중인 해당 분야 프로그램이 없습니다.
                   </Text>
                 ) : (
                   categoryRecommendations.map((rec, i, arr) => (

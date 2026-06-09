@@ -40,7 +40,7 @@ public class Medication {
     @Column(name = "medication_id", nullable = false)
     private Long medicationId;
 
-    // 환자
+    // 입소자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patientId;

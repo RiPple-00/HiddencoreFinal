@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AssignPatientToBedRequest { // 병상에 환자 배정 요청 DTO
+public class AssignPatientToBedRequest { // 병상에 입소자 배정 요청 DTO
     private Long patientId;
 }

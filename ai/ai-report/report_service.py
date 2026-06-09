@@ -4,7 +4,7 @@
 엔드포인트:
   GET  /health
   POST /api/weekly-narrative      — 체크리스트 기반 주간 요약
-  POST /api/prescription-summary  — 스캔 등록 처방전·진단 기반 환자 상태 분석
+  POST /api/prescription-summary  — 스캔 등록 처방전·진단 기반 입소자 상태 분석
   POST /api/program-recommendation — 모집 중 프로그램 기반 분야별 추천
 """
 
@@ -58,7 +58,7 @@ app.add_middleware(
 class WeeklyNarrativeRequest(BaseModel):
     period_start: str
     period_end: str
-    patient_name: str = "환자"
+    patient_name: str = "입소자"
     overall_rate: int = 0
     risk_level: str = "안정"
     risk_flags: List[str] = Field(default_factory=list)
@@ -94,7 +94,7 @@ class MedicationItem(BaseModel):
 
 
 class PrescriptionSummaryRequest(BaseModel):
-    patient_name: str = "환자"
+    patient_name: str = "입소자"
     period_start: str = ""
     period_end: str = ""
     overall_rate: int = 0
@@ -118,7 +118,7 @@ class MedicationSummaryItem(BaseModel):
 
 
 class ProgramRecommendationRequest(BaseModel):
-    patient_name: str = "환자"
+    patient_name: str = "입소자"
     period_start: str = ""
     period_end: str = ""
     next_week_start: str = ""
@@ -210,14 +210,14 @@ PROGRAM_SYSTEM = """
 출력은 반드시 JSON 하나만 반환한다. 마크다운·코드블록 금지.
 
 규칙:
-1) 환자의 등록 진단(원무), 주간 체크리스트, 등록 약 정보를 종합해 도움이 될 '분야'만 추천한다.
+1) 입소자의 등록 진단(원무), 주간 체크리스트, 등록 약 정보를 종합해 도움이 될 '분야'만 추천한다.
 2) 추천 분야가 없으면 categoryRecommendations 를 빈 배열로 반환한다.
 3) 추천 분야가 있으면, 반드시 available_programs 목록 안에서만 프로그램을 고른다.
 4) 해당 분야에 모집 중 프로그램이 없으면 hasProgram=false, noProgramMessage="현재 모집 중인 해당 분야 프로그램이 없습니다."
 5) 목록에 없는 post_id 를 만들지 말 것. hasProgram=true 일 때 post_id·programTitle 은 목록과 일치해야 한다.
 6) next_week_start 이후 시작하는 프로그램만 후보이므로, 이미 제공된 available_programs 만 사용한다.
 7) activityTitle/activityDescription/effects 는 이번 주 돌봄·진단 맥락의 활동 요약(관찰 중심)이다.
-8) 알츠하이머·치매 진단 환자에게는 '나만의 추억 앨범 만들기', '숫자 카드 순서 맞추기' 등 인지·추억 프로그램이 후보에 있으면 우선 추천한다.
+8) 알츠하이머·치매 진단 입소자에게는 '나만의 추억 앨범 만들기', '숫자 카드 순서 맞추기' 등 인지·추억 프로그램이 후보에 있으면 우선 추천한다.
 """.strip()
 
 
@@ -261,7 +261,7 @@ def weekly_narrative(body: WeeklyNarrativeRequest):
 - programSection.recommendations: 2~3개
 
 입력:
-환자: {body.patient_name}
+입소자: {body.patient_name}
 기간: {body.period_start} ~ {body.period_end}
 전체 수행률: {body.overall_rate}%
 위험도: {body.risk_level}
@@ -326,7 +326,7 @@ def prescription_summary(body: PrescriptionSummaryRequest):
 }}
 
 제약:
-- summaryText: 2~3문장, 환자 {body.patient_name} 님의 복약·돌봄 맥락 종합
+- summaryText: 2~3문장, 입소자 {body.patient_name} 님의 복약·돌봄 맥락 종합
 - medicationHighlights: 등록 약 2~4개 핵심 (약명·목적 위주)
 - cautions: 2~3개 (부작용·상호작용·관찰 포인트, 의료진 상담 권고 포함 가능)
 - careTips: 2~3개 (요양원·보호자가 실천할 수 있는 관리 팁)
@@ -380,7 +380,7 @@ def program_recommendation(body: ProgramRecommendationRequest):
     med_lines = [f"- {m.summary}" for m in body.medication_summaries if m.summary]
 
     user_prompt = f"""
-환자 {body.patient_name} 님의 다음 주 프로그램 추천 JSON을 생성해라.
+입소자 {body.patient_name} 님의 다음 주 프로그램 추천 JSON을 생성해라.
 
 반드시 아래 스키마만 반환:
 {{
@@ -408,7 +408,7 @@ def program_recommendation(body: ProgramRecommendationRequest):
 }}
 
 제약:
-- categoryRecommendations: 0~3개. 환자 상태에 맞는 분야만. 맞는 분야가 없으면 [].
+- categoryRecommendations: 0~3개. 입소자 상태에 맞는 분야만. 맞는 분야가 없으면 [].
 - hasProgram=true 이면 available_programs 의 post_id 만 사용.
 - effects: 1~2개
 - activityDescription: 진단·체크리스트·약 정보를 반영한 이번 주 활동/관찰 요약

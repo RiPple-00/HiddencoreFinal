@@ -39,9 +39,9 @@ LABELING_COLUMNS_KO = [
     ("program_id", "프로그램ID"),
     ("face_index", "얼굴번호"),
     ("status", "예측상태"),
-    ("predicted_patient", "예측환자"),
+    ("predicted_patient", "예측입소자"),
     ("top1_similarity", "1등유사도"),
-    ("top2_patient", "2등환자"),
+    ("top2_patient", "2등입소자"),
     ("top2_similarity", "2등유사도"),
     ("similarity_gap", "점수차"),
     ("patient_1_similarity", "P1유사도"),
@@ -295,7 +295,7 @@ def export_labeling_workbook(df: pd.DataFrame, path: Path | None = None) -> Path
     full_ko = LABELING_COLUMNS_KO + [
         ("source_image", "원본경로"),
         ("det_score", "검출점수"),
-        ("top1_patient", "1등환자"),
+        ("top1_patient", "1등입소자"),
         ("patient_similarities", "유사도JSON"),
     ]
     full_df = _rename_columns(enriched, full_ko)
@@ -421,8 +421,8 @@ def export_project_guide_workbook(path: Path | None = None) -> Path:
     ws3 = wb.create_sheet("라벨값안내", 8)
     labels = [
         ("수동라벨_입력", "의미"),
-        ("patient_1 ~ patient_6", "해당 등록 환자"),
-        ("unknown", "얼굴은 있으나 환자 특정 불가"),
+        ("patient_1 ~ patient_6", "해당 등록 입소자"),
+        ("unknown", "얼굴은 있으나 입소자 특정 불가"),
         ("no_face", "이 얼굴/사람 없음"),
         ("ignore", "평가에서 제외"),
         ("예측상태 MATCHED", "threshold 통과, 1등 확정"),

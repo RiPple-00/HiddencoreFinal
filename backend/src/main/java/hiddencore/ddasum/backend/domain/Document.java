@@ -78,7 +78,7 @@ public class Document {
     @Column(name = "overall_status", length = 20)
     private Status overallStatus;
 
-    // CARE_CHECK 등 일자별 문서가 동일 (환자, 일자) 키로 식별될 수 있도록 보조 컬럼 추가
+    // CARE_CHECK 등 일자별 문서가 동일 (입소자, 일자) 키로 식별될 수 있도록 보조 컬럼 추가
     @Column(name = "record_date")
     private LocalDate recordDate;
 

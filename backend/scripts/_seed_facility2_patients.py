@@ -1,4 +1,4 @@
-"""시설 2 프로그램 신청 데모용 — 환자·신청 데이터 보강."""
+"""시설 2 프로그램 신청 데모용 — 입소자·신청 데이터 보강."""
 import pymysql
 from datetime import datetime, timedelta
 

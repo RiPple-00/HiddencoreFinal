@@ -23,7 +23,7 @@ def load_representatives() -> dict[str, np.ndarray]:
     path = _rep_path()
     if not path.is_file():
         raise FileNotFoundError(
-            f"환자 대표 embedding 없음: {path}\n"
+            f"입소자 대표 embedding 없음: {path}\n"
             "먼저 실행: python main.py --step build-patient-db"
         )
     data = np.load(path, allow_pickle=True).item()
@@ -46,7 +46,7 @@ def build_patient_database(
 
     if not S.PATIENTS_PREPROCESSED_DIR.is_dir():
         raise FileNotFoundError(
-            f"전처리 환자 폴더 없음: {S.PATIENTS_PREPROCESSED_DIR}\n"
+            f"전처리 입소자 폴더 없음: {S.PATIENTS_PREPROCESSED_DIR}\n"
             "먼저: python main.py --step preprocess"
         )
 

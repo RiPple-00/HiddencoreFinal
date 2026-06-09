@@ -29,7 +29,7 @@ public class CaregiverCareCheckController {
     private final CaregiverCareCheckService careCheckService;
 
     @Operation(summary = "자동 저장(임시저장)",
-            description = "프론트가 디바운스해 호출. 동일 (환자, 날짜) 가 있으면 갱신, 없으면 생성한다.")
+            description = "프론트가 디바운스해 호출. 동일 (입소자, 날짜) 가 있으면 갱신, 없으면 생성한다.")
     @ApiResponse(responseCode = "200", description = "저장 성공")
     @PostMapping("/auto-save")
     public ResponseEntity<CaregiverCareCheckDto.Response> autoSave(
@@ -47,11 +47,11 @@ public class CaregiverCareCheckController {
     }
 
     @Operation(summary = "단건 조회",
-            description = "특정 환자의 특정 일자 체크리스트를 가져온다. 데이터가 없으면 빈 응답을 반환한다.")
+            description = "특정 입소자의 특정 일자 체크리스트를 가져온다. 데이터가 없으면 빈 응답을 반환한다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping
     public ResponseEntity<CaregiverCareCheckDto.Response> getOne(
-            @Parameter(description = "환자 ID", example = "1")
+            @Parameter(description = "입소자 ID", example = "1")
             @RequestParam Long patientId,
             @Parameter(description = "기록 일자(yyyy-MM-dd). 미지정 시 오늘.", example = "2026-05-11")
             @RequestParam(required = false)
@@ -59,11 +59,11 @@ public class CaregiverCareCheckController {
         return ResponseEntity.ok(careCheckService.getOne(patientId, date));
     }
 
-    @Operation(summary = "환자별 이력 목록", description = "환자의 CARE_CHECK 문서 이력을 최신순으로 반환한다.")
+    @Operation(summary = "입소자별 이력 목록", description = "입소자의 CARE_CHECK 문서 이력을 최신순으로 반환한다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/history")
     public ResponseEntity<List<CaregiverCareCheckDto.Response>> getHistory(
-            @Parameter(description = "환자 ID", example = "1") @RequestParam Long patientId) {
+            @Parameter(description = "입소자 ID", example = "1") @RequestParam Long patientId) {
         return ResponseEntity.ok(careCheckService.getHistory(patientId));
     }
 }

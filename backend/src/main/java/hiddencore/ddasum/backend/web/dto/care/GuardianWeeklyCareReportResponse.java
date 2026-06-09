@@ -83,7 +83,7 @@ public class GuardianWeeklyCareReportResponse {
         private List<String> effects;
         /** 하위 호환: 텍스트 추천 목록 */
         private List<String> recommendations;
-        /** AI가 환자 상태·모집 중 프로그램을 매칭한 분야별 추천 */
+        /** AI가 입소자 상태·모집 중 프로그램을 매칭한 분야별 추천 */
         private List<ProgramRecommendation> categoryRecommendations;
     }
 

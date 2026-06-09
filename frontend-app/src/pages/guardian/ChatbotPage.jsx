@@ -91,7 +91,7 @@ const CATEGORIES_BASE = [
     id: 4, icon: "🏨", bg: "#E0F2F1", accent: "#00695C",
     labels: { ko: "원무",        en: "Administration", ja: "事務" },
     subs: [
-      { labels: { ko: "퇴원 서비스", en: "Discharge Services",   ja: "退院サービス" }, question: "퇴원환자 서비스에는 어떤 것이 있나요?" },
+      { labels: { ko: "퇴원 서비스", en: "Discharge Services",   ja: "退院サービス" }, question: "퇴원입소자 서비스에는 어떤 것이 있나요?" },
       { labels: { ko: "퇴원 절차",   en: "Discharge Process",    ja: "退院手続き" },   question: "퇴원 절차를 알려주세요" },
       { labels: { ko: "면회 신청",   en: "Visit Application",    ja: "面会申請" },     question: "면회 신청은 어떻게 하나요?" },
       { labels: { ko: "면회 시간",   en: "Visit Hours",          ja: "面会時間" },     question: "면회 시간이 어떻게 되나요?" },

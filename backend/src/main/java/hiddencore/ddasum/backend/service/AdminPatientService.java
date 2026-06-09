@@ -17,7 +17,7 @@ public class AdminPatientService {
 
     public AdminPatientDetailResponse getPatientDetail(Long patientId) {
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("환자가 없습니다. id=" + patientId));
+                .orElseThrow(() -> new IllegalArgumentException("입소자가 없습니다. id=" + patientId));
         return AdminPatientDetailResponse.from(patient);
     }
 

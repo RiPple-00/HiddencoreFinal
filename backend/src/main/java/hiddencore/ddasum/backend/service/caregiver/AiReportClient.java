@@ -63,7 +63,7 @@ public class AiReportClient {
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("period_start", input.periodStart);
             body.put("period_end", input.periodEnd);
-            body.put("patient_name", patientName != null ? patientName : "환자");
+            body.put("patient_name", patientName != null ? patientName : "입소자");
             body.put("overall_rate", input.overallRate);
             body.put("risk_level", input.riskLevel);
             body.put("risk_flags", input.riskFlags != null ? input.riskFlags : List.of());
@@ -125,7 +125,7 @@ public class AiReportClient {
             }
 
             Map<String, Object> body = new LinkedHashMap<>();
-            body.put("patient_name", input.patientName() != null ? input.patientName() : "환자");
+            body.put("patient_name", input.patientName() != null ? input.patientName() : "입소자");
             body.put("period_start", input.periodStart() != null ? input.periodStart() : "");
             body.put("period_end", input.periodEnd() != null ? input.periodEnd() : "");
             body.put("overall_rate", input.overallRate());
@@ -219,7 +219,7 @@ public class AiReportClient {
             }
 
             Map<String, Object> body = new LinkedHashMap<>();
-            body.put("patient_name", input.patientName() != null ? input.patientName() : "환자");
+            body.put("patient_name", input.patientName() != null ? input.patientName() : "입소자");
             body.put("period_start", input.periodStart() != null ? input.periodStart() : "");
             body.put("period_end", input.periodEnd() != null ? input.periodEnd() : "");
             body.put("next_week_start", input.nextWeekStart() != null ? input.nextWeekStart() : "");

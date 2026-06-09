@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "Rooms", description = "병실별 병상 조회 및 환자 침상 배정")
+@Tag(name = "Rooms", description = "병실별 병상 조회 및 입소자 침상 배정")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/rooms")
@@ -39,9 +39,9 @@ public class BedRoomController {
         return ResponseEntity.ok(beds);
     }
 
-    @Operation(summary = "침상에 환자 배정", description = "지정한 location(침상)에 환자를 배정합니다. 본문에 patientId가 필요합니다.")
+    @Operation(summary = "침상에 입소자 배정", description = "지정한 location(침상)에 입소자를 배정합니다. 본문에 patientId가 필요합니다.")
     @ApiResponse(responseCode = "204", description = "배정 완료 (응답 본문 없음)")
-    @ApiResponse(responseCode = "400", description = "patientId 누락, 병상/환자 없음 등")
+    @ApiResponse(responseCode = "400", description = "patientId 누락, 병상/입소자 없음 등")
     @PutMapping("/beds/{locationId}/assign")
     public ResponseEntity<Void> assignPatientToBed(
             @Parameter(description = "침상(LOCATION) ID", example = "101") @PathVariable Long locationId,
@@ -53,7 +53,7 @@ public class BedRoomController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "침상 환자 배정 해제", description = "해당 침상에서 환자 연결을 끊어 빈 병상으로 만듭니다.")
+    @Operation(summary = "침상 입소자 배정 해제", description = "해당 침상에서 입소자 연결을 끊어 빈 병상으로 만듭니다.")
     @ApiResponse(responseCode = "204", description = "해제 완료")
     @DeleteMapping("/beds/{locationId}/assign")
     public ResponseEntity<Void> unassignPatientFromBed(
