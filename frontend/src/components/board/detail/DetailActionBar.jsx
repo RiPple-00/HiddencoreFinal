@@ -15,12 +15,22 @@ import { useI18n } from '../../../hooks/useI18n.jsx';
  * @param {string|number} facilityId
  * @param {function} onDelete - 삭제 핸들러
  */
+const parseJwtSub = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.sub ? Number(payload.sub) : null;
+  } catch {
+    return null;
+  }
+};
+
 const DetailActionBar = ({ post, user, facilityId, onDelete }) => {
   const { t } = useI18n();
   const navigate = useNavigate();
 
-  // CHECK!!! AuthContext 연동 후 user?.userId === post.authorId 방식으로 교체
-  const isAuthor = user?.name === post?.authorName;
+  const token = user?.accessToken ?? user?.token;
+  const jwtUserId = token ? parseJwtSub(token) : null;
+  const isAuthor = jwtUserId != null && post?.authorId != null && jwtUserId === Number(post.authorId);
   const isAdmin  = user?.role === 'ADMIN';
   const canEdit  = isAuthor || isAdmin;
 

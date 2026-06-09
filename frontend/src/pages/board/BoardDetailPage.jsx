@@ -121,7 +121,7 @@ const BoardDetailPage = () => {
         {/* 브레드크럼 */}
         <p className="text-sm text-gray-400 mb-3">
           {t('board.detail.breadcrumbPrefix', '게시판')} &gt; {t('board.detail.noticeSection', '공지사항')} &gt;{' '}
-          <span className="text-teal-600">{breadcrumbLabel}</span>
+          <span className="text-blue-600">{breadcrumbLabel}</span>
         </p>
 
         {/* 제목 영역 */}

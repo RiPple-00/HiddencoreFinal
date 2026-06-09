@@ -5,6 +5,7 @@ import hiddencore.ddasum.backend.domain.Post.PostType;
 import hiddencore.ddasum.backend.domain.Post.PostStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -93,4 +94,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                         + "AND p.startAt IS NOT NULL AND p.endAt IS NOT NULL "
                                         + "ORDER BY p.startAt DESC")
         List<Post> findActiveApplyProgramsWithSchedule(@Param("facilityId") Long facilityId);
+
+        // 조회수만 직접 SQL로 증가 — @PreUpdate(updatedAt 갱신)를 트리거하지 않음
+        @Modifying(clearAutomatically = true)
+        @Query("UPDATE Post p SET p.views = COALESCE(p.views, 0) + 1 WHERE p.postId = :postId")
+        void incrementViewsByPostId(@Param("postId") Long postId);
 }

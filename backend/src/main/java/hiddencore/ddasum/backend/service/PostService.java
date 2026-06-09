@@ -56,9 +56,11 @@ public class PostService {
     public PostDto.PostResponse getPost(Long facilityId, Long postId) {
         Post post = postRepository.findByPostIdAndFacilityId(postId, facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        // 공개 게시글만 조회수 증가 (임시저장·비공개 조회는 제외)
+        // JPQL UPDATE로 조회수만 증가 — entity setter를 쓰지 않으므로 @PreUpdate(updatedAt)가 발생하지 않음
         if (post.getStatus() == PostStatus.ACTIVE || post.getStatus() == PostStatus.RESERVE) {
-            post.incrementViews();
+            postRepository.incrementViewsByPostId(postId);
+            post = postRepository.findByPostIdAndFacilityId(postId, facilityId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
         }
         return PostDto.PostResponse.from(post);
     }

@@ -56,6 +56,7 @@ public class PostDto {
 
         private Long id;
         private Long facilityId;
+        private Long authorId;
         private String authorName;
         private PostType type;
         private Boolean isPinned;
@@ -78,6 +79,7 @@ public class PostDto {
             return PostResponse.builder()
                     .id(post.getPostId())
                     .facilityId(post.getFacilityId().getFacilityId())
+                    .authorId(post.getAuthorUserId().getUserId())
                     .authorName(post.getAuthorUserId().getName())
                     .type(post.getType())
                     .isPinned(post.getIsPinned())
