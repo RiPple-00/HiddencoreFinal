@@ -10,7 +10,7 @@ import DiagnosisCard from '../../components/adminPatient/DiagnosisCard';
 import PaymentInsuranceCard from '../../components/adminPatient/PaymentInsuranceCard';
 import GuardianAlertCard from '../../components/adminPatient/GuardianAlertCard';
 import GuardianVisitCard from '../../components/adminPatient/GuardianVisitCard';
-import AdminQuickMenu from '../../components/adminPatient/AdminQuickMenu';
+// import AdminQuickMenu from '../../components/adminPatient/AdminQuickMenu';
 import MealPreviewCard from '../../components/adminPatient/MealPreviewCard';
 
 export default function AdminPatientDetailPage() {
@@ -120,7 +120,7 @@ export default function AdminPatientDetailPage() {
 
         <aside className="hidden w-[320px] shrink-0 space-y-5 lg:block">
           <GuardianAlertCard patient={patient} />
-          <AdminQuickMenu />
+          {/* <AdminQuickMenu /> */}
           <MealPreviewCard patient={patient} meals={meals} />
           <div className="flex items-center justify-between rounded-2xl bg-[#2d5bff] px-4 py-3 text-white shadow-md">
             <span className="text-sm font-bold">실시간 면회 현황</span>

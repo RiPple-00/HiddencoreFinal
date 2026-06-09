@@ -245,7 +245,7 @@ export default function PatientListPage() {
           )}
           <aside className="w-[360px] shrink-0 space-y-6 self-start lg:sticky lg:top-6">
             <GuardianPanel />
-            <AdminMenuPanel />
+            {/* <AdminMenuPanel /> */}
             <MealCarePage />
           </aside>
         </div>

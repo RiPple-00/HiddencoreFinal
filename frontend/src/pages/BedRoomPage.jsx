@@ -458,7 +458,7 @@ function BedRoomPage() {
 
           <aside className="w-[320px] space-y-6">
             <GuardianPanel />
-            <AdminMenuPanel />
+            {/* <AdminMenuPanel /> */}
             <VisitorsPanel />
             <MealCarePage />
           </aside>
