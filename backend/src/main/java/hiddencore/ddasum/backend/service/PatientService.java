@@ -71,7 +71,9 @@ public class PatientService {
                                 .admissionDate(request.getAdmissionDate())
                                 .type(request.getBloodType())
                                 .memo(request.getMemo())
-                                .status(Patient.PatientStatus.STABLE)
+                                .status(request.getPatientStatus() != null
+                                                ? request.getPatientStatus()
+                                                : Patient.PatientStatus.STABLE)
                                 .build();
 
                 Patient savedPatient = patientRepository.save(patient);

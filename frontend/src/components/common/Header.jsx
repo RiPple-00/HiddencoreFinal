@@ -79,7 +79,7 @@ export default function Header({
   activeNav = "rooms",
   navItems,
   brandLabel = "따숨",
-  brandTo,
+  brandTo = "/ward",
   userName = "김관리자 (Admin Kim)",
   userRole = "SUPERUSER",
   searchPlaceholder,
