@@ -22,14 +22,22 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+// abstract class인 이유: @Binds 함수는 본문이 없어야 해서(그냥 매핑 선언), Dagger가
+//   컴파일 시점에 "이 함수는 몸체를 채우지 마라"고 강제하는 게 abstract fun이기 때문.
+//   (@Provides처럼 실제 로직이 필요하면 abstract가 아닌 object를 쓴다 — ApiModule/NetworkModule 참고)
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
+    // @Binds: "MealRepository 타입 요청이 오면 MealRepositoryImpl을 줘라"는 매핑표.
+    //   MealRepositoryImpl에 이미 @Inject constructor가 있어서 Dagger가 만드는 법을 알고 있으므로,
+    //   여기선 인터페이스 ↔ 구현체 연결만 해주면 됨 (본문 없이 파라미터를 그대로 반환하는 것처럼 선언).
+    // @Singleton: MealRepositoryImpl도 앱 전체에서 1개만 만들어서 재사용.
     @Binds
     @Singleton
     abstract fun bindMealRepository(impl: MealRepositoryImpl): MealRepository
 
+    // 아래부터는 전부 위와 동일한 패턴(@Binds + @Singleton) — 대상 Repository만 다름
     @Binds
     @Singleton
     abstract fun bindGalleryRepository(impl: GalleryRepositoryImpl): GalleryRepository

@@ -6,18 +6,28 @@ import com.ddasum.app.data.model.MedicationScanResult
 import com.ddasum.app.data.remote.api.MedicationApiService
 import com.ddasum.app.data.remote.dto.medication.MedicationScanRequestDto
 import com.ddasum.app.data.remote.dto.medication.toDomain
+import com.ddasum.app.di.IoDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MedicationRepositoryImpl @Inject constructor(
-    private val api: MedicationApiService
+    private val api: MedicationApiService,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MedicationRepository {
 
     override suspend fun scanQr(patientId: Long, guardianId: Long?, qrRawData: String): MedicationScanResult =
-        api.scanMedicationQr(MedicationScanRequestDto(patientId, guardianId, qrRawData)).toDomain()
+        withContext(ioDispatcher) {
+            api.scanMedicationQr(MedicationScanRequestDto(patientId, guardianId, qrRawData)).toDomain()
+        }
 
     override suspend fun getHistory(patientId: Long, guardianId: Long?): List<MedicationHistoryItem> =
-        api.getHistory(patientId, guardianId).map { it.toDomain() }
+        withContext(ioDispatcher) {
+            api.getHistory(patientId, guardianId).map { it.toDomain() }
+        }
 
     override suspend fun getDetail(medicationId: Long): MedicationDetail =
-        api.getDetail(medicationId).toDomain()
+        withContext(ioDispatcher) {
+            api.getDetail(medicationId).toDomain()
+        }
 }

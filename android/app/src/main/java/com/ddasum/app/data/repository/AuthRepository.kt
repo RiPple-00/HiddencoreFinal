@@ -6,4 +6,5 @@ interface AuthRepository {
     val isLoggedIn: Flow<Boolean>
     suspend fun guardianLogin(loginId: String, password: String)
     suspend fun logout()
+    suspend fun currentGuardianId(): Long?
 }

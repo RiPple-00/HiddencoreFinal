@@ -1,37 +1,37 @@
 package com.ddasum.app.data.local
 
-import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.dataStore by preferencesDataStore(name = "session")
-
 @Singleton
 class SessionStore @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val dataStore: DataStore<Preferences>
 ) {
     private object Keys {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val ROLE = stringPreferencesKey("role")
         val FACILITY_ID = longPreferencesKey("facility_id")
+        val USER_ID = longPreferencesKey("user_id")
     }
 
-    val accessTokenFlow: Flow<String?> = context.dataStore.data.map { it[Keys.ACCESS_TOKEN] }
-    val facilityIdFlow: Flow<Long?> = context.dataStore.data.map { it[Keys.FACILITY_ID] }
+    val accessTokenFlow: Flow<String?> = dataStore.data.map { it[Keys.ACCESS_TOKEN] }
+    val facilityIdFlow: Flow<Long?> = dataStore.data.map { it[Keys.FACILITY_ID] }
+    val userIdFlow: Flow<Long?> = dataStore.data.map { it[Keys.USER_ID] }
 
     suspend fun currentAccessToken(): String? = accessTokenFlow.first()
     suspend fun currentFacilityId(): Long? = facilityIdFlow.first()
+    suspend fun currentUserId(): Long? = userIdFlow.first()
 
-    suspend fun saveSession(accessToken: String, role: String, facilityId: Long?) {
-        context.dataStore.edit { prefs ->
+    suspend fun saveSession(accessToken: String, role: String, facilityId: Long?, userId: Long?) {
+        dataStore.edit { prefs ->
             prefs[Keys.ACCESS_TOKEN] = accessToken
             prefs[Keys.ROLE] = role
             if (facilityId != null) {
@@ -39,10 +39,15 @@ class SessionStore @Inject constructor(
             } else {
                 prefs.remove(Keys.FACILITY_ID)
             }
+            if (userId != null) {
+                prefs[Keys.USER_ID] = userId
+            } else {
+                prefs.remove(Keys.USER_ID)
+            }
         }
     }
 
     suspend fun clear() {
-        context.dataStore.edit { it.clear() }
+        dataStore.edit { it.clear() }
     }
 }

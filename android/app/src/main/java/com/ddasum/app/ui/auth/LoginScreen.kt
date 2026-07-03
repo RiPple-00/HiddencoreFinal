@@ -26,6 +26,10 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    // 실제 "다음 화면으로 이동"은 ViewModel이 아니라 여기서 일어난다.
+    // LaunchedEffect(key)는 key(uiState.loginSuccess)가 바뀔 때마다 코루틴을 새로 실행하고,
+    // Composable이 사라지면 자동 취소됨 — loginSuccess가 false→true로 바뀌는 그 순간을 잡아서
+    // MainActivity.DdasumApp()이 넘겨준 onLoginSuccess(=navigate + popUpTo)를 호출한다.
     LaunchedEffect(uiState.loginSuccess) {
         if (uiState.loginSuccess) onLoginSuccess()
     }
