@@ -12,4 +12,9 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Release signing — never commit real keystores or credentials
+keystore.properties
+*.jks
+*.keystore
 local.properties

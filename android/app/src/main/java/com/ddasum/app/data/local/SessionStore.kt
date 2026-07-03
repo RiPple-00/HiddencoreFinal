@@ -13,7 +13,8 @@ import javax.inject.Singleton
 
 @Singleton
 class SessionStore @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val tokenCipher: TokenCipher
 ) {
     private object Keys {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
@@ -22,7 +23,12 @@ class SessionStore @Inject constructor(
         val USER_ID = longPreferencesKey("user_id")
     }
 
-    val accessTokenFlow: Flow<String?> = dataStore.data.map { it[Keys.ACCESS_TOKEN] }
+    // Only the token is encrypted (TokenCipher) — role/facilityId/userId aren't secrets on
+    // their own and DataStore's edit{} transaction needs them in plain form to query/display
+    // quickly; the token is the one value that grants real access if leaked.
+    val accessTokenFlow: Flow<String?> = dataStore.data.map { prefs ->
+        prefs[Keys.ACCESS_TOKEN]?.let { tokenCipher.decrypt(it) }
+    }
     val facilityIdFlow: Flow<Long?> = dataStore.data.map { it[Keys.FACILITY_ID] }
     val userIdFlow: Flow<Long?> = dataStore.data.map { it[Keys.USER_ID] }
 
@@ -32,7 +38,7 @@ class SessionStore @Inject constructor(
 
     suspend fun saveSession(accessToken: String, role: String, facilityId: Long?, userId: Long?) {
         dataStore.edit { prefs ->
-            prefs[Keys.ACCESS_TOKEN] = accessToken
+            prefs[Keys.ACCESS_TOKEN] = tokenCipher.encrypt(accessToken)
             prefs[Keys.ROLE] = role
             if (facilityId != null) {
                 prefs[Keys.FACILITY_ID] = facilityId
