@@ -18,9 +18,9 @@ import org.junit.Test
 class AuthRepositoryImplTest {
 
     private val api: AuthApiService = mockk()
-    // relaxed(not just relaxUnitFun): AuthRepositoryImpl reads sessionStore.accessTokenFlow
-    // eagerly in its property initializer, so every test needs a default even when it
-    // doesn't care about isLoggedIn specifically.
+    // relaxUnitFun이 아니라 relaxed인 이유: AuthRepositoryImpl이 프로퍼티 초기화 시점에
+    // sessionStore.accessTokenFlow를 곧바로 읽어버려서, isLoggedIn을 안 쓰는 테스트에서도
+    // 기본값이 필요하다.
     private val sessionStore: SessionStore = mockk(relaxed = true)
     private val dispatcher = StandardTestDispatcher()
 
@@ -32,11 +32,11 @@ class AuthRepositoryImplTest {
         every { sessionStore.accessTokenFlow } returns tokenFlow
 
         repository().isLoggedIn.test {
-            assertEquals(false, awaitItem())   // no token yet → false, never null at this layer
+            assertEquals(false, awaitItem())   // 토큰 없음 → false, 이 레벨에선 null이 절대 안 나옴
             tokenFlow.value = "eyJhbGciOi..."
             assertEquals(true, awaitItem())
             tokenFlow.value = ""
-            assertEquals(false, awaitItem())   // blank token also counts as logged out
+            assertEquals(false, awaitItem())   // 빈 문자열 토큰도 로그아웃 상태로 취급
         }
     }
 
@@ -51,9 +51,9 @@ class AuthRepositoryImplTest {
 
         repository().guardianLogin("guardian01", "pw1234")
 
-        // userId isn't asserted here: JwtDecoder depends on android.util.Base64, which plain
-        // JVM unit tests stub to return default values (see testOptions.isReturnDefaultValues) —
-        // properly verifying real JWT decoding needs an instrumented test or Robolectric.
+        // userId는 여기서 검증하지 않는다: JwtDecoder가 android.util.Base64에 의존하는데,
+        // 순수 JVM 유닛테스트는 이걸 기본값으로 스텁 처리한다(testOptions.isReturnDefaultValues 참고) —
+        // 실제 JWT 디코딩까지 제대로 검증하려면 instrumented test나 Robolectric이 필요하다.
         coVerify {
             sessionStore.saveSession(
                 accessToken = "token-123",

@@ -1,7 +1,7 @@
 package com.ddasum.app.data.remote.dto
 
 /**
- * Mirrors backend ActivityGalleryListResponse
+ * 백엔드 ActivityGalleryListResponse를 그대로 반영한 DTO
  * (GET /api/guardian/me/patients/{patientId}/activity-gallery).
  */
 data class ActivityGalleryListResponse(

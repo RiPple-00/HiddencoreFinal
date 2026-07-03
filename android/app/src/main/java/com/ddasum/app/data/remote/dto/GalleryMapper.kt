@@ -5,9 +5,8 @@ import com.ddasum.app.data.model.GalleryPhoto
 import java.time.LocalDateTime
 
 /**
- * imageUrl comes back as a server-relative path (e.g. "/uploads/gallery/x.jpg"),
- * served as a static file outside the "/api" prefix — fileBaseUrl is the API
- * base URL with the trailing "api/" stripped off.
+ * imageUrl은 서버 기준 상대경로("/uploads/gallery/x.jpg" 형태)로 내려오고, "/api" 접두사
+ * 밖에서 정적 파일로 서빙된다 — fileBaseUrl은 API base URL에서 끝의 "api/"를 뗀 값이다.
  */
 fun GalleryCardDto.toDomain(fileBaseUrl: String): GalleryPhoto = GalleryPhoto(
     id = documentId,

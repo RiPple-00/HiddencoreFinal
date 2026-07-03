@@ -12,10 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Encrypts values with an AES key that's generated and held inside the device's secure
- * hardware (Android Keystore) — the raw key material never leaves the keystore, not even
- * to this process's memory. DataStore has no built-in encryption, so without this the
- * access token would sit as plain text in the preferences file on disk.
+ * 기기의 보안 하드웨어(Android Keystore) 안에서 생성·보관되는 AES 키로 값을 암호화한다 —
+ * 키 원본은 이 프로세스 메모리로도 나오지 않고 Keystore 밖으로 절대 안 나간다.
+ * DataStore는 자체 암호화가 없어서, 이게 없으면 accessToken이 디스크에 평문으로 남는다.
  */
 @Singleton
 class TokenCipher @Inject constructor() {
@@ -35,7 +34,7 @@ class TokenCipher @Inject constructor() {
         return keyGenerator.generateKey()
     }
 
-    /** Result is "<base64 iv>:<base64 ciphertext>" — GCM needs the IV again to decrypt. */
+    /** 결과는 "<base64 iv>:<base64 암호문>" 형태 — GCM은 복호화할 때 IV가 다시 필요하다. */
     fun encrypt(plainText: String): String {
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getOrCreateKey())
@@ -45,7 +44,7 @@ class TokenCipher @Inject constructor() {
         return "$iv:$cipherText"
     }
 
-    /** Null on any failure (corrupt value, key rotated, etc.) — caller treats that as "no session". */
+    /** 실패하면(값 손상, 키 교체 등) null — 호출하는 쪽은 이걸 "세션 없음"으로 취급한다. */
     fun decrypt(encrypted: String): String? = runCatching {
         val (ivPart, cipherPart) = encrypted.split(":", limit = 2)
         val cipher = Cipher.getInstance(TRANSFORMATION)

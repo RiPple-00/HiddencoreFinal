@@ -13,10 +13,9 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * DataStore opening the same file twice throws IllegalStateException, so the
- * instance itself must be a singleton — providing it here (rather than the
- * `by preferencesDataStore(...)` Context-extension pattern) also means tests
- * can substitute a fake DataStore for SessionStore instead of touching disk.
+ * DataStore는 같은 파일을 두 번 열면 IllegalStateException이 나서, 인스턴스 자체가
+ * 싱글턴이어야 한다 — `by preferencesDataStore(...)` Context 확장 프로퍼티 패턴 대신
+ * 여기서 제공하면, 테스트에서도 SessionStore에 가짜 DataStore를 넣어줄 수 있다(디스크 안 건드림).
  */
 @Module
 @InstallIn(SingletonComponent::class)

@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
- * Some endpoints call out to slow external services inline server-side:
- * weekly-report (LLM, up to ~120s) and medications/scan (HIRA/MFDS lookups, ~65s).
+ * 일부 엔드포인트는 서버 내부에서 느린 외부 서비스를 동기적으로 호출한다:
+ * weekly-report(LLM 호출, 최대 ~120초), medications/scan(HIRA/MFDS 조회, ~65초).
  */
 class LongTimeoutInterceptor @Inject constructor() : Interceptor {
 

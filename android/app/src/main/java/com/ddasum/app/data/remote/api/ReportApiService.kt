@@ -8,8 +8,8 @@ import retrofit2.http.Query
 interface ReportApiService {
 
     /**
-     * Backend generates this synchronously (calls an LLM service inline) and can
-     * take up to ~120s — see LongTimeoutInterceptor in NetworkModule.
+     * 백엔드가 이 응답을 동기적으로 생성한다(내부에서 LLM 서비스를 직접 호출) — 최대 ~120초까지
+     * 걸릴 수 있다. NetworkModule의 LongTimeoutInterceptor 참고.
      */
     @GET("guardian/me/patients/{patientId}/weekly-report")
     suspend fun getWeeklyReport(

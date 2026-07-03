@@ -25,7 +25,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun DdasumTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
+    // 다이나믹 컬러는 Android 12 이상에서만 사용 가능
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {

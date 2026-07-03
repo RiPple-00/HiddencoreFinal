@@ -17,7 +17,7 @@ class AuthRepositoryImpl @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepository {
 
-    // DataStore's own Flow already dispatches off the caller's thread — nothing to wrap here.
+    // DataStore의 Flow는 이미 호출자 스레드 밖에서 동작해서 별도로 감쌀 필요가 없다.
     // 이 레벨에서는 null이 나올 수 없다 — 토큰이 없으면(로그인 기록 없음) false, 있으면 true로 항상 확정된다.
     // accessTokenFlow: Flow<String?> (토큰없음=null) → isNullOrBlank()로 뒤집어서 Boolean(non-null)으로 변환.
     // (AuthViewModel이 이걸 stateIn으로 감싸면서 "아직 응답 전"을 뜻하는 null을 그 계층에서만 별도로 추가함)

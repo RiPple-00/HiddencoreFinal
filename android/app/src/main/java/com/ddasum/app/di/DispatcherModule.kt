@@ -8,9 +8,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
 /**
- * Repositories take a dispatcher instead of calling Dispatchers.IO directly so
- * unit tests can substitute a TestDispatcher (real time / no delays) via Hilt
- * test modules — hardcoding Dispatchers.IO in a repository is untestable.
+ * Repository가 Dispatchers.IO를 직접 호출하지 않고 주입받는 이유는, 테스트에서
+ * TestDispatcher(가상 시간, 딜레이 없음)로 바꿔치기할 수 있게 하기 위해서다 —
+ * Dispatchers.IO를 코드에 하드코딩하면 테스트가 불가능해진다.
  */
 @Module
 @InstallIn(SingletonComponent::class)

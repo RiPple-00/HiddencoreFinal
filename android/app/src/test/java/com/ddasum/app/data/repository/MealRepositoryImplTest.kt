@@ -13,8 +13,8 @@ import org.junit.Test
 import java.time.LocalDate
 
 /**
- * @IoDispatcher was injected into the repository specifically so tests could hand it
- * a StandardTestDispatcher instead of the real Dispatchers.IO — no Hilt, no real network.
+ * Repository에 @IoDispatcher를 주입해둔 건 바로 이럴 때를 위해서다 — 테스트에서
+ * 진짜 Dispatchers.IO 대신 StandardTestDispatcher를 넘겨줄 수 있다. Hilt도, 진짜 네트워크도 필요 없다.
  */
 class MealRepositoryImplTest {
 
@@ -66,9 +66,9 @@ class MealRepositoryImplTest {
     fun `getMealsByRange formats both dates as ISO strings before calling the api`() = runTest(dispatcher) {
         val start = LocalDate.of(2026, 7, 1)
         val end = LocalDate.of(2026, 7, 7)
-        // coEvery constrains the exact args MockK expects — if MealRepositoryImpl formatted
-        // the dates differently, this stub wouldn't match and the test would fail with
-        // "no answer found", so the assertion is implicit in the stub matching at all.
+        // coEvery는 MockK가 기대하는 인자를 정확히 못박는다 — MealRepositoryImpl이 날짜를
+        // 다르게 포맷했다면 이 스텁이 매칭이 안 돼서 "no answer found"로 테스트가 실패한다.
+        // 그러니 스텁이 매칭됐다는 것 자체가 곧 검증(assertion) 역할을 한다.
         coEvery { api.getMealsByRange("2026-07-01", "2026-07-07", null) } returns emptyList()
 
         val result = repository.getMealsByRange(start, end, facilityId = null)

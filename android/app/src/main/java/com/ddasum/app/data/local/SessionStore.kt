@@ -23,9 +23,9 @@ class SessionStore @Inject constructor(
         val USER_ID = longPreferencesKey("user_id")
     }
 
-    // Only the token is encrypted (TokenCipher) — role/facilityId/userId aren't secrets on
-    // their own and DataStore's edit{} transaction needs them in plain form to query/display
-    // quickly; the token is the one value that grants real access if leaked.
+    // 토큰만 암호화한다(TokenCipher) — role/facilityId/userId는 그 자체로는 민감정보가
+    // 아니고, DataStore의 edit{} 트랜잭션에서 빠르게 조회·표시하려면 평문이 편함.
+    // 유출됐을 때 실제 권한을 주는 값은 토큰 하나뿐이다.
     val accessTokenFlow: Flow<String?> = dataStore.data.map { prefs ->
         prefs[Keys.ACCESS_TOKEN]?.let { tokenCipher.decrypt(it) }
     }

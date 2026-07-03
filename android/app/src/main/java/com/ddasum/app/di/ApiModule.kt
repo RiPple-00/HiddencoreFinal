@@ -15,7 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
-/** Which endpoint interfaces exist, built from the Retrofit instances NetworkModule provides. */
+/** 어떤 엔드포인트 인터페이스가 있는지 정의 — NetworkModule이 제공하는 Retrofit 인스턴스로 만든다. */
 @Module                                        // "이 안에 provide/binds 레시피가 들어있다" 표시
 @InstallIn(SingletonComponent::class)          // 앱이 살아있는 동안 이 모듈의 결과물을 계속 재사용
 object ApiModule {

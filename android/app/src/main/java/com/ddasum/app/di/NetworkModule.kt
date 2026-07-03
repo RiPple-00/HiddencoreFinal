@@ -13,8 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 /**
- * Owns only "how do we talk to a server" — OkHttp/Retrofit/Interceptors.
- * Which endpoint interfaces exist is a separate concern; see ApiModule.
+ * "서버와 어떻게 통신하는가"만 담당 — OkHttp/Retrofit/Interceptor.
+ * 어떤 엔드포인트 인터페이스가 있는지는 별개 관심사라 ApiModule 참고.
  */
 @Module
 @InstallIn(SingletonComponent::class)

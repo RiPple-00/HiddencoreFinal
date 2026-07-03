@@ -7,10 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-// keystore.properties is gitignored (see keystore.properties.example) — the real keystore
-// is generated locally by a human, never by CI/an agent. Missing file = still-unsigned
-// release build, exactly like before this was added, so nothing breaks for contributors
-// who haven't set one up yet.
+// keystore.properties는 gitignore 처리됨(keystore.properties.example 참고) — 실제 keystore는
+// 사람이 로컬에서 직접 생성하고, CI/에이전트가 대신 만들지 않는다. 파일이 없으면 이 설정을
+// 추가하기 전처럼 그냥 unsigned로 빌드되니, 아직 keystore를 안 만든 팀원도 빌드가 안 깨진다.
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) {
@@ -83,9 +82,9 @@ android {
     }
     testOptions {
         unitTests {
-            // Plain JVM unit tests don't have a real Android runtime, so calls into
-            // android.* classes (e.g. JwtDecoder's android.util.Base64) would otherwise
-            // throw "Method ... not mocked" — this makes them return default values instead.
+            // 순수 JVM 유닛테스트는 실제 안드로이드 런타임이 없어서, android.* 클래스 호출
+            // (예: JwtDecoder의 android.util.Base64)이 원래는 "Method ... not mocked" 예외를
+            // 던진다 — 이 설정으로 그런 호출이 기본값을 리턴하도록 만든다.
             isReturnDefaultValues = true
         }
     }

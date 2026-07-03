@@ -1,10 +1,10 @@
 package com.ddasum.app.data.remote.dto.medication
 
 /**
- * Mirrors backend MedicationService.getMedicationDetail() (GET /api/medications/{id}).
- * MedicationDetail rows carry ~35 HIRA/MFDS/DUR enrichment fields server-side —
- * only the display-relevant subset is modeled here; extra JSON fields are safely
- * ignored by Gson, so this stays correct even though it isn't exhaustive.
+ * 백엔드 MedicationService.getMedicationDetail()을 그대로 반영 (GET /api/medications/{id}).
+ * 서버 쪽 MedicationDetail 행은 HIRA/MFDS/DUR 보강 필드를 ~35개 갖고 있지만,
+ * 여기서는 화면에 표시할 부분집합만 모델링한다 — 나머지 JSON 필드는 Gson이 알아서
+ * 무시하기 때문에 필드를 전부 옮기지 않아도 이 DTO는 여전히 정확하게 동작한다.
  */
 data class MedicationDetailResponseDto(
     val medicationId: Long,
